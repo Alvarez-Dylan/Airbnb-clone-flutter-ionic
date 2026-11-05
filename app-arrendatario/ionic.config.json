@@ -1,0 +1,7 @@
+{
+  "name": "app-arrendatario",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
