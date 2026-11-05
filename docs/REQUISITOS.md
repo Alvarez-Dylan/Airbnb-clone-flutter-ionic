@@ -7,7 +7,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | ID | Requisito | Fase | Dónde se cumple | Hecho |
 |---|---|---|---|---|
 | RG-01 | Las dos apps están hechas en tecnologías distintas vistas en clase (cliente: Flutter; arrendatario: Ionic + Angular) | 1 | `app-cliente/` (Flutter) y `app-arrendatario/` (Ionic + Angular), creados y compilando | ✔ |
-| RG-02 | Ambas apps exigen iniciar sesión antes de entrar | A1, C1 | | |
+| RG-02 | Ambas apps exigen iniciar sesión antes de entrar | A1, C1 | Arrendatario: `app-arrendatario/src/app/guards/auth.guard.ts` (falta C1 del lado cliente) | |
 | RG-03 | Código propio y explicable: cada fase tiene su entrada en `docs/ESTUDIO.md` | Todas | | |
 
 ## App Cliente (Flutter)
@@ -35,8 +35,8 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 
 | ID | Requisito | Fase | Dónde se cumple | Hecho |
 |---|---|---|---|---|
-| RA-01 | Login con email y contraseña | A1 | | |
-| RA-02 | Registro con email, nombre completo, contraseña y teléfono | A1 | | |
+| RA-01 | Login con email y contraseña | A1 | `src/app/pages/login/login.page.ts` + `src/app/services/auth.service.ts` | ✔ |
+| RA-02 | Registro con email, nombre completo, contraseña y teléfono | A1 | `src/app/pages/registro/registro.page.ts` + `src/app/services/auth.service.ts` | ✔ |
 | RA-03 | Pantalla principal: lista de los lugares del arrendatario con primera foto, nombre, ciudad y precio por noche | A2 | | |
 | RA-04 | Botón para agregar un nuevo lugar | A2 | | |
 | RA-05 | Formulario: nombre, descripción, personas, camas, baños, habitaciones, wifi sí/no, parqueo para cuántos vehículos, precio por noche, costo de limpieza y ciudad | A3 | | |
@@ -51,8 +51,8 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 
 | ID | Criterio | Fase | Dónde se cumple | Hecho |
 |---|---|---|---|---|
-| RX-01 | Cerrar sesión en ambas apps | A1, C1 | | |
-| RX-02 | La sesión se mantiene al cerrar y abrir la app | A1, C1 | | |
+| RX-01 | Cerrar sesión en ambas apps | A1, C1 | Arrendatario: `mis-lugares.page.ts` → `cerrarSesion()` (falta C1 del lado cliente) | |
+| RX-02 | La sesión se mantiene al cerrar y abrir la app | A1, C1 | Arrendatario: `AuthService.usuarioActual()` lee `localStorage` (falta C1 del lado cliente) | |
 | RX-03 | Validaciones de formularios con mensajes claros (campos obligatorios, llegada antes que salida, ubicación elegida) | Todas | | |
 | RX-04 | Estados cargando / error / vacío en toda pantalla que pide datos | Todas | | |
 | RX-05 | Botones de envío deshabilitados mientras se espera la respuesta | Todas | | |

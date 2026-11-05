@@ -77,3 +77,37 @@ Se completa en la Fase final:
   - *¿Dónde se cambia la URL de la API si el túnel vence?* En dos lugares, uno por app: `app-cliente/lib/config/api_config.dart` y los dos `environment*.ts` de `app-arrendatario`.
   - *¿Qué pasa si falta el permiso de INTERNET en Android?* Las llamadas HTTP fallan en una build de release (en modo debug Android lo permite igual, por eso el error no aparece hasta compilar en modo release).
 - **Ejercicio para hacer a mano**: cambiar el texto de la pantalla temporal de `app-cliente/lib/main.dart` (por ejemplo, agregar el nombre propio debajo de "Pantalla temporal - Fase 1") y volver a correr `flutter analyze` para confirmar que sigue sin errores.
+
+### Fase A1 — Arrendatario: sesion (login, registro, proteccion de rutas)
+
+- **Qué se hizo**: login, registro y guard de sesión para la app arrendatario. El registro exitoso inicia sesión automáticamente (dos llamadas encadenadas: registrar → iniciar sesión) y entra a una pantalla `mis-lugares` temporal con botón de cerrar sesión.
+- **Archivos**:
+  - `src/app/models/usuario.ts` — interface `Usuario` con los campos que la app realmente usa (`id`, `nombrecompleto`, `email`, `telefono`); la API devuelve más campos (`password` hasheada, etc.) que simplemente se ignoran.
+  - `src/app/services/auth.service.ts` — único lugar que habla con `arrendatario/login` y `arrendatario/registro`; `guardarSesion`/`usuarioActual`/`haySesion`/`cerrarSesion` leen y escriben `localStorage` bajo la clave `sesionArrendatario`.
+  - `src/app/guards/auth.guard.ts` — `CanActivateFn`: si `authService.haySesion()` es falso, navega a `/login` y bloquea la ruta.
+  - `src/app/utils/manejar-error.ts` — `mensajeDeError()`: dado el hallazgo de la Fase 0 (la API no usa 422, todo es 404 salvo login incorrecto que es 401), decide si el cuerpo es `{"message": "..."}` (error de negocio) o `{"campo": [...]}` (error de validación) y devuelve el texto a mostrar.
+  - `src/app/pages/login/login.page.ts` (+ `.html`) — formulario con `[(ngModel)]`; al fallar, muestra `mensajeDeError()` en un `ToastController`.
+  - `src/app/pages/registro/registro.page.ts` (+ `.html`) — mismo patrón; al registrar OK, llama a `iniciarSesion()` con el mismo email/contraseña antes de navegar.
+  - `src/app/pages/mis-lugares/mis-lugares.page.ts` (+ `.html`) — temporal: solo título y botón "Cerrar sesión" que llama `cerrarSesion()` y vuelve a `/login`.
+  - `src/app/app.routes.ts` — `login` y `registro` sin guard; `mis-lugares` con `canActivate: [authGuard]`; `''` redirige a `mis-lugares` (el guard la manda a `login` si no hay sesión).
+  - Se borró `src/app/home/` (página de ejemplo del starter de Ionic).
+- **Flujo de datos**:
+  1. Usuario completa el formulario de login → `LoginPage.iniciarSesion()` → `AuthService.iniciarSesion()` → `POST arrendatario/login`.
+  2. Si la API responde 200: `AuthService.guardarSesion(usuario)` escribe `localStorage['sesionArrendatario']` → `router.navigate(['mis-lugares'])`.
+  3. Al navegar a `mis-lugares`, el `authGuard` corre antes de activar la ruta: lee `localStorage` vía `haySesion()` → como ya hay sesión, deja pasar.
+  4. Si la API responde error (401/404): el `error` callback de `.subscribe()` llama a `mensajeDeError()` y lo muestra en un toast; nunca se guarda sesión ni se navega.
+  5. Registro: mismo flujo pero con un paso extra — `POST arrendatario/registro` y, solo si eso responde 200, se dispara el login automático (paso 1).
+- **Conceptos clave**:
+  - `inject()` en vez de inyección por constructor: el linter del proyecto (`@angular-eslint/prefer-inject`) lo exige; se usa en todas las páginas y en `auth.guard.ts` (`AuthService` y `Router` como campos de clase, no parámetros de `constructor`).
+  - `CanActivateFn` como función (no clase `Guard`): es el estilo moderno de Angular standalone, igual que las rutas usan `loadComponent` en vez de módulos.
+  - `localStorage` como "base de datos" de sesión: no hay token, así que sesión = tener el usuario guardado; cerrar sesión = borrarlo.
+  - `@ionic/angular` (no `@ionic/angular/standalone`): la versión instalada es Ionic 9, que exporta los componentes standalone directo desde el paquete principal; ese subpath ya no existe (actualiza lo que decía `app-arrendatario/CLAUDE.md`, escrito pensando en Ionic 7).
+- **Decisiones y por qué**:
+  - `mensajeDeError()` se extrajo a `utils/` en vez de repetirse en cada página, porque se va a volver a necesitar en todas las fases siguientes que mandan datos a la API (lugares, fotos, reservas).
+  - El login y el registro arman el `Toast` directo en la página (no en un servicio) porque `CLAUDE.md` pide que los `services` no tengan lógica de UI.
+  - No se usó ningún operador RxJS encadenado (`switchMap`, etc.) para el registro-seguido-de-login: se anidó un `.subscribe()` dentro de otro a propósito, siguiendo la prohibición explícita de `CLAUDE.md` sobre RxJS avanzado — es un poco más verboso pero más fácil de explicar paso a paso.
+- **Preguntas probables del docente**:
+  - *¿Dónde queda guardada la sesión y qué pasa si borro esa clave de `localStorage` a mano?* En `localStorage['sesionArrendatario']`; si se borra, `haySesion()` devuelve `false` y el guard manda a `/login` en el próximo intento de entrar a `mis-lugares`.
+  - *¿Por qué el guard es una función y no una clase?* Es el estilo `CanActivateFn` de Angular standalone (desde Angular 14+), más corto que la interfaz `CanActivate` de una clase con `@Injectable`.
+  - *¿Qué pasa si la contraseña es incorrecta?* La API responde HTTP 401 con `{"message": "Contraseña incorrecta"}`; `mensajeDeError()` lo detecta por tener la clave `message` y lo muestra tal cual en el toast.
+- **Ejercicio para hacer a mano**: agregar una validación en `LoginPage` que deshabilite el botón "Iniciar sesión" si `email` o `password` están vacíos (sin tocar `AuthService`).
