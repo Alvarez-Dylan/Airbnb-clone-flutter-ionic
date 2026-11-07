@@ -18,7 +18,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RC-02 | Registro con email, nombre completo, contraseña y teléfono | C1 | `lib/screen/registro_screen.dart` + `lib/service/auth_service.dart` | ✔ |
 | RC-03 | Pantalla principal con buscador: ciudad, fecha de llegada, fecha de salida y cantidad de huéspedes | C2 | `lib/screen/busqueda_screen.dart` | ✔ |
 | RC-04 | La búsqueda simple es por ciudad | C2 | `lib/service/lugar_service.dart` → `buscar()` | ✔ |
-| RC-05 | Botón "Búsqueda avanzada": mismos campos de la simple + todos los campos del lugar, menos foto y anfitrión | C7 | | |
+| RC-05 | Botón "Búsqueda avanzada": mismos campos de la simple + todos los campos del lugar, menos foto y anfitrión | C7 | `lib/screen/busqueda_avanzada_screen.dart` + `lib/repository/busqueda_provider.dart` → `buscarAvanzado()` | ✔ |
 | RC-06 | Botón "Ver reservas": lista de reservas hechas anteriormente por el cliente | C6 | `lib/screen/busqueda_screen.dart` (botón) → `lib/screen/mis_reservas_screen.dart` | ✔ |
 | RC-07 | Resultados en lista: primera foto, nombre, descripción, cantidad de personas y precio por noche | C2 | `lib/widget/lugar_card.dart` | ✔ |
 | RC-08 | Debajo de la lista, botón "Vista de mapa": los mismos lugares como marcadores en un mapa | C3 | `lib/widget/mapa_lugares.dart` + `resultados_screen.dart` | ✔ |

@@ -19,6 +19,16 @@ class LugarService {
     }
   }
 
+  Future<List<LugarModel>> busquedaAvanzada(Map<String, dynamic> filtros) async {
+    try {
+      final respuesta = await _dio.post('/lugares/advancedsearch', data: filtros);
+      final lista = respuesta.data as List<dynamic>;
+      return lista.map((json) => LugarModel.fromJson(json as Map<String, dynamic>)).toList();
+    } on DioException catch (error) {
+      throw Exception(mensajeDeError(error));
+    }
+  }
+
   Future<LugarModel> obtenerLugar(int id) async {
     try {
       final respuesta = await _dio.get('/lugares/$id');

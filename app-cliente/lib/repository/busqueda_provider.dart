@@ -39,4 +39,23 @@ class BusquedaProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Busqueda avanzada: mismos campos de la simple + filtros del lugar (Fase C7).
+  // filtrosLugar ya viene armado por la pantalla con solo las claves que el
+  // usuario lleno (la API filtra exacto y "0" cuenta como filtro real).
+  Future<void> buscarAvanzado(Map<String, dynamic> filtrosLugar) async {
+    _cargando = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final lugares = await _lugarService.busquedaAvanzada({...filtrosLugar, 'ciudad': ciudad});
+      _resultados = lugares.where((lugar) => lugar.cantPersonas >= huespedes).toList();
+      _cargando = false;
+      notifyListeners();
+    } catch (error) {
+      _error = error.toString().replaceFirst('Exception: ', '');
+      _cargando = false;
+      notifyListeners();
+    }
+  }
 }
