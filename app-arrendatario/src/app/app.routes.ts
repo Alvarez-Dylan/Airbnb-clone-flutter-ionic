@@ -18,6 +18,23 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    // Antes que 'lugar/:id': si no, 'nuevo' se toma como un id.
+    path: 'lugar/nuevo',
+    loadComponent: () => import('./pages/lugar-form/lugar-form.page').then((m) => m.LugarFormPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'lugar/:id',
+    loadComponent: () => import('./pages/lugar-form/lugar-form.page').then((m) => m.LugarFormPage),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'lugar/:id/reservas',
+    loadComponent: () =>
+      import('./pages/reservas-lugar/reservas-lugar.page').then((m) => m.ReservasLugarPage),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     redirectTo: 'mis-lugares',
     pathMatch: 'full',

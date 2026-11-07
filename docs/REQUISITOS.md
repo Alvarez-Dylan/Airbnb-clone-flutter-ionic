@@ -37,14 +37,14 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 |---|---|---|---|---|
 | RA-01 | Login con email y contraseña | A1 | `src/app/pages/login/login.page.ts` + `src/app/services/auth.service.ts` | ✔ |
 | RA-02 | Registro con email, nombre completo, contraseña y teléfono | A1 | `src/app/pages/registro/registro.page.ts` + `src/app/services/auth.service.ts` | ✔ |
-| RA-03 | Pantalla principal: lista de los lugares del arrendatario con primera foto, nombre, ciudad y precio por noche | A2 | | |
-| RA-04 | Botón para agregar un nuevo lugar | A2 | | |
-| RA-05 | Formulario: nombre, descripción, personas, camas, baños, habitaciones, wifi sí/no, parqueo para cuántos vehículos, precio por noche, costo de limpieza y ciudad | A3 | | |
-| RA-06 | Formulario: seleccionar en un mapa la ubicación exacta del lugar | A3 | | |
-| RA-07 | Formulario: agregar una o más fotos | A4 | | |
-| RA-08 | Al guardar se envía a la API y se vuelve a la pantalla anterior | A3, A4 | | |
-| RA-09 | Al seleccionar un lugar de la lista se abre el mismo formulario con los datos cargados y la ubicación guardada | A5 | | |
-| RA-10 | En un lugar existente aparece el botón "Ver reservas" | A5 | | |
+| RA-03 | Pantalla principal: lista de los lugares del arrendatario con primera foto, nombre, ciudad y precio por noche | A2 | `src/app/pages/mis-lugares/mis-lugares.page.ts` + `.html` | ✔ |
+| RA-04 | Botón para agregar un nuevo lugar | A2 | `mis-lugares.page.html` (`ion-fab` → `lugar/nuevo`) | ✔ |
+| RA-05 | Formulario: nombre, descripción, personas, camas, baños, habitaciones, wifi sí/no, parqueo para cuántos vehículos, precio por noche, costo de limpieza y ciudad | A3 | `src/app/pages/lugar-form/lugar-form.page.html` | ✔ |
+| RA-06 | Formulario: seleccionar en un mapa la ubicación exacta del lugar | A3 | `src/app/components/mapa-selector/mapa-selector.component.ts` | ✔ |
+| RA-07 | Formulario: agregar una o más fotos | A4 | `lugar-form.page.ts` (`alSeleccionarFotos`, `quitarFoto`) + `lugar-form.page.html` | ✔ |
+| RA-08 | Al guardar se envía a la API y se vuelve a la pantalla anterior | A3, A4 | `lugar-form.page.ts` → `guardar()` (crear y editar) | ✔ |
+| RA-09 | Al seleccionar un lugar de la lista se abre el mismo formulario con los datos cargados y la ubicación guardada | A5 | `lugar-form.page.ts` → `cargarLugar()` | ✔ |
+| RA-10 | En un lugar existente aparece el botón "Ver reservas" | A5 | `lugar-form.page.html` (`ion-buttons` en el header, solo si `modoEditar`) | ✔ |
 | RA-11 | Lista de reservas del lugar: primera foto del lugar, cantidad de noches, fecha de llegada, fecha de salida, nombre del cliente y precio total | A6 | | |
 
 ## Criterios propios (no los pide el enunciado; los decidimos para que la app sea usable)

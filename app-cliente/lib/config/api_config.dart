@@ -4,11 +4,11 @@ import 'package:dio/dio.dart';
 
 class ApiConfig {
   static const String urlBase =
-      'https://aspect-emotions-johnston-mls.trycloudflare.com/api';
+      'https://higher-project-organize-fisher.trycloudflare.com/api';
 
   // Sin /api: la usan las fotos, que cuelgan de la raiz (ver docs/API.md).
   static const String urlRaiz =
-      'https://aspect-emotions-johnston-mls.trycloudflare.com';
+      'https://higher-project-organize-fisher.trycloudflare.com';
 
   static final Dio dio = Dio(
     BaseOptions(

@@ -111,3 +111,120 @@ Se completa en la Fase final:
   - *¿Por qué el guard es una función y no una clase?* Es el estilo `CanActivateFn` de Angular standalone (desde Angular 14+), más corto que la interfaz `CanActivate` de una clase con `@Injectable`.
   - *¿Qué pasa si la contraseña es incorrecta?* La API responde HTTP 401 con `{"message": "Contraseña incorrecta"}`; `mensajeDeError()` lo detecta por tener la clave `message` y lo muestra tal cual en el toast.
 - **Ejercicio para hacer a mano**: agregar una validación en `LoginPage` que deshabilite el botón "Iniciar sesión" si `email` o `password` están vacíos (sin tocar `AuthService`).
+
+### Fase A2 — Arrendatario: lista de mis lugares
+
+- **Qué se hizo**: pantalla principal real (reemplaza el placeholder de la Fase A1): lista los lugares del arrendatario logueado con foto, nombre, ciudad y precio; botón "+" para ir a crear un lugar nuevo; tocar un ítem lleva a editarlo. Las dos rutas de destino (`lugar/nuevo`, `lugar/:id`) apuntan por ahora a una página temporal que se completa en la Fase A3.
+- **Archivos**:
+  - `src/app/models/lugar.ts` — interfaces `Lugar` y `Foto` con los campos tal como los manda la API (`cantBanios`, `tieneWifi` como `0`/`1`, etc.).
+  - `src/app/utils/formato.ts` — `aNumero` (tolera texto o número), `formatearPrecio` (`$us 30.00`), `urlFoto` (reconstruye la URL de la foto contra la base actual, por el hallazgo de la Fase 0: el campo `url` de la API apunta a un dominio caído).
+  - `src/app/services/lugares.service.ts` — `misLugares(idArrendatario)` → `GET lugares/arrendatario/{id}`.
+  - `src/app/pages/mis-lugares/mis-lugares.page.ts` (+ `.html`) — reescrita: `signal<Lugar[]>` para los datos, `signal<boolean>` para cargando, `signal<string>` para error; cada estado tiene su propio bloque `@if` en la plantilla.
+  - `src/app/pages/lugar-form/lugar-form.page.ts` (+ `.html`, `.scss`) — placeholder nuevo: solo lee el `id` de la ruta para decidir el título ("Nuevo lugar" / "Editar lugar"), sin lógica todavía.
+  - `src/app/app.routes.ts` — se agregaron `lugar/nuevo` y `lugar/:id` (en ese orden; si `lugar/:id` fuera primero, Angular tomaría "nuevo" como un id), ambas protegidas con `authGuard`.
+- **Flujo de datos**:
+  1. El usuario entra a `mis-lugares` (ya sea por login o navegando de vuelta) → Ionic dispara `ionViewWillEnter()` (no `ngOnInit()`, que solo corre la primera vez que se crea el componente).
+  2. `ionViewWillEnter()` llama a `cargarLugares()`, que lee el `id` del usuario logueado con `authService.usuarioActual()` y pone `cargando.set(true)`.
+  3. `LugaresService.misLugares(id)` → `GET lugares/arrendatario/{id}` → la API devuelve un arreglo de lugares, cada uno con su arreglo `fotos`.
+  4. Éxito: `lugares.set(...)` y `cargando.set(false)` → la plantilla recalcula el `@if`/`@else` y muestra la lista. Error: `error.set(mensajeDeError(...))`.
+  5. Tocar el botón "+" o un ítem llama a `router.navigate(...)`, que activa el `authGuard` de la ruta destino y carga `LugarFormPage`.
+- **Conceptos clave**:
+  - `ionViewWillEnter()` vs `ngOnInit()`: Ionic por defecto mantiene las páginas visitadas vivas en el DOM (para animar la transición al volver), así que `ngOnInit()` solo se ejecuta la primera vez que se crea la página; `ionViewWillEnter()` se ejecuta cada vez que la página vuelve a quedar visible, que es lo que hace falta para refrescar la lista después de crear o editar un lugar en la Fase A3.
+  - Exponer funciones puras (`formatearPrecio`, `urlFoto`) como propiedades de la clase (`formatearPrecio = formatearPrecio;`) para poder llamarlas directo desde el template sin pasar por un pipe.
+  - `(error)` en `<img>`: si la foto no carga, `ocultarImagenRota()` la oculta en vez de mostrar el ícono de imagen rota del navegador.
+- **Decisiones y por qué**:
+  - El ícono de imagen (`image-outline` de ionicons) se usa como placeholder cuando el lugar no tiene fotos, en vez de un archivo de imagen propio: evita agregar un asset nuevo solo para este caso.
+  - `LugarFormPage` se creó ahora (vacía) en vez de esperar a la Fase A3, porque las rutas `lugar/nuevo` y `lugar/:id` ya tenían que existir para que "+" y los ítems de la lista pudieran navegar (parte de "Listo cuando" de esta fase).
+- **Preguntas probables del docente**:
+  - *¿Por qué la lista no se recarga sola si edito un lugar y vuelvo?* Sí se recarga: `ionViewWillEnter()` se dispara cada vez que la página vuelve a mostrarse, a diferencia de `ngOnInit()`.
+  - *¿Qué pasa si un lugar no tiene fotos?* `lugar.fotos.length === 0` muestra un ícono de imagen en vez de intentar cargar una URL inexistente.
+  - *¿Por qué `lugar/nuevo` va antes que `lugar/:id` en las rutas?* Angular prueba las rutas en orden; si `lugar/:id` fuera primero, interpretaría "nuevo" como el valor del parámetro `id`.
+- **Ejercicio para hacer a mano**: agregar un `ion-refresher` (pull-to-refresh) arriba de la lista que vuelva a llamar a `cargarLugares()`.
+
+### Fase A3 — Arrendatario: formulario para crear un lugar + mapa
+
+- **Qué se hizo**: `LugarFormPage` pasó de placeholder a formulario completo en modo crear, con todos los campos de RA-05 y un mapa Leaflet (`MapaSelectorComponent`) para elegir la ubicación exacta (RA-06). Guardar valida los datos, envía el lugar a la API y vuelve a `mis-lugares` (RA-08, todavía sin fotos — eso es la Fase A4).
+- **Archivos**:
+  - `src/app/components/mapa-selector/mapa-selector.component.ts` (+ `.html`, `.scss`) — componente nuevo: crea el mapa Leaflet en `ngAfterViewInit`, centra en Santa Cruz si no hay ubicación previa, coloca un `circleMarker` al hacer clic y emite `ubicacionSeleccionada`; lo destruye en `ngOnDestroy`.
+  - `src/app/models/lugar.ts` — se agregó `LugarBody` (el cuerpo que se manda a la API, sin `id` ni `fotos`).
+  - `src/app/services/lugares.service.ts` — se agregó `guardarLugar(body)` → `POST lugares`.
+  - `src/app/pages/lugar-form/lugar-form.page.ts` (+ `.html`) — formulario template-driven con `[(ngModel)]` sobre un objeto `formulario` (no `signal`, porque `ngModel` necesita una propiedad normal); valida y arma el body antes de guardar. El modo editar (`idLugar` presente) todavía muestra un mensaje fijo — se completa en la Fase A5.
+- **Flujo de datos**:
+  1. El usuario llena el formulario y toca el mapa; cada clic en el mapa dispara el evento `(click)` de Leaflet dentro de `MapaSelectorComponent`, que calcula `evento.latlng` y lo emite con `ubicacionSeleccionada.emit(...)`.
+  2. `LugarFormPage` escucha ese evento con `(ubicacionSeleccionada)="alSeleccionarUbicacion($event)"` y guarda `{ latitud, longitud }` en una propiedad local.
+  3. Al tocar "Guardar", `validar()` revisa todos los campos y la ubicación; si falta algo, muestra el primer error en un toast y no llama a la API.
+  4. Si todo está bien, arma el `body` (convirtiendo con `Number()`, wifi como `1`/`0`, `cantVehiculosParqueo` en `0` si el toggle de parqueo está apagado, lat/long como texto) y llama a `LugaresService.guardarLugar(body)` → `POST lugares`.
+  5. Éxito: toast verde "Lugar guardado" y `router.navigate(['mis-lugares'])`, que dispara `ionViewWillEnter()` en `MisLugaresPage` y recarga la lista con el lugar nuevo adentro.
+- **Conceptos clave**:
+  - `input()` / `output()` en `MapaSelectorComponent`: forma moderna de declarar propiedades de entrada y eventos de salida en un componente standalone, reemplaza a `@Input()`/`@Output()`.
+  - `ngAfterViewInit` (no `ngOnInit`): el mapa necesita el `<div>` del template ya renderizado en el DOM (vía `@ViewChild`) antes de poder crearlo con `L.map(...)`.
+  - `[(ngModel)]` sobre un objeto plano: cada campo del formulario se liga de a dos vías a una propiedad de `formulario`; Angular actualiza el objeto solo con que el `name` del input sea único.
+- **Decisiones y por qué**:
+  - Los campos numéricos del formulario se guardan como texto en `formulario` (igual que lo que devuelve `ion-input type="number"`) y se convierten con `Number()` recién al armar el `body`; evita mezclar tipos en el `[(ngModel)]`.
+  - `circleMarker` en vez de `marker`: el ícono por defecto de Leaflet se rompe con el empaquetador de Angular (busca imágenes que no quedan en el bundle); un círculo no necesita ningún ícono.
+  - El modo editar de `LugarFormPage` se dejó con un mensaje fijo en vez de intentar algo parcial: cargar y actualizar un lugar es trabajo completo de la Fase A5, armarlo a medias ahora sería código que hay que reescribir.
+- **Preguntas probables del docente**:
+  - *¿Cómo sabe el formulario qué ubicación se eligió?* El mapa no modifica nada del formulario directamente: emite un evento (`output()`) con la ubicación, y es `LugarFormPage` quien lo escucha y lo guarda.
+  - *¿Por qué el mapa se crea en `ngAfterViewInit` y no en el constructor?* Porque recién en `ngAfterViewInit` el `<div>` de la plantilla existe en el DOM; crear el mapa antes fallaría porque no hay dónde dibujarlo.
+  - *¿Qué pasa si toco "Guardar" sin elegir ubicación?* `validar()` devuelve "Selecciona la ubicacion en el mapa" como primer error encontrado (es la última validación de la lista) y no se manda nada a la API.
+- **Ejercicio para hacer a mano**: agregar una validación que impida guardar si `cantPersonas` es mayor a 20 (un límite razonable que el enunciado no pide, pero evita datos absurdos).
+
+**Probado contra la API real** (Fase 0): se creó un lugar de prueba desde el formulario (clic en el mapa, todos los campos llenos); apareció en `mis-lugares` con el precio y ciudad correctos, y `GET lugares/arrendatario/12` confirmó que la `latitud`/`longitud` guardadas coinciden con el punto donde se hizo clic en el mapa.
+
+### Fase A4 — Arrendatario: fotos del lugar
+
+- **Qué se hizo**: el formulario de crear lugar ahora pide fotos (RA-07): selector múltiple con vista previa, opción de quitar una antes de guardar, y exige al menos una. Al guardar, primero se crea el lugar y recién con su `id` se suben las fotos una por una (RA-08 completo para el modo crear).
+- **Archivos**:
+  - `src/app/services/lugares.service.ts` — se agregó `subirFoto(idLugar, archivo)`: arma un `FormData` con el campo `foto` y hace `POST lugares/{id}/foto`, sin fijar `Content-Type` a mano.
+  - `src/app/pages/lugar-form/lugar-form.page.ts` — `fotos: FotoNueva[]` guarda cada archivo elegido junto a su `previewUrl` (de `URL.createObjectURL`); `alSeleccionarFotos()` agrega, `quitarFoto()` saca por índice; `guardar()` pasó de método normal a `async` con `try/catch` y `firstValueFrom()`.
+  - `src/app/pages/lugar-form/lugar-form.page.html` (+ `.scss`) — fila de miniaturas con botón "x" para quitar cada una, botón "+" que dispara un `<input type="file" multiple hidden>` via `inputFotos.click()`.
+- **Flujo de datos**:
+  1. El usuario toca "+" → `inputFotos.click()` abre el selector nativo del sistema operativo.
+  2. Al elegir archivos, `(change)` dispara `alSeleccionarFotos(evento)`, que lee `evento.target.files` y por cada uno crea una vista previa con `URL.createObjectURL(archivo)` (una URL temporal que apunta al archivo en memoria, sin subir nada todavía).
+  3. Al tocar "Guardar" (con `validar()` ya aprobado, incluida la foto obligatoria): `await firstValueFrom(guardarLugar(body))` crea el lugar y devuelve su `id`.
+  4. `for (const foto of this.fotos)`: por cada una, `await firstValueFrom(subirFoto(id, foto.archivo))` — se espera que termine una antes de mandar la siguiente, porque las dos comparten el mismo lugar y conviene que terminen en orden.
+  5. Si una falla, se avisa cuál con un toast y se corta ahí (las fotos ya subidas quedan guardadas, el lugar también); si todas terminan bien, toast de éxito y vuelta a `mis-lugares`.
+- **Conceptos clave**:
+  - `multipart/form-data` vs JSON: un archivo no se puede meter en un string JSON tal cual, por eso las fotos van en un `FormData` (un formato pensado para enviar binarios) en vez del objeto JSON que usa el resto de la app.
+  - Por qué no se fija `Content-Type` a mano: el navegador arma el header `multipart/form-data; boundary=...` solo, con un boundary (separador) único generado en el momento; si se lo pisa a mano, falta ese boundary y el servidor no puede separar los campos.
+  - `async/await` + `firstValueFrom()` en vez de `subscribe()`: es la única excepción a `subscribe()` en esta app, porque subir una foto necesita el `id` del lugar que recién se conoce después de que la petición anterior termine — son pasos encadenados, no independientes.
+- **Decisiones y por qué**:
+  - Si una foto falla, se corta el `for...of` en vez de seguir intentando las demás: evita un estado confuso donde no queda claro cuáles subieron y cuáles no. El usuario ve el mensaje con el nombre exacto del archivo que falló y puede reintentar entrando a editar (cuando exista, Fase A5).
+  - `URL.createObjectURL` para la vista previa en vez de subir primero y mostrar la URL real: evita subir archivos que el usuario capaz termina quitando antes de guardar.
+- **Preguntas probables del docente**:
+  - *¿Por qué subir fotos no usa el mismo patrón `subscribe()` que el resto de la app?* Porque subir una foto depende del `id` del lugar, que recién se tiene después de que la petición de crear el lugar responda; encadenar eso con `subscribe()` anidados sería más difícil de leer que `await` en orden.
+  - *¿Qué pasa si quito una foto antes de guardar?* Nada se manda a la API: la vista previa solo existe en el navegador (`URL.createObjectURL`) hasta que se confirma el guardado.
+  - *¿Por qué `FormData` y no JSON para las fotos?* JSON es texto; un archivo es binario. `FormData` permite mandar ambos (texto y binarios) en una sola petición `multipart/form-data`.
+- **Ejercicio para hacer a mano**: cambiar el límite de fotos previas de "sin límite" a un máximo de 6, mostrando un toast si se intenta agregar una séptima.
+
+**Probado contra la API real**: se armó un lugar nuevo con 3 fotos de prueba, se quitó una antes de guardar (quedaron 2) y se guardó. Apareció en `mis-lugares` con la primera foto como miniatura, y `GET lugares/arrendatario/12` confirmó las 2 fotos correctas asociadas al lugar nuevo (`id` 14).
+
+### Fase A5 — Arrendatario: editar un lugar
+
+- **Qué se hizo**: `LugarFormPage` ahora soporta el modo editar completo: si la ruta trae `id`, carga el lugar con `GET lugares/{id}`, precarga todos los campos, las fotos existentes y el mapa con la ubicación guardada, y al guardar usa `PUT lugares/{id}` (confirmado en la Fase 0: `POST` con `id` adentro duplica en vez de actualizar). Aparece el botón "Ver reservas" solo en este modo.
+- **Archivos**:
+  - `src/app/utils/formato.ts` — se agregó `aBooleano(valor)`: la API manda `tieneWifi` como `0`/`1`, y el `ion-toggle` necesita un `boolean`.
+  - `src/app/services/lugares.service.ts` — se agregaron `obtenerLugar(id)` (`GET lugares/{id}`) y `editarLugar(id, body)` (`PUT lugares/{id}`).
+  - `src/app/pages/lugar-form/lugar-form.page.ts` — `modoEditar = idLugar !== null` decide todo el comportamiento de la página (patrón `notaSeleccionada` del práctico 2). Nuevo `signal` `cargando` (true solo si hay que esperar la carga); `fotosExistentes` (de la API, sin botón de quitar) separado de `fotosNuevas` (las que se suben); `guardar()` ahora llama a `editarLugar` o `guardarLugar` según `modoEditar`.
+  - `src/app/pages/lugar-form/lugar-form.page.html` — todo el formulario queda detrás de `@if (cargando()) { spinner } @else { ...formulario... }`: el mapa (`<app-mapa-selector [latitud] [longitud]>`) recién se crea cuando el lugar ya cargó, así nace con el marcador en el punto guardado en vez de tener que moverlo después.
+  - `src/app/pages/reservas-lugar/` (nuevo, temporal) y `src/app/app.routes.ts` — ruta `lugar/:id/reservas`, destino del botón "Ver reservas"; se completa en la Fase A6.
+- **Flujo de datos**:
+  1. Al entrar a `lugar/:id`, el constructor de `LugarFormPage` ve que `idLugar` no es `null` y llama a `cargarLugar()` con `cargando.set(true)` ya puesto por defecto.
+  2. `LugaresService.obtenerLugar(id)` → `GET lugares/{id}` → la API devuelve el lugar completo (incluye `arrendatario` y `fotos`, aunque esta pantalla solo usa estas últimas).
+  3. La respuesta llena `formulario`, `ubicacion` y `fotosExistentes`; recién ahí `cargando.set(false)`, lo que hace que Angular recién ahora renderice (y cree) `<app-mapa-selector>` con la ubicación ya conocida.
+  4. El usuario edita lo que quiera y toca "Guardar": como `modoEditar` es `true`, se llama `editarLugar(id, body)` → `PUT lugares/{id}` en vez de `guardarLugar(body)` → `POST lugares`.
+  5. Las fotos nuevas (si agregó alguna) se suben igual que en la Fase A4, una por una; las que ya estaban no se vuelven a mandar (la API no tiene forma de borrarlas, así que no hace falta re-subirlas).
+- **Conceptos clave**:
+  - Mismo patrón `notaSeleccionada` del práctico 2, aplicado con una variable (`modoEditar`) calculada una sola vez en vez de revisarla en cada método: más fácil de leer que repetir `this.idLugar !== null` por todos lados.
+  - Por qué el mapa espera a `cargando()`: el componente del mapa solo lee sus `input()` una vez, en `ngAfterViewInit()` (ver Fase A3); si se creara antes de tener la ubicación real, nacería centrado en Santa Cruz por defecto y no se movería solo cuando llegaran los datos.
+  - Separar `fotosExistentes` (objetos `Foto` de la API, con `url`) de `fotosNuevas` (objetos `File` locales, con `previewUrl`): son dos tipos de datos distintos (uno ya en el servidor, el otro todavía solo en el navegador) y la plantilla los trata distinto (unas tienen botón de quitar, las otras no).
+- **Decisiones y por qué**:
+  - No se intenta "borrar" fotos existentes porque la API no tiene esa ruta (documentado en `CLAUDE.md`); el único control sobre fotos existentes es no tocarlas.
+  - La validación de "al menos una foto" de la Fase A4 se desactiva en modo editar (`!this.modoEditar && fotosNuevas.length === 0`): un lugar que ya existe siempre tiene alguna foto, así que no hace falta exigir una nueva.
+- **Preguntas probables del docente**:
+  - *¿Cómo decide la pantalla si crea o edita?* Por `modoEditar`, que se calcula una sola vez al entrar a la página mirando si la ruta trajo un `id` (`ActivatedRoute.snapshot.paramMap.get('id')`).
+  - *¿Qué pasa si guardo sin cambiar nada?* Igual se manda el `PUT` completo con todos los campos del formulario (la API espera el objeto entero, no un parche); el lugar queda con los mismos datos y mismo `id`.
+  - *¿Por qué no se repite el error de "editar duplica" de la Fase 0?* Porque esta pantalla nunca manda el `id` dentro del body: va en la URL (`PUT lugares/{id}`), que es la ruta que sí actualiza en vez de crear otro.
+- **Ejercicio para hacer a mano**: agregar un botón "Cancelar" junto a "Guardar" que vuelva a `mis-lugares` sin mandar nada a la API.
+
+**Probado**: con la API real caída (el túnel volvió a cambiar de URL a mitad de esta fase), se usó el mock de Mockoon como respaldo. Se abrió el lugar de ejemplo del mock (`id` 1, "Casa Azul"): todos los campos, el wifi/parqueo y el mapa (con el marcador ya puesto en la ubicación guardada) precargaron correctamente, y apareció el botón "Ver reservas". Se editó el nombre y se movió el marcador, y el registro del servidor del mock confirmó un `PUT /api/lugares/1` (no `POST`) y que la lista siguió teniendo un solo lugar (sin duplicar). El mock no tiene estado real, así que no puede confirmar que el cambio quede guardado al volver a abrir — esa verificación final queda pendiente para cuando vuelva la URL real.

@@ -1,12 +1,14 @@
 # Contrato de la API
 
-> **Estado: VERIFICADO** (Fase 0, 2026-11-05). Confirmado ejecutando el procedimiento completo contra `https://aspect-emotions-johnston-mls.trycloudflare.com/api`. Backend Laravel. La API es compartida por todo el curso: las búsquedas devuelven lugares de otros alumnos (se ven ejemplos reales de eso abajo). Los ejemplos de prueba de esta fase quedaron identificados como "...Dylan" o "...Prueba".
+> **Estado: VERIFICADO** (Fase 0, 2026-11-05). Confirmado ejecutando el procedimiento completo contra `https://aspect-emotions-johnston-mls.trycloudflare.com/api` (URL de ese momento). Backend Laravel. La API es compartida por todo el curso: las búsquedas devuelven lugares de otros alumnos (se ven ejemplos reales de eso abajo). Los ejemplos de prueba de esta fase quedaron identificados como "...Dylan" o "...Prueba".
+>
+> ⚠ **2026-11-05 (más tarde)**: esa URL dejó de resolver (túnel reiniciado). URL vigente ahora: `https://higher-project-organize-fisher.trycloudflare.com/api` — confirmada respondiendo. Todo lo demás en este documento (rutas, formas de respuesta, hallazgos) sigue válido; es el mismo backend, solo cambió el nombre del túnel.
 >
 > ⚠ La URL es un túnel temporal (Cloudflare): si deja de responder, pedir la URL nueva y cambiarla solo en `app-cliente/lib/config/api_config.dart` y en `app-arrendatario/src/environments/environment.ts` / `environment.prod.ts`.
 
 ## Datos generales
 
-- URL base: `https://aspect-emotions-johnston-mls.trycloudflare.com/api/`
+- URL base vigente: `https://higher-project-organize-fisher.trycloudflare.com/api/`
 - Headers en peticiones JSON: `Accept: application/json` y `Content-Type: application/json`.
 - Backend Laravel confirmado. Importante: **todos los errores (validación, no encontrado, credenciales) responden HTTP 404**, nunca 422 ni 401/403. Hay que distinguir el tipo de error por la FORMA del cuerpo, no por el código HTTP:
   - Validación (faltó un campo, tipo incorrecto): `{"campo": ["mensaje de error", ...], ...}` — un objeto con una clave por campo, cada una con un arreglo de strings.
@@ -24,7 +26,7 @@
 
 ## Endpoints (confirmados)
 
-Rutas relativas a `https://aspect-emotions-johnston-mls.trycloudflare.com/api`. Ninguna ruta del PDF dio 404 por no existir; las alternativas de Postman (`/api/lugar`, `/api/arrendatario`, `/api/users/login`) **no se probaron porque no hicieron falta** — las del PDF funcionan.
+Rutas relativas a la URL base vigente (ver arriba). Ninguna ruta del PDF dio 404 por no existir; las alternativas de Postman (`/api/lugar`, `/api/arrendatario`, `/api/users/login`) **no se probaron porque no hicieron falta** — las del PDF funcionan.
 
 | # | Método | Ruta | Lo usa | Notas |
 |---|---|---|---|---|

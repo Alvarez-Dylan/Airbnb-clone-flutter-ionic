@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ modoEditar ? 'Editar lugar' : 'Nuevo lugar' }}</ion-title>
+    @if (modoEditar) {
+      <ion-buttons slot="end">
+        <ion-button (click)="irAReservas()">Ver reservas</ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else {
+    <p>Fotos</p>
+    <div class="fotos">
+      @for (foto of fotosExistentes; track foto.id) {
+        <div class="foto-previa">
+          <img [src]="urlFoto(foto.url)" alt="Foto del lugar" />
+        </div>
+      }
+      @for (foto of fotosNuevas; track foto.previewUrl; let indice = $index) {
+        <div class="foto-previa">
+          <img [src]="foto.previewUrl" alt="Foto nueva del lugar" />
+          <ion-button fill="clear" size="small" (click)="quitarFoto(indice)">
+            <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      }
+      <ion-button fill="outline" (click)="inputFotos.click()">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+    <input
+      type="file"
+      accept="image/*"
+      multiple
+      hidden
+      #inputFotos
+      (change)="alSeleccionarFotos($event)"
+    />
+
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input [(ngModel)]="formulario.nombre" name="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripcion</ion-label>
+      <ion-input [(ngModel)]="formulario.descripcion" name="descripcion"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cantidad de personas</ion-label>
+      <ion-input type="number" [(ngModel)]="formulario.cantPersonas" name="cantPersonas"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cantidad de camas</ion-label>
+      <ion-input type="number" [(ngModel)]="formulario.cantCamas" name="cantCamas"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cantidad de banios</ion-label>
+      <ion-input type="number" [(ngModel)]="formulario.cantBanios" name="cantBanios"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cantidad de habitaciones</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="formulario.cantHabitaciones"
+        name="cantHabitaciones"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Tiene wifi</ion-label>
+      <ion-toggle [(ngModel)]="formulario.tieneWifi" name="tieneWifi"></ion-toggle>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Tiene parqueo</ion-label>
+      <ion-toggle [(ngModel)]="formulario.tieneParqueo" name="tieneParqueo"></ion-toggle>
+    </ion-item>
+
+    @if (formulario.tieneParqueo) {
+      <ion-item>
+        <ion-label position="floating">Vehiculos de parqueo</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="formulario.cantVehiculosParqueo"
+          name="cantVehiculosParqueo"
+        ></ion-input>
+      </ion-item>
+    }
+
+    <ion-item>
+      <ion-label position="floating">Precio por noche ($us)</ion-label>
+      <ion-input type="number" [(ngModel)]="formulario.precioNoche" name="precioNoche"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Costo de limpieza ($us)</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="formulario.costoLimpieza"
+        name="costoLimpieza"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Ciudad</ion-label>
+      <ion-input [(ngModel)]="formulario.ciudad" name="ciudad"></ion-input>
+    </ion-item>
+
+    <p class="ion-padding-top">Toca el mapa para elegir la ubicacion exacta</p>
+    <app-mapa-selector
+      [latitud]="ubicacion?.latitud ?? null"
+      [longitud]="ubicacion?.longitud ?? null"
+      (ubicacionSeleccionada)="alSeleccionarUbicacion($event)"
+    ></app-mapa-selector>
+
+    <ion-button expand="block" class="ion-margin-top" [disabled]="guardando()" (click)="guardar()">
+      Guardar
+    </ion-button>
+  }
+</ion-content>

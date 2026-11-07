@@ -7,6 +7,43 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <p>Pantalla temporal - Fase A1</p>
+<ion-content>
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else if (error()) {
+    <p class="ion-padding">{{ error() }}</p>
+  } @else if (lugares().length === 0) {
+    <p class="ion-padding">Todavia no tenes lugares publicados.</p>
+  } @else {
+    <ion-list>
+      @for (lugar of lugares(); track lugar.id) {
+        <ion-item button (click)="irAEditarLugar(lugar.id)">
+          <ion-thumbnail slot="start">
+            @if (lugar.fotos.length > 0) {
+              <img
+                [src]="urlFoto(lugar.fotos[0].url)"
+                [alt]="lugar.nombre"
+                (error)="ocultarImagenRota($event)"
+              />
+            } @else {
+              <ion-icon name="image-outline" size="large"></ion-icon>
+            }
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ lugar.nombre }}</h2>
+            <p>{{ lugar.ciudad }}</p>
+            <p>{{ formatearPrecio(lugar.precioNoche) }} / noche</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="irANuevoLugar()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
