@@ -45,7 +45,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RA-08 | Al guardar se envía a la API y se vuelve a la pantalla anterior | A3, A4 | `lugar-form.page.ts` → `guardar()` (crear y editar) | ✔ |
 | RA-09 | Al seleccionar un lugar de la lista se abre el mismo formulario con los datos cargados y la ubicación guardada | A5 | `lugar-form.page.ts` → `cargarLugar()` | ✔ |
 | RA-10 | En un lugar existente aparece el botón "Ver reservas" | A5 | `lugar-form.page.html` (`ion-buttons` en el header, solo si `modoEditar`) | ✔ |
-| RA-11 | Lista de reservas del lugar: primera foto del lugar, cantidad de noches, fecha de llegada, fecha de salida, nombre del cliente y precio total | A6 | | |
+| RA-11 | Lista de reservas del lugar: primera foto del lugar, cantidad de noches, fecha de llegada, fecha de salida, nombre del cliente y precio total | A6 | `src/app/pages/reservas-lugar/reservas-lugar.page.ts` + `.html` | ✔ |
 
 ## Criterios propios (no los pide el enunciado; los decidimos para que la app sea usable)
 

@@ -228,3 +228,30 @@ Se completa en la Fase final:
 - **Ejercicio para hacer a mano**: agregar un botón "Cancelar" junto a "Guardar" que vuelva a `mis-lugares` sin mandar nada a la API.
 
 **Probado**: con la API real caída (el túnel volvió a cambiar de URL a mitad de esta fase), se usó el mock de Mockoon como respaldo. Se abrió el lugar de ejemplo del mock (`id` 1, "Casa Azul"): todos los campos, el wifi/parqueo y el mapa (con el marcador ya puesto en la ubicación guardada) precargaron correctamente, y apareció el botón "Ver reservas". Se editó el nombre y se movió el marcador, y el registro del servidor del mock confirmó un `PUT /api/lugares/1` (no `POST`) y que la lista siguió teniendo un solo lugar (sin duplicar). El mock no tiene estado real, así que no puede confirmar que el cambio quede guardado al volver a abrir — esa verificación final queda pendiente para cuando vuelva la URL real.
+
+### Fase A6 — Arrendatario: reservas de un lugar
+
+- **Qué se hizo**: última pantalla de la app arrendatario. `ReservasLugarPage` deja de ser un placeholder y muestra, para el lugar cuyo `id` viene en la ruta, cada reserva con la primera foto del lugar, el nombre del cliente, la cantidad de noches (calculada), las fechas en `dd/MM/yyyy` y el precio total.
+- **Archivos**:
+  - `src/app/models/reserva.ts` — `Reserva`, `Cliente` y `LugarConReservas` (extiende `Lugar` con un arreglo `reservas`): la ruta `reservas/lugar/{id}` devuelve el lugar completo con las reservas adentro, no un arreglo plano (confirmado en la Fase 0).
+  - `src/app/services/reservas.service.ts` — `reservasDeLugar(idLugar)` → `GET reservas/lugar/{id}`.
+  - `src/app/utils/formato.ts` — se agregaron `formatearFecha` y `calcularNoches`, ambos partiendo el texto de la fecha en vez de usar el constructor `Date` directo.
+  - `src/app/pages/reservas-lugar/reservas-lugar.page.ts` (+ `.html`) — reescrita con los mismos signals `cargando`/`error` y el mismo patrón de ícono-placeholder para la foto que `MisLugaresPage` (Fase A2).
+- **Flujo de datos**:
+  1. Al entrar a `lugar/:id/reservas`, el constructor llama a `cargarReservas()`, que pide `GET reservas/lugar/{id}`.
+  2. La API devuelve un solo objeto: el lugar (con sus `fotos`) y, adentro, un arreglo `reservas` donde cada una ya trae el `cliente` completo — no hace falta ninguna petición extra para saber el nombre del cliente ni la foto del lugar.
+  3. Por cada reserva, `calcularNoches(fechaInicio, fechaFin)` resta las dos fechas (parseadas a mano) y `formatearFecha` las muestra como texto legible.
+- **Conceptos clave**:
+  - `fechaInicio.substring(0, 10).split('-')`: la fecha puede venir con hora (`"2026-12-01T00:00:00"`); cortar a 10 caracteres se queda solo con `YYYY-MM-DD` antes de partirla.
+  - `Date.UTC(anio, mes - 1, dia)` en vez de `new Date('2026-12-01')`: construye la fecha en UTC a propósito para los dos lados de la resta, así da igual en qué zona horaria corra el navegador — la resta en milisegundos siempre da el mismo número de noches.
+  - `reserva.cliente.nombrecompleto` viene anidado directo en la respuesta: mismo patrón de datos "todo junto" que ya se vio en `GET lugares/{id}` (Fase A2) con `arrendatario`.
+- **Decisiones y por qué**:
+  - No se pidió `GET lugares/{id}` aparte para la foto: la respuesta de `reservas/lugar/{id}` ya la trae, pedirla de nuevo sería una petición de más sin necesidad.
+  - Se reutilizó literalmente el mismo patrón de ícono-placeholder de `MisLugaresPage` (Fase A2) en vez de inventar uno nuevo: mismo problema (foto puede no existir o no cargar), misma solución.
+- **Preguntas probables del docente**:
+  - *¿Por qué no hay un `LugaresService.obtenerLugar()` extra en esta pantalla?* Porque `GET reservas/lugar/{id}` ya devuelve todo lo que hace falta (lugar, fotos y reservas con su cliente) en una sola respuesta.
+  - *¿Cómo se calculan las noches sin que la zona horaria del navegador afecte el resultado?* Usando `Date.UTC(...)` para las dos fechas: como las dos se construyen de la misma forma, la diferencia en milisegundos no depende de en qué huso horario esté la computadora.
+  - *¿Qué pasa si la fecha de la API viene con hora en vez de solo la fecha?* `substring(0, 10)` se queda solo con los primeros 10 caracteres (`YYYY-MM-DD`) antes de partir el texto, así que no importa si trae hora o no.
+- **Ejercicio para hacer a mano**: ordenar la lista de reservas por `fechaInicio` (de la más próxima a la más lejana) antes de mostrarla.
+
+**Probado**: con la API real todavía caída, se usó el mock de nuevo. Se abrió `lugar/1/reservas`: apareció "Cliente de Ejemplo", 2 noches (01/12/2026 al 03/12/2026, calculado correcto) y "$us 400.00" — todos los valores coinciden exactamente con los datos de prueba del mock. También se probó el camino de error con `lugar/99999/reservas`, que mostró "Reserva no encontrada" (el mensaje real que devuelve la API en ese caso). Con esto queda cubierta la Fase A6 **y toda la app arrendatario**; falta repetir la prueba contra la API real en cuanto vuelva, para confirmar los datos reales de la Fase 0 (reserva `id` 7, lugar 11, cliente 14, 4 noches, $us 137.00).

@@ -4,6 +4,38 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <p>Pantalla temporal - Fase A5</p>
+<ion-content>
+  @if (cargando()) {
+    <div class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+  } @else if (error()) {
+    <p class="ion-padding">{{ error() }}</p>
+  } @else if (lugar()!.reservas.length === 0) {
+    <p class="ion-padding">Este lugar aun no tiene reservas</p>
+  } @else {
+    <ion-list>
+      @for (reserva of lugar()!.reservas; track reserva.id) {
+        <ion-item>
+          <ion-thumbnail slot="start">
+            @if (lugar()!.fotos.length > 0) {
+              <img
+                [src]="urlFoto(lugar()!.fotos[0].url)"
+                alt="Foto del lugar"
+                (error)="ocultarImagenRota($event)"
+              />
+            } @else {
+              <ion-icon name="image-outline" size="large"></ion-icon>
+            }
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ reserva.cliente.nombrecompleto }}</h2>
+            <p>{{ calcularNoches(reserva.fechaInicio, reserva.fechaFin) }} noches</p>
+            <p>{{ formatearFecha(reserva.fechaInicio) }} - {{ formatearFecha(reserva.fechaFin) }}</p>
+            <p>{{ formatearPrecio(reserva.precioTotal) }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
 </ion-content>
