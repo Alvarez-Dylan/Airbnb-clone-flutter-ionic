@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'repository/auth_provider.dart';
 import 'repository/busqueda_provider.dart';
+import 'repository/reserva_provider.dart';
 import 'screen/busqueda_screen.dart';
 import 'screen/login_screen.dart';
 
@@ -29,6 +30,7 @@ class BnbClienteApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => BusquedaProvider()),
+        ChangeNotifierProvider(create: (_) => ReservaProvider()),
       ],
       child: MaterialApp(
         title: 'BNB Cliente',

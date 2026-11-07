@@ -27,8 +27,8 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RC-11 | Detalle: primera foto en grande y las demás pequeñas debajo; tocar una pequeña la muestra en grande | C4 | `lib/widget/galeria_fotos.dart` | ✔ |
 | RC-12 | Detalle: nombre, descripción, personas, camas, baños, nombre del anfitrión, precio por noche, habitaciones, si tiene wifi y parqueo para cuántos vehículos | C4 | `lib/screen/detalle_lugar_screen.dart` → `_buildContenido()` | ✔ |
 | RC-13 | Detalle: botón "Reservar" que lleva a confirmar reserva | C4 | `lib/screen/detalle_lugar_screen.dart` (botón "Reservar") | ✔ |
-| RC-14 | Confirmar reserva: precio total por la cantidad de noches, gastos de limpieza, cobro por servicio y el total sumado | C5 | | |
-| RC-15 | Botón "Confirmar reserva" que envía la reserva a la API | C5 | | |
+| RC-14 | Confirmar reserva: precio total por la cantidad de noches, gastos de limpieza, cobro por servicio y el total sumado | C5 | `lib/utils/calculo_reserva.dart` + `lib/screen/confirmar_reserva_screen.dart` | ✔ |
+| RC-15 | Botón "Confirmar reserva" que envía la reserva a la API | C5 | `lib/repository/reserva_provider.dart` → `confirmarReserva()` + `lib/service/reserva_service.dart` | ✔ |
 | RC-16 | (Wireframe) Lista de reservas del cliente con foto, nombre del lugar, noches, fecha de inicio, fecha de fin y precio | C6 | | |
 
 ## App Arrendatario (Ionic + Angular)
