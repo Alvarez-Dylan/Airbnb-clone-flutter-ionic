@@ -19,7 +19,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RC-03 | Pantalla principal con buscador: ciudad, fecha de llegada, fecha de salida y cantidad de huéspedes | C2 | `lib/screen/busqueda_screen.dart` | ✔ |
 | RC-04 | La búsqueda simple es por ciudad | C2 | `lib/service/lugar_service.dart` → `buscar()` | ✔ |
 | RC-05 | Botón "Búsqueda avanzada": mismos campos de la simple + todos los campos del lugar, menos foto y anfitrión | C7 | | |
-| RC-06 | Botón "Ver reservas": lista de reservas hechas anteriormente por el cliente | C6 | | |
+| RC-06 | Botón "Ver reservas": lista de reservas hechas anteriormente por el cliente | C6 | `lib/screen/busqueda_screen.dart` (botón) → `lib/screen/mis_reservas_screen.dart` | ✔ |
 | RC-07 | Resultados en lista: primera foto, nombre, descripción, cantidad de personas y precio por noche | C2 | `lib/widget/lugar_card.dart` | ✔ |
 | RC-08 | Debajo de la lista, botón "Vista de mapa": los mismos lugares como marcadores en un mapa | C3 | `lib/widget/mapa_lugares.dart` + `resultados_screen.dart` | ✔ |
 | RC-09 | En el mapa, botón "Vista de lista" para volver a la lista | C3 | `resultados_screen.dart` (`_verMapa` + `bottomNavigationBar`) | ✔ |
@@ -29,7 +29,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RC-13 | Detalle: botón "Reservar" que lleva a confirmar reserva | C4 | `lib/screen/detalle_lugar_screen.dart` (botón "Reservar") | ✔ |
 | RC-14 | Confirmar reserva: precio total por la cantidad de noches, gastos de limpieza, cobro por servicio y el total sumado | C5 | `lib/utils/calculo_reserva.dart` + `lib/screen/confirmar_reserva_screen.dart` | ✔ |
 | RC-15 | Botón "Confirmar reserva" que envía la reserva a la API | C5 | `lib/repository/reserva_provider.dart` → `confirmarReserva()` + `lib/service/reserva_service.dart` | ✔ |
-| RC-16 | (Wireframe) Lista de reservas del cliente con foto, nombre del lugar, noches, fecha de inicio, fecha de fin y precio | C6 | | |
+| RC-16 | (Wireframe) Lista de reservas del cliente con foto, nombre del lugar, noches, fecha de inicio, fecha de fin y precio | C6 | `lib/model/reserva_model.dart` + `lib/widget/reserva_card.dart` | ✔ |
 
 ## App Arrendatario (Ionic + Angular)
 

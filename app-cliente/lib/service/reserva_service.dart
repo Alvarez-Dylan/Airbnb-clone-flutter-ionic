@@ -3,10 +3,21 @@
 import 'package:dio/dio.dart';
 
 import '../config/api_config.dart';
+import '../model/reserva_model.dart';
 import '../utils/manejar_error.dart';
 
 class ReservaService {
   final Dio _dio = ApiConfig.dio;
+
+  Future<List<ReservaModel>> obtenerReservasCliente(int clienteId) async {
+    try {
+      final respuesta = await _dio.get('/reservas/cliente/$clienteId');
+      final lista = respuesta.data as List<dynamic>;
+      return lista.map((json) => ReservaModel.fromJson(json as Map<String, dynamic>)).toList();
+    } on DioException catch (error) {
+      throw Exception(mensajeDeError(error));
+    }
+  }
 
   Future<void> crearReserva({
     required int lugarId,

@@ -2,6 +2,7 @@
 // providers). Las reservas del cliente (listado) se agregan en la Fase C6.
 import 'package:flutter/foundation.dart';
 
+import '../model/reserva_model.dart';
 import '../service/reserva_service.dart';
 
 class ReservaProvider extends ChangeNotifier {
@@ -12,6 +13,29 @@ class ReservaProvider extends ChangeNotifier {
 
   bool get cargando => _cargando;
   String? get error => _error;
+
+  List<ReservaModel> _reservas = [];
+  bool _cargandoReservas = false;
+  String? _errorReservas;
+
+  List<ReservaModel> get reservas => _reservas;
+  bool get cargandoReservas => _cargandoReservas;
+  String? get errorReservas => _errorReservas;
+
+  Future<void> cargarReservas(int clienteId) async {
+    _cargandoReservas = true;
+    _errorReservas = null;
+    notifyListeners();
+    try {
+      _reservas = await _reservaService.obtenerReservasCliente(clienteId);
+      _cargandoReservas = false;
+      notifyListeners();
+    } catch (error) {
+      _errorReservas = error.toString().replaceFirst('Exception: ', '');
+      _cargandoReservas = false;
+      notifyListeners();
+    }
+  }
 
   Future<bool> confirmarReserva({
     required int lugarId,
