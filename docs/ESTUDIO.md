@@ -255,3 +255,121 @@ Se completa en la Fase final:
 - **Ejercicio para hacer a mano**: ordenar la lista de reservas por `fechaInicio` (de la más próxima a la más lejana) antes de mostrarla.
 
 **Probado**: con la API real todavía caída, se usó el mock de nuevo. Se abrió `lugar/1/reservas`: apareció "Cliente de Ejemplo", 2 noches (01/12/2026 al 03/12/2026, calculado correcto) y "$us 400.00" — todos los valores coinciden exactamente con los datos de prueba del mock. También se probó el camino de error con `lugar/99999/reservas`, que mostró "Reserva no encontrada" (el mensaje real que devuelve la API en ese caso). Con esto queda cubierta la Fase A6 **y toda la app arrendatario**; falta repetir la prueba contra la API real en cuanto vuelva, para confirmar los datos reales de la Fase 0 (reserva `id` 7, lugar 11, cliente 14, 4 noches, $us 137.00).
+
+### Fase C1 — Cliente: sesión (login y registro)
+
+- **Qué se hizo**: primera fase de la app cliente (Flutter). Login y registro con la misma lógica de sesión que la app arrendatario, pero con las herramientas de Flutter: `shared_preferences` en vez de `localStorage`, `ChangeNotifier` en vez de `signal()`.
+- **Archivos**:
+  - `lib/model/usuario_model.dart` — clase con `fromJson`/`toJson` escritos a mano (el `toJson` no se manda a la API; se usa para guardar el usuario en `shared_preferences`).
+  - `lib/service/auth_service.dart` — `iniciarSesion`, `registrar` con `Dio`; atrapa `DioException` y arma el mensaje de error mirando la FORMA del cuerpo (mismo criterio que `manejar-error.ts` de la app arrendatario, hallazgo de la Fase 0: `{"message"}` = negocio, `{"campo": [...]}` = validación).
+  - `lib/repository/auth_provider.dart` — `ChangeNotifier` con `_usuario`, `_cargando`, `_error` privados y getters públicos; `cargarSesion()` lee `shared_preferences` (clave `sesionCliente`), `iniciarSesion`/`registrar` llaman al service y guardan la sesión si sale bien, `cerrarSesion()` la borra.
+  - `lib/screen/login_screen.dart`, `registro_screen.dart` — `StatefulWidget` con `Form` + `GlobalKey<FormState>` + `TextFormField` con `validator`; botón deshabilitado mientras `context.watch<AuthProvider>().cargando` es verdadero.
+  - `lib/screen/busqueda_screen.dart` — temporal, con botón de cerrar sesión en el `AppBar`.
+  - `lib/main.dart` — ahora es `async`: `WidgetsFlutterBinding.ensureInitialized()` + `AuthProvider().cargarSesion()` antes de `runApp`; `MultiProvider` con el `AuthProvider` ya cargado; la pantalla inicial depende de `authProvider.haySesion`.
+- **Flujo de datos**:
+  1. Antes de que exista cualquier pantalla, `main()` crea el `AuthProvider` y espera `cargarSesion()` (lee `shared_preferences` de forma asíncrona, por eso `main` es `async` y usa `await`).
+  2. `runApp` recién se llama después, con la pantalla inicial ya decidida (`BusquedaScreen` o `LoginScreen`) — así la app nunca "parpadea" mostrando el login si ya había una sesión guardada.
+  3. En `LoginScreen`, tocar "Iniciar sesión" llama a `context.read<AuthProvider>().iniciarSesion(...)`, que pone `_cargando = true` y notifica (el botón se deshabilita), llama a `AuthService`, y según el resultado guarda la sesión o guarda el mensaje de error.
+  4. La pantalla espera el `Future<bool>` que devuelve el provider y navega o muestra un `SnackBar`, sin que el provider toque nada de UI directamente.
+- **Conceptos clave**:
+  - `ChangeNotifier` vs `signal()`: en Flutter el estado vive en una clase que extiende `ChangeNotifier` y llama a `notifyListeners()` manualmente después de cada cambio; en Angular cada `signal` se actualiza solo y Angular detecta el cambio sin que haga falta notificar nada a mano.
+  - `shared_preferences` guarda pares clave-valor de texto (persisten en el almacenamiento del dispositivo, sobreviven a cerrar la app); el `UsuarioModel` se convierte a JSON con `jsonEncode`/`toJson()` para poder guardarlo como un solo string.
+  - `cargarSesion()` antes de `runApp`: si se llamara después (por ejemplo en `initState` de una pantalla), la primera pantalla en dibujarse siempre sería la de login, aunque hubiera sesión guardada, porque leer `shared_preferences` es asíncrono y `initState` no puede esperarlo antes del primer `build`.
+- **Decisiones y por qué**:
+  - Se usó `Navigator.pushAndRemoveUntil` (no `pushReplacement`) al terminar el registro: `RegistroScreen` se abre encima de `LoginScreen` con `push`, así que `pushReplacement` solo saca a `RegistroScreen` de la pila y deja a `LoginScreen` debajo — aparecía un botón "atrás" que volvía al login estando ya adentro. Se detectó probando la app en el emulador. En `LoginScreen` no hace falta este cuidado porque es la pantalla raíz (no hay nada debajo).
+  - El mensaje de error se arma en el `service` (no en el `provider` ni en la pantalla): es el único lugar que ve la respuesta cruda de `Dio`, y así el resto de la app solo trabaja con `Exception`s con mensaje en español.
+- **Preguntas probables del docente**:
+  - *¿Por qué `main()` es `async`?* Porque `cargarSesion()` necesita leer `shared_preferences`, que es una operación asíncrona (usa un canal de plataforma); `main` tiene que poder hacer `await` antes de llamar a `runApp`.
+  - *¿Qué pasa si cierro la app a la fuerza en vez de usar "Cerrar sesión"?* No cambia nada: `shared_preferences` ya tiene el usuario guardado de la última vez que inició sesión, así que la próxima vez que abra la app entra directo (probado relanzando la app completa en el emulador, no solo recargando).
+  - *¿Dónde se decide si el login fue exitoso?* `AuthProvider.iniciarSesion()` devuelve `true`/`false`; la pantalla nunca mira la respuesta de la API directamente.
+- **Ejercicio para hacer a mano**: agregar un campo de "confirmar contraseña" en `RegistroScreen` que valide que coincide con la contraseña antes de permitir enviar el formulario.
+
+**Probado**: con la API real caída, se usó el mock (apuntando el emulador a `http://10.0.2.2:3001/api`, la dirección con la que el emulador Android ve al `localhost` de la PC — no `localhost` directo). Se registró un cliente nuevo → entró directo a "Buscar lugares" (una vez corregido el bug de navegación). Se cerró sesión → volvió a "Iniciar sesión". Se mató el proceso de la app por completo y se volvió a abrir (relanzamiento real, no hot-reload) → entró directo a "Buscar lugares" sin pedir login, confirmando que la sesión persiste de verdad en el almacenamiento del dispositivo.
+
+### Fase C2 — Cliente: búsqueda simple y resultados en lista
+
+- **Qué se hizo**: la pantalla principal del cliente pasó de placeholder a buscador real (ciudad, fechas, huéspedes), con los tres botones del wireframe. Buscar lleva a `ResultadosScreen`, que muestra los lugares encontrados en una lista con `LugarCard`.
+- **Archivos**:
+  - `lib/model/lugar_model.dart` (+ `FotoModel` anidado) — incluye `nombreAnfitrion` (sacado del objeto `arrendatario` anidado que manda la API) y la lista de fotos; usa `utils/conversiones.dart` para tolerar texto o número en los campos numéricos.
+  - `lib/utils/conversiones.dart` — `aEntero`, `aDecimal`, `aBool` (tolerantes a texto/número/null), `urlFoto` (mismo hallazgo de la Fase 0 que en la app arrendatario: hay que reconstruirla), `formatearPrecio`, `formatearFecha` (con `DateFormat` de `intl`).
+  - `lib/utils/manejar_error.dart` — se extrajo de `auth_service.dart` para no repetir la misma lógica en cada `service` nuevo.
+  - `lib/service/lugar_service.dart` — `buscar(ciudad)` → `POST lugares/search` con `{"search": ciudad}` (solo la ciudad, nada de fechas ni huéspedes: la API no los recibe).
+  - `lib/repository/busqueda_provider.dart` — guarda los criterios (`ciudad`, `fechaLlegada`, `fechaSalida`, `huespedes`) ademas de `resultados`/`cargando`/`error`; `buscar()` llama al service y despues filtra localmente por `cantPersonas >= huespedes`.
+  - `lib/widget/vista_estado.dart`, `lib/widget/lugar_card.dart` — widgets reutilizables: el primero decide cargando/error/vacío/datos, el segundo es el ítem de la lista.
+  - `lib/screen/resultados_screen.dart`, `busqueda_avanzada_screen.dart` (temporal), `mis_reservas_screen.dart` (temporal).
+  - `lib/screen/busqueda_screen.dart` — formulario con `showDatePicker` para las dos fechas y un contador +/- para huéspedes; valida ciudad, fechas elegidas y que la salida sea posterior a la llegada antes de llamar a `buscar()`.
+  - `lib/main.dart` — se agregó `BusquedaProvider` al `MultiProvider`.
+- **Flujo de datos**:
+  1. El usuario llena ciudad, toca las fechas (cada una abre `showDatePicker`, que devuelve un `DateTime?` o `null` si cancela) y ajusta huéspedes con los botones +/-.
+  2. Al tocar "Buscar", `_buscar()` valida localmente (sin llamar a la API todavía); si todo está bien, copia esos criterios al `BusquedaProvider` (porque hacen falta de nuevo en la Fase C5, al confirmar la reserva) y llama a `provider.buscar()`.
+  3. `BusquedaProvider.buscar()` llama a `LugarService.buscar(ciudad)` → `POST lugares/search`; la API devuelve un arreglo de lugares.
+  4. Antes de guardar `_resultados`, se filtra localmente por `cantPersonas >= huespedes`, porque la búsqueda simple de la API no recibe la cantidad de huéspedes.
+  5. `ResultadosScreen` lee `context.watch<BusquedaProvider>()` y muestra la lista con `VistaEstado` + `LugarCard` por cada lugar.
+- **Conceptos clave**:
+  - `showDatePicker`: diálogo nativo de Flutter/Material que devuelve un `Future<DateTime?>`; hay que esperarlo con `await` y revisar `if (fecha == null) return;` porque el usuario puede cancelar.
+  - Las fechas se guardan en el `BusquedaProvider` (no solo en la pantalla) porque la Fase C5 (confirmar reserva) las necesita para calcular las noches; si vivieran solo en el `State` de `BusquedaScreen`, se perderían al navegar.
+  - `VistaEstado` como widget reutilizable: en vez de repetir el mismo `if (cargando) ... else if (error) ...` en cada pantalla, se escribió una sola vez y recibe los datos por parámetro.
+- **Decisiones y por qué**:
+  - El filtro por huéspedes vive en `BusquedaProvider.buscar()`, después de recibir la respuesta de la API, con un comentario explicando por qué (la búsqueda simple de la API no tiene ese campo) — mismo patrón que ya anticipaba `CLAUDE.md`.
+  - `manejar_error.dart` se extrajo recién ahora (no en la Fase C1) porque recién con el segundo `service` (`LugarService`) la duplicación se volvía evidente; antes, con un solo service, la función privada en `AuthService` todavía no pedía la ventaja de ser compartida.
+- **Preguntas probables del docente**:
+  - *¿Por qué la cantidad de huéspedes no se manda a la API?* El enunciado dice que la búsqueda simple es solo por ciudad; la API tampoco tiene un campo para eso en esa ruta (confirmado en la Fase 0), así que se filtra después, en la app.
+  - *¿Dónde quedan guardadas las fechas elegidas y por qué?* En `BusquedaProvider` (no en `BusquedaScreen`), porque la Fase C5 las va a necesitar para calcular noches y el total de la reserva, y un provider sobrevive a cambiar de pantalla.
+  - *¿Qué pasa si elijo una fecha de salida igual a la de llegada?* `_fechaSalida!.isAfter(_fechaLlegada!)` es `false` en ese caso (no es estrictamente posterior), así que se bloquea con el mismo mensaje que una fecha anterior.
+- **Ejercicio para hacer a mano**: agregar un texto debajo del buscador que muestre "X noches" en cuanto las dos fechas estén elegidas (sin tocar `BusquedaProvider`, calculándolo en la propia pantalla).
+
+**Probado**: con la API real caída, se usó el mock de nuevo. En el emulador: tocar "Buscar" sin ciudad mostró "Ingresa la ciudad"; con fecha de salida anterior a la de llegada mostró "La fecha de salida debe ser posterior a la de llegada"; con ciudad y fechas válidas, apareció "Casa Azul" (el lugar de ejemplo del mock) en los resultados, con su descripción, "4 personas" y "$us 150.00" — todo coincide con los datos de prueba.
+
+### Fase C3 — Cliente: vista de mapa
+
+- **Qué se hizo**: `ResultadosScreen` ahora puede mostrar los mismos resultados como mapa (RC-08/RC-09), con un marcador por lugar con su precio; tocar un marcador o un ítem de la lista lleva al detalle (RC-10, todavía con placeholder hasta la Fase C4).
+- **Archivos**:
+  - `lib/widget/mapa_lugares.dart` — `FlutterMap` con un `TileLayer` de OpenStreetMap y un `MarkerLayer` con un `Marker` por lugar (precio arriba, ícono de pin abajo, envueltos en un `GestureDetector` para detectar el toque); se centra en el primer resultado, o en Santa Cruz si la lista viene vacía.
+  - `lib/screen/detalle_lugar_screen.dart` (temporal) — recibe el `LugarModel` completo por el constructor, sin pedir nada a la API todavía.
+  - `lib/screen/resultados_screen.dart` — pasó de `StatelessWidget` a `StatefulWidget`: agregó `bool _verMapa` (estado local, no vive en `BusquedaProvider` porque es pura cuestión de cómo se *muestra* esta pantalla, no un dato de la búsqueda) y un `bottomNavigationBar` con el botón que lo invierte.
+- **Flujo de datos**:
+  1. `ResultadosScreen` ya tenía los resultados cargados desde la Fase C2 (vía `BusquedaProvider`); esta fase no agrega ninguna petición nueva a la API, solo una forma distinta de mostrar los mismos datos.
+  2. Según `_verMapa`, el `body` de `VistaEstado` muestra `MapaLugares(...)` o el `ListView` de siempre; el botón de abajo llama a `setState(() => _verMapa = !_verMapa)`.
+  3. Tocar un marcador (`onTap` del `GestureDetector` dentro de cada `Marker`) o un `LugarCard` de la lista llama a la misma función `_irADetalle(lugar)`, que navega pasando el `LugarModel` completo por el constructor de `DetalleLugarScreen` (sin pedir nada de nuevo a la API: ya se tenía todo desde la búsqueda).
+- **Conceptos clave**:
+  - Un *tile* es una imagen cuadrada (normalmente 256×256) que representa una porción del mapa a un nivel de zoom dado; `TileLayer` arma la URL de cada tile visible (`{z}/{x}/{y}.png`) y las va pidiendo a medida que el usuario se mueve o hace zoom.
+  - Un `Marker` de `flutter_map` no es una imagen fija: es cualquier widget (`child`) posicionado en una coordenada (`point`) del mapa; por eso se pudo poner un precio y un ícono juntos, en vez de un simple pin.
+  - Por qué no hizo falta `Expanded` acá: la guía de `CLAUDE.md` advierte que `FlutterMap` necesita una altura definida dentro de una `Column`; en esta pantalla el mapa es directamente el `body` del `Scaffold` (dentro de `VistaEstado`), que ya le da toda la altura disponible sin pasar por una `Column`.
+- **Decisiones y por qué**:
+  - `_verMapa` vive en el `State` de `ResultadosScreen`, no en `BusquedaProvider`: es el mismo criterio que ya definía `CLAUDE.md` ("estado local de pantalla... en StatefulWidget, no en providers") — es una preferencia de cómo ver el resultado, no un dato de la búsqueda en sí.
+  - El precio se muestra siempre sobre el marcador (no solo al tocarlo): el enunciado pide ver "los mismos lugares como marcadores en un mapa", y mostrar el precio de entrada evita que el usuario tenga que tocar cada uno para comparar.
+- **Preguntas probables del docente**:
+  - *¿Por qué `_verMapa` no está en el provider?* Porque es un detalle de esta pantalla nada más (cómo se ve), no un criterio de búsqueda; si estuviera en el provider, cualquier otra pantalla que mirara `BusquedaProvider` se vería afectada sin necesidad.
+  - *¿De dónde sale la ubicación que usa el mapa para centrarse?* Del primer lugar de la lista de resultados (`lugares.first`); si no hay resultados, usa la constante de Santa Cruz.
+  - *¿Qué pasa si toco un marcador?* Llama a la misma función que tocar un ítem de la lista (`_irADetalle`), que navega a `DetalleLugarScreen` pasándole el lugar ya cargado.
+- **Ejercicio para hacer a mano**: hacer que el marcador del lugar seleccionado se vea de un color distinto al resto (sin agregar ningún estado nuevo al provider).
+
+**Probado**: con la API real caída, se usó el mock. Se buscó en Santa Cruz y se tocó "Vista de mapa": apareció el mapa de OpenStreetMap centrado en el punto correcto, con el marcador de "Casa Azul" mostrando "$us 150.00" justo en el centro de la ciudad (coincide con la latitud/longitud de prueba del mock). Tocar el marcador llevó al detalle ("Casa Azul"); al volver, el botón seguía en "Vista de mapa"/"Vista de lista" y se pudo alternar sin problemas entre las dos vistas.
+
+### Fase C4 — Cliente: detalle del lugar con galería
+
+- **Qué se hizo**: `DetalleLugarScreen` dejó de recibir el lugar completo por el constructor; ahora recibe solo el `id` y pide `GET lugares/{id}` de nuevo, mostrando todos los datos de RC-12 y una galería de fotos (RC-11) con miniaturas tocables.
+- **Archivos**:
+  - `lib/service/lugar_service.dart` — se agregó `obtenerLugar(id)` → `GET lugares/{id}`.
+  - `lib/widget/galeria_fotos.dart` — `StatefulWidget` con `_indiceSeleccionado`: una foto grande arriba (la del índice actual) y una fila horizontal de miniaturas abajo; tocar una miniatura cambia el índice.
+  - `lib/screen/confirmar_reserva_screen.dart` (temporal) — recibe el `LugarModel` completo (ya se tiene desde el detalle, no hace falta pedirlo de nuevo).
+  - `lib/screen/detalle_lugar_screen.dart` — reescrita: ahora es `StatefulWidget` con `_cargando`/`_error`/`_lugar` propios (sin provider: esta pantalla pide un solo lugar una sola vez, no necesita el patrón `ChangeNotifier` de las búsquedas); llama a `LugarService.obtenerLugar()` en `initState()`.
+  - `lib/screen/resultados_screen.dart` — `_irADetalle` ahora pasa `lugar.id` en vez del `LugarModel` completo.
+- **Flujo de datos**:
+  1. Al entrar a `DetalleLugarScreen(idLugar: ...)`, `initState()` llama a `_cargarLugar()`, que pide `GET lugares/{id}` — los datos de la búsqueda (Fase C2/C3) no se reutilizan a propósito, para que el detalle siempre muestre la versión más actual.
+  2. La respuesta ya trae `arrendatario` y `fotos` anidados (igual que en la app arrendatario), así que no hace falta ninguna petición extra para el nombre del anfitrión ni las fotos.
+  3. `GaleriaFotos` recibe la lista de fotos ya convertida; su propio estado (`_indiceSeleccionado`) decide cuál se ve grande, sin que `DetalleLugarScreen` necesite saberlo.
+  4. "Reservar" navega a `ConfirmarReservaScreen` pasando el `LugarModel` ya cargado por el constructor (sin pedir nada de nuevo).
+- **Conceptos clave**:
+  - El `StatefulWidget` de la galería: `_indiceSeleccionado` es un número que vive únicamente dentro de `GaleriaFotos`; cuando cambia (`setState`), solo se reconstruye la foto grande y el resaltado de las miniaturas, no el resto de la pantalla de detalle.
+  - No todas las pantallas necesitan un provider: `BusquedaProvider` tiene sentido porque sus datos (criterios, resultados) se comparten entre varias pantallas (`BusquedaScreen`, `ResultadosScreen`); el detalle de un lugar se pide una sola vez y se usa en una sola pantalla, así que alcanza con el estado local de un `StatefulWidget`.
+- **Decisiones y por qué**:
+  - Pedir `GET lugares/{id}` de nuevo (en vez de reusar el `LugarModel` que ya se tenía desde la búsqueda) sigue el flujo que ya documentaba `app-cliente/CLAUDE.md`; además, los datos de búsqueda no traen `nombreAnfitrion` completo en todos los casos y así se evita cualquier duda sobre si el detalle está desactualizado.
+  - `ConfirmarReservaScreen` sí recibe el `LugarModel` completo (no un id): a diferencia del detalle, la Fase C5 va a necesitar varios campos del lugar (precio, costo de limpieza) para calcular la reserva, y ya se tienen disponibles sin otra petición.
+- **Preguntas probables del docente**:
+  - *¿Por qué el detalle pide los datos de nuevo si ya los tenía la lista de resultados?* Para mostrar siempre la versión más reciente del lugar (podría haber cambiado desde que se hizo la búsqueda) y porque así lo define el flujo documentado para esta app.
+  - *¿Dónde vive el índice de la foto seleccionada?* Dentro de `GaleriaFotos`, no en `DetalleLugarScreen` ni en ningún provider: es un detalle de cómo se ve ese widget en particular.
+  - *¿Qué pasa si el lugar no tiene fotos?* `GaleriaFotos` muestra un ícono de imagen en un contenedor gris en vez de intentar cargar algo; nunca se accede a `fotos[0]` sin revisar antes que la lista no esté vacía.
+- **Ejercicio para hacer a mano**: agregar que al tocar la foto grande (no una miniatura) se abra en pantalla completa con `Navigator.push` (sin tocar el estado de `GaleriaFotos`, solo agregando un `GestureDetector` a la foto grande).
+
+**Probado**: con la API real caída, se usó el mock, agregándole temporalmente 2 fotos más al lugar de ejemplo (para poder probar la galería con varias miniaturas). Se abrió el detalle de "Casa Azul": aparecieron las 3 miniaturas con la primera seleccionada, y todos los datos (4 personas, 2 camas, 1 baño, 2 habitaciones, "Anfitrion: Arrendatario de Ejemplo", "Wifi: Si", "Parqueo para 1 vehiculos", "$us 150.00 por noche") coincidiendo exactamente con la respuesta de `GET lugares/1`. Al tocar la segunda miniatura, el resaltado se movió y el registro del servidor del mock confirmó un nuevo pedido a `GET /fotos/casa-azul-2.jpg` — la foto correcta para ese índice.

@@ -1,20 +1,38 @@
-// Punto de entrada de la app cliente. Pantalla temporal hasta la Fase C1.
+// Punto de entrada de la app cliente: carga la sesion antes de runApp y elige
+// la pantalla inicial segun si hay un usuario logueado.
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const BnbClienteApp());
+import 'repository/auth_provider.dart';
+import 'repository/busqueda_provider.dart';
+import 'screen/busqueda_screen.dart';
+import 'screen/login_screen.dart';
+
+Future<void> main() async {
+  // Necesario porque se usa shared_preferences (un canal de plataforma) antes de runApp.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authProvider = AuthProvider();
+  await authProvider.cargarSesion();
+
+  runApp(BnbClienteApp(authProvider: authProvider));
 }
 
 class BnbClienteApp extends StatelessWidget {
-  const BnbClienteApp({super.key});
+  final AuthProvider authProvider;
+
+  const BnbClienteApp({super.key, required this.authProvider});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BNB Cliente',
-      home: Scaffold(
-        appBar: AppBar(title: const Text('BNB Cliente')),
-        body: const Center(child: Text('Pantalla temporal - Fase 1')),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => BusquedaProvider()),
+      ],
+      child: MaterialApp(
+        title: 'BNB Cliente',
+        home: authProvider.haySesion ? const BusquedaScreen() : const LoginScreen(),
       ),
     );
   }
