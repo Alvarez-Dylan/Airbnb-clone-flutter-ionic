@@ -3,12 +3,10 @@
 import 'package:dio/dio.dart';
 
 class ApiConfig {
-  static const String urlBase =
-      'https://higher-project-organize-fisher.trycloudflare.com/api';
+  static const String urlBase = 'https://api.airbnbmob2.online/api';
 
   // Sin /api: la usan las fotos, que cuelgan de la raiz (ver docs/API.md).
-  static const String urlRaiz =
-      'https://higher-project-organize-fisher.trycloudflare.com';
+  static const String urlRaiz = 'https://api.airbnbmob2.online';
 
   static final Dio dio = Dio(
     BaseOptions(

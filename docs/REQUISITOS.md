@@ -8,7 +8,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 |---|---|---|---|---|
 | RG-01 | Las dos apps están hechas en tecnologías distintas vistas en clase (cliente: Flutter; arrendatario: Ionic + Angular) | 1 | `app-cliente/` (Flutter) y `app-arrendatario/` (Ionic + Angular), creados y compilando | ✔ |
 | RG-02 | Ambas apps exigen iniciar sesión antes de entrar | A1, C1 | Arrendatario: `guards/auth.guard.ts`. Cliente: `main.dart` elige `LoginScreen` si no hay sesión | ✔ |
-| RG-03 | Código propio y explicable: cada fase tiene su entrada en `docs/ESTUDIO.md` | Todas | | |
+| RG-03 | Código propio y explicable: cada fase tiene su entrada en `docs/ESTUDIO.md` | Todas | `docs/ESTUDIO.md` (14 entradas: Fase 1, A1–A6, C1–C7) | ✔ |
 
 ## App Cliente (Flutter)
 
@@ -53,6 +53,6 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 |---|---|---|---|---|
 | RX-01 | Cerrar sesión en ambas apps | A1, C1 | Arrendatario: `mis-lugares.page.ts` → `cerrarSesion()`. Cliente: `busqueda_screen.dart` → `_cerrarSesion()` | ✔ |
 | RX-02 | La sesión se mantiene al cerrar y abrir la app | A1, C1 | Arrendatario: `AuthService.usuarioActual()` lee `localStorage`. Cliente: `AuthProvider.cargarSesion()` lee `shared_preferences` | ✔ |
-| RX-03 | Validaciones de formularios con mensajes claros (campos obligatorios, llegada antes que salida, ubicación elegida) | Todas | | |
-| RX-04 | Estados cargando / error / vacío en toda pantalla que pide datos | Todas | | |
-| RX-05 | Botones de envío deshabilitados mientras se espera la respuesta | Todas | | |
+| RX-03 | Validaciones de formularios con mensajes claros (campos obligatorios, llegada antes que salida, ubicación elegida) | Todas | Arrendatario: `lugar-form.page.ts` → `validar()`. Cliente: `busqueda_screen.dart`/`busqueda_avanzada_screen.dart` → `_buscar()`, `Form`+`validator` en login/registro (ambas apps) | ✔ |
+| RX-04 | Estados cargando / error / vacío en toda pantalla que pide datos | Todas | Cliente: `widget/vista_estado.dart` en `resultados_screen.dart`, `detalle_lugar_screen.dart`, `mis_reservas_screen.dart`. Arrendatario: señales `cargando()`/`error()` en `mis-lugares.page.html`, `lugar-form.page.html`, `reservas-lugar.page.html` | ✔ |
+| RX-05 | Botones de envío deshabilitados mientras se espera la respuesta | Todas | Cliente: `cargando ? null : ...` en login/registro/confirmar reserva. Arrendatario: `[disabled]="enviando()"` / `[disabled]="guardando()"` en login/registro/lugar-form | ✔ |

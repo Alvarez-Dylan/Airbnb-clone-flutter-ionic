@@ -1,6 +1,7 @@
 // Punto de entrada de la app cliente: carga la sesion antes de runApp y elige
 // la pantalla inicial segun si hay un usuario logueado.
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'repository/auth_provider.dart';
@@ -34,6 +35,14 @@ class BnbClienteApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'BNB Cliente',
+        // Selectores de fecha y demas textos de Material en espanol.
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('es')],
+        locale: const Locale('es'),
         home: authProvider.haySesion ? const BusquedaScreen() : const LoginScreen(),
       ),
     );

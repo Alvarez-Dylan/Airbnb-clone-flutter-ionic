@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://higher-project-organize-fisher.trycloudflare.com/api',
+  apiUrl: 'https://api.airbnbmob2.online/api',
 };
 
 /*

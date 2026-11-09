@@ -39,10 +39,67 @@ Objetivo: poder explicar cada parte del proyecto sin ayuda. Claude Code agrega u
 
 ## Preparación para la defensa
 
-Se completa en la Fase final:
-- Recorrido de 5 minutos por cada app: qué pantalla llama a qué y por qué.
-- Las 10 preguntas más probables del docente, con respuesta corta basada en el código.
-- Las 3 partes más difíciles del proyecto (fotos, mapa selector, cálculo de reserva) explicadas paso a paso.
+### Recorrido de 5 minutos — App arrendatario (Ionic + Angular)
+
+1. **Login/registro** (`pages/login`, `pages/registro`): `AuthService` llama a la API y guarda el usuario en `localStorage`. `authGuard` (`guards/auth.guard.ts`) revisa esa sesión antes de dejar entrar a cualquier ruta protegida.
+2. **Mis lugares** (`pages/mis-lugares`): pantalla principal. `ionViewWillEnter()` pide `GET lugares/arrendatario/{id}` cada vez que se vuelve a esta pantalla (no en `ngOnInit`, porque Ionic no destruye la página al navegar). Botón `+` → `lugar/nuevo`.
+3. **Formulario de lugar** (`pages/lugar-form`): una sola página para crear y editar (patrón "nota seleccionada" del práctico 2). Si la ruta trae `:id`, pide el lugar, precarga el formulario, la ubicación y las fotos existentes, y muestra el botón "Ver reservas". Guardar llama `POST` o `PUT` según el modo, y recién después sube las fotos nuevas una por una con `await`+`firstValueFrom()` (única excepción al patrón `subscribe`, porque son pasos que dependen uno del otro: primero necesito el `id` del lugar guardado).
+4. **Mapa selector** (`components/mapa-selector`): un Leaflet embebido que muestra el punto actual (si hay) y permite tocar para moverlo; emite `ubicacionSeleccionada` hacia el formulario.
+5. **Reservas del lugar** (`pages/reservas-lugar`): solo visible desde un lugar existente; pide `GET reservas/lugar/{id}` (que en realidad devuelve el lugar completo con las reservas adentro, no un arreglo plano — hay que explicar esa particularidad de la API).
+
+### Recorrido de 5 minutos — App cliente (Flutter)
+
+1. **main.dart**: antes de `runApp`, `AuthProvider.cargarSesion()` lee `shared_preferences`. Con sesión → `BusquedaScreen`; sin sesión → `LoginScreen`. Los tres providers (`AuthProvider`, `BusquedaProvider`, `ReservaProvider`) se registran una sola vez en el `MultiProvider` de la raíz.
+2. **Login/registro**: `AuthService` + `AuthProvider`; al registrarse se inicia sesión automáticamente con el mismo email/password (así lo piden los wireframes).
+3. **Buscar lugares** (pantalla principal): guarda ciudad/fechas/huéspedes en `BusquedaProvider` (se van a necesitar después, al confirmar la reserva) y llama `buscar()` (solo manda la ciudad). El botón "Búsqueda avanzada" lleva a un formulario con los mismos campos más los del lugar; el botón "Ver reservas" lleva a `MisReservasScreen`.
+4. **Resultados**: `LugarCard` en lista; el botón inferior cambia a `MapaLugares` (un marcador por lugar) y viceversa — mismo `BusquedaProvider.resultados` para ambas vistas.
+5. **Detalle**: pide `GET lugares/{id}` de nuevo (no reutiliza los datos parciales de la búsqueda) para mostrar siempre la versión más actual; `GaleriaFotos` maneja su propio índice de foto grande.
+6. **Confirmar reserva**: toma el `LugarModel` del detalle y las fechas de `BusquedaProvider`; calcula con `calculo_reserva.dart` y envía `POST reservas` con el `cliente_id` de la sesión. Al terminar, vuelve directo a la pantalla principal (`popUntil((ruta) => ruta.isFirst)`).
+7. **Mis reservas**: pide `GET reservas/cliente/{id}`, que trae el lugar de cada reserva anidado como un arreglo de 1 elemento (otra particularidad de la API a explicar).
+
+### Las 10 preguntas más probables del docente
+
+1. **¿Por qué cada app usa una tecnología distinta?** Porque el enunciado lo exige (ver tabla de requisitos RG-01); además así se practican dos formas distintas de manejar estado (`ChangeNotifier`/`provider` vs `signal()`) con el mismo problema de fondo.
+2. **¿Cómo se mantiene la sesión si cierro la app?** Se guarda el usuario (sin token) en almacenamiento local al iniciar sesión: `shared_preferences` en Flutter, `localStorage` en Angular. Al abrir la app de nuevo, se lee antes de decidir la pantalla inicial.
+3. **¿Qué pasa si la API responde un error?** Ambas apps miran la FORMA del cuerpo, no el código HTTP: `{"message": "texto"}` es un error de negocio (se muestra tal cual); `{"campo": ["mensaje"]}` es de validación (se muestra el primer mensaje). La API usa HTTP 404 para casi todos los errores, no 422 — fue un hallazgo de la Fase 0, no una suposición.
+4. **¿Por qué `provider`/`signal` y no Bloc, Riverpod o NgRx?** Porque el enunciado pide reutilizar los patrones vistos en los prácticos de clase, y esos otros no se vieron (y están explícitamente prohibidos en `CLAUDE.md` del proyecto).
+5. **¿Cómo decide el formulario del arrendatario si crear o editar?** Por si la ruta trae un `:id` (patrón "nota seleccionada" del práctico 2): con `id` pide el lugar y precarga todo; sin `id` arranca vacío.
+6. **¿Por qué el cobro por servicio es 10% fijo?** No lo define la API ni el enunciado; es una decisión propia del proyecto, documentada en una sola constante (`porcentajeServicio` en `calculo_reserva.dart`) para poder cambiarla en un solo lugar si hiciera falta.
+7. **¿Cómo se suben varias fotos de un lugar?** Una petición `multipart/form-data` por foto (campo `foto`), después de guardar el lugar y tener su `id`; la API no acepta varias fotos en una sola petición.
+8. **¿Cómo se elige la ubicación en el mapa?** Un componente Leaflet (`mapa-selector`) escucha el clic, mueve un `circleMarker` (no el ícono por defecto, que sale roto con el empaquetador de Angular) y emite la latitud/longitud al formulario, que las guarda como texto (la API rechaza números).
+9. **¿Por qué la búsqueda avanzada arma el body dinámicamente en vez de mandar todos los campos?** Porque la API trata "campo ausente" y "campo en `0`" como cosas distintas: mandar `0` filtra literalmente por ese valor. Se arma un mapa vacío y se le agregan solo las claves que el usuario llenó.
+10. **¿Qué pasa si un lugar no tiene fotos, o no tiene wifi/parqueo?** Nunca se accede a `fotos[0]` sin revisar que la lista no esté vacía (se muestra un ícono de imagen); wifi y parqueo son datos que siempre vienen (`0`/`1` o cantidad), así que siempre tienen algo que mostrar ("Wifi: No", "No tiene parqueo").
+
+### Las 3 partes más difíciles, paso a paso
+
+**1. Subir fotos (arrendatario, Fase A4)**
+1. El usuario elige uno o más archivos con `<input type="file" multiple>`.
+2. Por cada archivo se arma una vista previa local con `URL.createObjectURL(archivo)` (no hace falta subir nada todavía para mostrarla).
+3. Al guardar el lugar: primero `POST`/`PUT /lugares` (sin fotos) y se espera la respuesta para tener el `id` del lugar.
+4. Recién ahí, una petición `POST /lugares/{id}/foto` por cada foto nueva, cada una con su propio `FormData`.
+5. Como estos pasos dependen uno del otro en orden estricto, se usa `async/await` + `firstValueFrom()` en vez del `subscribe` habitual de los demás services — la única excepción documentada a esa regla.
+
+**2. Elegir ubicación en un mapa (ambas apps)**
+1. Arrendatario (Leaflet): el mapa se crea en `ngAfterViewInit` sobre un `div` con altura fija; como dentro de `ion-content` el tamaño final se conoce recién después del primer render, se llama `mapa.invalidateSize()` con un `setTimeout` corto. Un clic mueve el `circleMarker` y emite la nueva ubicación hacia el formulario.
+2. Cliente (`flutter_map`, solo para mostrar, no para elegir): un `Marker` por lugar de los resultados, con `TileLayer` apuntando a OpenStreetMap y un `userAgentPackageName` obligatorio (si falta, OpenStreetMap puede bloquear las peticiones).
+3. En ambos casos la `latitud`/`longitud` viajan como **texto** hacia la API (nunca como número), porque la API devuelve error de validación con números.
+
+**3. Calcular el precio de una reserva (cliente, Fase C5)**
+1. `calcularNoches(llegada, salida)` = diferencia en días completos entre las dos fechas (sin horas).
+2. `calcularSubtotal(noches, precioNoche)` = noches × precio por noche.
+3. `calcularServicio(subtotal)` = subtotal × 10% (constante `porcentajeServicio`).
+4. `calcularTotal(subtotal, limpieza, servicio)` = suma de los tres.
+5. Cada función redondea a 2 decimales antes de devolver, para que la suma final no arrastre errores de coma flotante (ej. que 120 + 5 + 12 dé 136.999999 en vez de 137).
+6. Al confirmar, esos mismos números se mandan a la API como texto con 2 decimales (`precioNoches`, `precioLimpieza`, `precioServicio`, `precioTotal`), igual que en el ejemplo confirmado en `docs/API.md`.
+
+### Cierre de la Fase final
+
+- `docs/REQUISITOS.md` recorrido completo: los 36 requisitos (generales, cliente, arrendatario y criterios propios) quedaron en `✔`.
+- `flutter analyze` sin advertencias y `npm run build` sin errores en ambas apps; no se encontró código comentado, `print`/`console.log` de depuración, `TODO` sueltos ni archivos de plantilla sin usar.
+- Extras opcionales que sí se hicieron (el usuario los pidió explícitamente al cerrar esta fase):
+  - **Selector de fechas en español**: se agregó `flutter_localizations` (viene con el SDK de Flutter, no es un paquete externo nuevo) y se configuró `locale: Locale('es')` en `main.dart`. Afecta el `DatePicker` y cualquier otro texto de Material.
+  - **Nombre e ícono propios**: `AndroidManifest.xml` del cliente → `android:label="BNB Cliente"`; `index.html` del arrendatario → `<title>BNB Arrendatario</title>`. Los íconos los proveyó el usuario (imágenes cuadradas de 512×512) y se redimensionaron sin agregar ninguna dependencia nueva: `ic_launcher.png` en los 5 tamaños de `mipmap-*` (Android) para el cliente, y `favicon.png` (64×64) para el arrendatario.
+- **URL definitiva de la API**: el docente avisó el 2026-11-09 la URL final (`https://api.airbnbmob2.online/api/`, dominio propio, ya no un túnel temporal que cambia de nombre). Se actualizó en los 3 archivos de configuración y en `CLAUDE.md`; al momento de cambiarla respondía error de Cloudflare 1033 (túnel del servidor del profesor desconectado, no un problema de esta app), así que las pruebas de esta fase se hicieron igual contra el mock.
 
 ---
 
