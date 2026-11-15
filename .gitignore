@@ -3,3 +3,7 @@ contexto/
 CLAUDE.md
 app-cliente/CLAUDE.md
 app-arrendatario/CLAUDE.md
+
+# Logs y capturas locales
+*.log
+screen.png
