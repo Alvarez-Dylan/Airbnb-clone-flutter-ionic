@@ -32,16 +32,25 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
   }
 
   Future<void> _elegirFecha({required bool esLlegada}) async {
+    final hoy = DateTime.now();
+    // La llegada se limita a hoy + 364 dias para que su dia siguiente (el
+    // primer dia posible de salida) nunca pase del lastDate de la salida.
+    final primerDiaSalida = _fechaLlegada?.add(const Duration(days: 1)) ?? hoy;
     final fecha = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: esLlegada ? hoy : primerDiaSalida,
+      firstDate: esLlegada ? hoy : primerDiaSalida,
+      lastDate: hoy.add(Duration(days: esLlegada ? 364 : 365)),
     );
     if (fecha == null) return;
     setState(() {
       if (esLlegada) {
         _fechaLlegada = fecha;
+        // Si la salida ya elegida queda antes o igual que la nueva llegada,
+        // se borra para que el usuario la vuelva a elegir.
+        if (_fechaSalida != null && !_fechaSalida!.isAfter(fecha)) {
+          _fechaSalida = null;
+        }
       } else {
         _fechaSalida = fecha;
       }
@@ -123,7 +132,7 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
             ),
             Row(
               children: [
-                const Text('Cantidad de huespedes'),
+                const Text('Cantidad de huéspedes'),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.remove),
@@ -143,7 +152,7 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => const BusquedaAvanzadaScreen()),
               ),
-              child: const Text('Busqueda avanzada'),
+              child: const Text('Búsqueda avanzada'),
             ),
             TextButton(
               onPressed: () => Navigator.push(

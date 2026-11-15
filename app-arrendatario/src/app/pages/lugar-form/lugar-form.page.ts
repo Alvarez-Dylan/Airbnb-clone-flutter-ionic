@@ -10,6 +10,7 @@ import {
   IonTitle,
   IonContent,
   IonButtons,
+  IonBackButton,
   IonItem,
   IonLabel,
   IonInput,
@@ -78,6 +79,7 @@ function formularioVacio(): FormularioLugar {
     IonTitle,
     IonContent,
     IonButtons,
+    IonBackButton,
     IonItem,
     IonLabel,
     IonInput,
@@ -171,6 +173,10 @@ export class LugarFormPage {
     this.router.navigate(['lugar', this.idLugar, 'reservas']);
   }
 
+  ocultarImagenRota(evento: Event): void {
+    (evento.target as HTMLImageElement).style.display = 'none';
+  }
+
   async guardar(): Promise<void> {
     const error = this.validar();
     if (error) {
@@ -234,20 +240,20 @@ export class LugarFormPage {
   private validar(): string | null {
     const f = this.formulario;
     if (!f.nombre.trim()) return 'Ingresa el nombre del lugar';
-    if (!f.descripcion.trim()) return 'Ingresa una descripcion';
+    if (!f.descripcion.trim()) return 'Ingresa una descripción';
     if (!f.ciudad.trim()) return 'Ingresa la ciudad';
     // Al editar ya existe al menos una foto (la API no permite borrarlas).
     if (!this.modoEditar && this.fotosNuevas.length === 0) return 'Agrega al menos una foto';
     if (Number(f.cantPersonas) < 1) return 'La cantidad de personas debe ser al menos 1';
     if (Number(f.cantCamas) < 1) return 'La cantidad de camas debe ser al menos 1';
-    if (Number(f.cantBanios) < 1) return 'La cantidad de banios debe ser al menos 1';
+    if (Number(f.cantBanios) < 1) return 'La cantidad de baños debe ser al menos 1';
     if (Number(f.cantHabitaciones) < 1) return 'La cantidad de habitaciones debe ser al menos 1';
     if (f.tieneParqueo && Number(f.cantVehiculosParqueo) < 1) {
-      return 'Ingresa la cantidad de vehiculos de parqueo';
+      return 'Ingresa la cantidad de vehículos de parqueo';
     }
     if (Number(f.precioNoche) < 0) return 'El precio por noche no puede ser negativo';
     if (Number(f.costoLimpieza) < 0) return 'El costo de limpieza no puede ser negativo';
-    if (!this.ubicacion) return 'Selecciona la ubicacion en el mapa';
+    if (!this.ubicacion) return 'Selecciona la ubicación en el mapa';
     return null;
   }
 

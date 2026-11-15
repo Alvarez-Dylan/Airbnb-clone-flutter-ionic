@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/mis-lugares"></ion-back-button>
+    </ion-buttons>
     <ion-title>{{ modoEditar ? 'Editar lugar' : 'Nuevo lugar' }}</ion-title>
     @if (modoEditar) {
       <ion-buttons slot="end">
@@ -19,7 +22,11 @@
     <div class="fotos">
       @for (foto of fotosExistentes; track foto.id) {
         <div class="foto-previa">
-          <img [src]="urlFoto(foto.url)" alt="Foto del lugar" />
+          <img
+            [src]="urlFoto(foto.url)"
+            alt="Foto del lugar"
+            (error)="ocultarImagenRota($event)"
+          />
         </div>
       }
       @for (foto of fotosNuevas; track foto.previewUrl; let indice = $index) {
@@ -49,7 +56,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Descripcion</ion-label>
+      <ion-label position="floating">Descripción</ion-label>
       <ion-input [(ngModel)]="formulario.descripcion" name="descripcion"></ion-input>
     </ion-item>
 
@@ -64,7 +71,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Cantidad de banios</ion-label>
+      <ion-label position="floating">Cantidad de baños</ion-label>
       <ion-input type="number" [(ngModel)]="formulario.cantBanios" name="cantBanios"></ion-input>
     </ion-item>
 
@@ -89,7 +96,7 @@
 
     @if (formulario.tieneParqueo) {
       <ion-item>
-        <ion-label position="floating">Vehiculos de parqueo</ion-label>
+        <ion-label position="floating">Vehículos de parqueo</ion-label>
         <ion-input
           type="number"
           [(ngModel)]="formulario.cantVehiculosParqueo"
@@ -117,7 +124,7 @@
       <ion-input [(ngModel)]="formulario.ciudad" name="ciudad"></ion-input>
     </ion-item>
 
-    <p class="ion-padding-top">Toca el mapa para elegir la ubicacion exacta</p>
+    <p class="ion-padding-top">Toca el mapa para elegir la ubicación exacta</p>
     <app-mapa-selector
       [latitud]="ubicacion?.latitud ?? null"
       [longitud]="ubicacion?.longitud ?? null"

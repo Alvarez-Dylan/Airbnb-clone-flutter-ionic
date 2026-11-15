@@ -64,7 +64,7 @@ class _DetalleLugarScreenState extends State<DetalleLugarScreen> {
 
   Widget _buildContenido(BuildContext context, LugarModel lugar) {
     final parqueo = lugar.cantVehiculosParqueo > 0
-        ? 'Parqueo para ${lugar.cantVehiculosParqueo} vehiculos'
+        ? 'Parqueo para ${lugar.cantVehiculosParqueo} vehículos'
         : 'No tiene parqueo';
 
     return ListView(
@@ -78,10 +78,10 @@ class _DetalleLugarScreenState extends State<DetalleLugarScreen> {
         const SizedBox(height: 16),
         Text('${lugar.cantPersonas} personas'),
         Text('${lugar.cantCamas} camas'),
-        Text('${lugar.cantBanios} banios'),
+        Text('${lugar.cantBanios} baños'),
         Text('${lugar.cantHabitaciones} habitaciones'),
-        Text('Anfitrion: ${lugar.nombreAnfitrion}'),
-        Text('Wifi: ${lugar.tieneWifi ? 'Si' : 'No'}'),
+        Text('Anfitrión: ${lugar.nombreAnfitrion}'),
+        Text('Wifi: ${lugar.tieneWifi ? 'Sí' : 'No'}'),
         Text(parqueo),
         const SizedBox(height: 8),
         Text(

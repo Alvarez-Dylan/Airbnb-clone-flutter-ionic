@@ -28,7 +28,7 @@ class ReservaCard extends StatelessWidget {
         title: Text(reserva.nombreLugar),
         subtitle: Text(
           '${reserva.noches} noches · ${formatearFecha(reserva.fechaInicio)} a '
-          '${formatearFecha(reserva.fechaFin)}\nAnfitrion: ${reserva.nombreAnfitrion}',
+          '${formatearFecha(reserva.fechaFin)}\nAnfitrión: ${reserva.nombreAnfitrion}',
         ),
         isThreeLine: true,
         trailing: Text(formatearPrecio(reserva.precioTotal)),

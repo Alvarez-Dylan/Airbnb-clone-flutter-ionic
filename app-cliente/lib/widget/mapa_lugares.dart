@@ -58,6 +58,8 @@ class MapaLugares extends StatelessWidget {
             );
           }).toList(),
         ),
+        // OpenStreetMap exige mostrar esta atribución sobre el mapa.
+        SimpleAttributionWidget(source: const Text('OpenStreetMap contributors')),
       ],
     );
   }

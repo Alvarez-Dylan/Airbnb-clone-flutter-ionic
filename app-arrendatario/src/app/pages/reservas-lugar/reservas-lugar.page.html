@@ -1,5 +1,8 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/lugar/{{ idLugar }}"></ion-back-button>
+    </ion-buttons>
     <ion-title>Reservas del lugar</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -12,7 +15,7 @@
   } @else if (error()) {
     <p class="ion-padding">{{ error() }}</p>
   } @else if (lugar()!.reservas.length === 0) {
-    <p class="ion-padding">Este lugar aun no tiene reservas</p>
+    <p class="ion-padding">Este lugar aún no tiene reservas</p>
   } @else {
     <ion-list>
       @for (reserva of lugar()!.reservas; track reserva.id) {

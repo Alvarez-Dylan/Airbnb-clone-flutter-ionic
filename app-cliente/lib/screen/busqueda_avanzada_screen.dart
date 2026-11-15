@@ -43,16 +43,25 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
   }
 
   Future<void> _elegirFecha({required bool esLlegada}) async {
+    final hoy = DateTime.now();
+    // La llegada se limita a hoy + 364 dias para que su dia siguiente (el
+    // primer dia posible de salida) nunca pase del lastDate de la salida.
+    final primerDiaSalida = _fechaLlegada?.add(const Duration(days: 1)) ?? hoy;
     final fecha = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: esLlegada ? hoy : primerDiaSalida,
+      firstDate: esLlegada ? hoy : primerDiaSalida,
+      lastDate: hoy.add(Duration(days: esLlegada ? 364 : 365)),
     );
     if (fecha == null) return;
     setState(() {
       if (esLlegada) {
         _fechaLlegada = fecha;
+        // Si la salida ya elegida queda antes o igual que la nueva llegada,
+        // se borra para que el usuario la vuelva a elegir.
+        if (_fechaSalida != null && !_fechaSalida!.isAfter(fecha)) {
+          _fechaSalida = null;
+        }
       } else {
         _fechaSalida = fecha;
       }
@@ -115,7 +124,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Busqueda avanzada')),
+      appBar: AppBar(title: const Text('Búsqueda avanzada')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -142,7 +151,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
           ),
           Row(
             children: [
-              const Text('Cantidad de huespedes'),
+              const Text('Cantidad de huéspedes'),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.remove),
@@ -158,7 +167,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
           const Divider(height: 32),
           TextField(
             controller: _descripcionController,
-            decoration: const InputDecoration(labelText: 'Descripcion (opcional)'),
+            decoration: const InputDecoration(labelText: 'Descripción (opcional)'),
           ),
           const SizedBox(height: 8),
           TextField(
@@ -170,7 +179,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
           TextField(
             controller: _baniosController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Cantidad de banios (opcional)'),
+            decoration: const InputDecoration(labelText: 'Cantidad de baños (opcional)'),
           ),
           const SizedBox(height: 8),
           TextField(
@@ -182,7 +191,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
           TextField(
             controller: _vehiculosController,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Vehiculos de parqueo (opcional)'),
+            decoration: const InputDecoration(labelText: 'Vehículos de parqueo (opcional)'),
           ),
           const SizedBox(height: 8),
           TextField(
@@ -196,7 +205,7 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
             decoration: const InputDecoration(labelText: 'Wifi'),
             items: const [
               DropdownMenuItem(value: null, child: Text('Cualquiera')),
-              DropdownMenuItem(value: true, child: Text('Si')),
+              DropdownMenuItem(value: true, child: Text('Sí')),
               DropdownMenuItem(value: false, child: Text('No')),
             ],
             onChanged: (valor) => setState(() => _tieneWifi = valor),

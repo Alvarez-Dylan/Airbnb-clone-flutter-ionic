@@ -87,17 +87,17 @@ class _RegistroScreenState extends State<RegistroScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Contrasena'),
+                decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: true,
                 validator: (valor) =>
-                    (valor == null || valor.isEmpty) ? 'Ingresa la contrasena' : null,
+                    (valor == null || valor.isEmpty) ? 'Ingresa la contraseña' : null,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _telefonoController,
-                decoration: const InputDecoration(labelText: 'Telefono'),
+                decoration: const InputDecoration(labelText: 'Teléfono'),
                 validator: (valor) =>
-                    (valor == null || valor.trim().isEmpty) ? 'Ingresa el telefono' : null,
+                    (valor == null || valor.trim().isEmpty) ? 'Ingresa el teléfono' : null,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -106,7 +106,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Iniciar sesion'),
+                child: const Text('Iniciar sesión'),
               ),
             ],
           ),

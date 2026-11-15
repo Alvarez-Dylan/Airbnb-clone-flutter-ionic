@@ -66,7 +66,7 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
     if (llegada == null || salida == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Confirmar reserva')),
-        body: const Center(child: Text('Elige primero las fechas en la busqueda')),
+        body: const Center(child: Text('Elige primero las fechas en la búsqueda')),
       );
     }
 

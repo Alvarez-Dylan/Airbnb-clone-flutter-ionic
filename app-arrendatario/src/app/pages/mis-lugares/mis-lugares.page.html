@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Mis lugares</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrarSesion()">Cerrar sesion</ion-button>
+      <ion-button (click)="cerrarSesion()">Cerrar sesión</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -15,7 +15,7 @@
   } @else if (error()) {
     <p class="ion-padding">{{ error() }}</p>
   } @else if (lugares().length === 0) {
-    <p class="ion-padding">Todavia no tenes lugares publicados.</p>
+    <p class="ion-padding">Todavía no tienes lugares publicados.</p>
   } @else {
     <ion-list>
       @for (lugar of lugares(); track lugar.id) {

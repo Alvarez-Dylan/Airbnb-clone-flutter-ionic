@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Iniciar sesion</ion-title>
+    <ion-title>Iniciar sesión</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,7 +11,7 @@
   </ion-item>
 
   <ion-item>
-    <ion-label position="floating">Contrasena</ion-label>
+    <ion-label position="floating">Contraseña</ion-label>
     <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
   </ion-item>
 
@@ -21,7 +21,7 @@
     [disabled]="enviando()"
     (click)="iniciarSesion()"
   >
-    Iniciar sesion
+    Iniciar sesión
   </ion-button>
 
   <ion-button expand="block" fill="clear" routerLink="/registro">Registrarse</ion-button>

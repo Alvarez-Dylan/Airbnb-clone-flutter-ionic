@@ -32,7 +32,7 @@ class _MisReservasScreenState extends State<MisReservasScreen> {
         cargando: reservaProvider.cargandoReservas,
         error: reservaProvider.errorReservas,
         vacio: reservaProvider.reservas.isEmpty,
-        mensajeVacio: 'No tienes reservas todavia',
+        mensajeVacio: 'No tienes reservas todavía',
         child: ListView.builder(
           itemCount: reservaProvider.reservas.length,
           itemBuilder: (context, indice) {
