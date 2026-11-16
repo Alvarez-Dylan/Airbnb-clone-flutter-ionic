@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
+import 'config/tema.dart';
 import 'repository/auth_provider.dart';
 import 'repository/busqueda_provider.dart';
 import 'repository/reserva_provider.dart';
@@ -35,6 +36,7 @@ class BnbClienteApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'BNB Cliente',
+        theme: crearTema(),
         // Selectores de fecha y demas textos de Material en espanol.
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,

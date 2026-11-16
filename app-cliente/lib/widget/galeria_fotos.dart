@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/lugar_model.dart';
-import '../utils/conversiones.dart';
+import 'foto_lugar.dart';
 
 class GaleriaFotos extends StatefulWidget {
   final List<FotoModel> fotos;
@@ -19,13 +19,8 @@ class _GaleriaFotosState extends State<GaleriaFotos> {
 
   @override
   Widget build(BuildContext context) {
-    // Un lugar puede no tener fotos: nunca se usa fotos[0] sin revisar antes.
     if (widget.fotos.isEmpty) {
-      return Container(
-        height: 220,
-        color: Colors.grey.shade300,
-        child: const Icon(Icons.image, size: 64),
-      );
+      return const SizedBox(height: 220, child: FotoLugar(url: null));
     }
 
     return Column(
@@ -33,11 +28,7 @@ class _GaleriaFotosState extends State<GaleriaFotos> {
         SizedBox(
           height: 220,
           width: double.infinity,
-          child: Image.network(
-            urlFoto(widget.fotos[_indiceSeleccionado].url),
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 64),
-          ),
+          child: FotoLugar(url: widget.fotos[_indiceSeleccionado].url),
         ),
         if (widget.fotos.length > 1) ...[
           const SizedBox(height: 8),
@@ -54,6 +45,7 @@ class _GaleriaFotosState extends State<GaleriaFotos> {
                   child: Container(
                     width: 64,
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: seleccionada
                             ? Theme.of(context).colorScheme.primary
@@ -61,11 +53,7 @@ class _GaleriaFotosState extends State<GaleriaFotos> {
                         width: 2,
                       ),
                     ),
-                    child: Image.network(
-                      urlFoto(widget.fotos[indice].url),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
-                    ),
+                    child: FotoLugar(url: widget.fotos[indice].url, radio: 8),
                   ),
                 );
               },

@@ -1,14 +1,16 @@
-// Confirmar reserva: muestra el desglose del precio y lo envia a la API.
+// Confirmar reserva: muestra el resumen y el desglose del precio, y lo envia a la API.
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../config/tema.dart';
 import '../model/lugar_model.dart';
 import '../repository/auth_provider.dart';
 import '../repository/busqueda_provider.dart';
 import '../repository/reserva_provider.dart';
 import '../utils/calculo_reserva.dart';
 import '../utils/conversiones.dart';
+import '../widget/foto_lugar.dart';
 
 class ConfirmarReservaScreen extends StatefulWidget {
   final LugarModel lugar;
@@ -21,6 +23,7 @@ class ConfirmarReservaScreen extends StatefulWidget {
 
 class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
   final _formatoApi = DateFormat('yyyy-MM-dd');
+  final _formatoFecha = DateFormat('dd/MM/yyyy');
 
   Future<void> _confirmar() async {
     final busquedaProvider = context.read<BusquedaProvider>();
@@ -47,8 +50,9 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
     if (!mounted) return;
 
     if (exito) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Reserva confirmada')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Reserva confirmada')));
       Navigator.popUntil(context, (ruta) => ruta.isFirst);
     } else {
       final error = context.read<ReservaProvider>().error ?? 'No se pudo confirmar la reserva';
@@ -78,25 +82,88 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Confirmar reserva')),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(widget.lugar.nombre, style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 16),
-            _filaPrecio(
-              '$noches noches x ${formatearPrecio(widget.lugar.precioNoche)}',
-              formatearPrecio(subtotal),
+        children: [
+          _tarjetaResumen(context, busquedaProvider.huespedes, llegada, salida),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _filaPrecio(
+                    '$noches noches x ${formatearPrecio(widget.lugar.precioNoche)}',
+                    formatearPrecio(subtotal),
+                  ),
+                  _filaPrecio('Limpieza', formatearPrecio(limpieza)),
+                  _filaPrecio('Servicio', formatearPrecio(servicio)),
+                  const Divider(),
+                  _filaPrecio('Total', formatearPrecio(total), destacado: true),
+                ],
+              ),
             ),
-            _filaPrecio('Limpieza', formatearPrecio(limpieza)),
-            _filaPrecio('Servicio', formatearPrecio(servicio)),
-            const Divider(),
-            _filaPrecio('Total', formatearPrecio(total), destacado: true),
-            const SizedBox(height: 24),
-            ElevatedButton(
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: FilledButton(
               onPressed: reservaProvider.cargando ? null : _confirmar,
               child: Text(reservaProvider.cargando ? 'Enviando...' : 'Confirmar reserva'),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _tarjetaResumen(BuildContext context, int huespedes, DateTime llegada, DateTime salida) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: FotoLugar(
+                url: widget.lugar.fotos.isEmpty ? null : widget.lugar.fotos.first.url,
+                radio: 12,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.lugar.nombre,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_formatoFecha.format(llegada)} - ${_formatoFecha.format(salida)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: colorTextoSecundario),
+                  ),
+                  Text(
+                    '$huespedes huéspedes',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: colorTextoSecundario),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -106,14 +173,16 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
 
   Widget _filaPrecio(String etiqueta, String valor, {bool destacado = false}) {
     final estilo = destacado
-        ? const TextStyle(fontWeight: FontWeight.bold)
+        ? const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
         : const TextStyle();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(etiqueta, style: estilo),
+          Expanded(
+            child: Text(etiqueta, style: estilo, maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
           Text(valor, style: estilo),
         ],
       ),

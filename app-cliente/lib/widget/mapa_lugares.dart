@@ -31,28 +31,37 @@ class MapaLugares extends StatelessWidget {
         ),
         MarkerLayer(
           markers: lugares.map((lugar) {
+            final colorScheme = Theme.of(context).colorScheme;
             return Marker(
               point: LatLng(lugar.latitud, lugar.longitud),
               width: 90,
-              height: 50,
+              height: 32,
               child: GestureDetector(
                 onTap: () => onTapLugar(lugar),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
-                      child: Text(
-                        formatearPrecio(lugar.precioNoche),
-                        style: const TextStyle(color: Colors.white, fontSize: 10),
-                      ),
+                    ],
+                  ),
+                  child: Text(
+                    formatearPrecio(lugar.precioNoche),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
-                    Icon(Icons.location_pin, color: Theme.of(context).colorScheme.primary),
-                  ],
+                  ),
                 ),
               ),
             );

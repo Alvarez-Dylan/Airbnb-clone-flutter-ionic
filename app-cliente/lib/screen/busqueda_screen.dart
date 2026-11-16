@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../repository/auth_provider.dart';
 import '../repository/busqueda_provider.dart';
+import '../widget/campo_fecha.dart';
+import '../widget/contador_huespedes.dart';
 import 'busqueda_avanzada_screen.dart';
 import 'login_screen.dart';
 import 'mis_reservas_screen.dart';
@@ -95,71 +97,102 @@ class _BusquedaScreenState extends State<BusquedaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final nombreCompleto = context.watch<AuthProvider>().usuario?.nombrecompleto ?? '';
+    final primerNombre = nombreCompleto.split(' ').first;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Buscar lugares'),
-        actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _cerrarSesion),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.logout), onPressed: _cerrarSesion)],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: _ciudadController,
-              decoration: const InputDecoration(labelText: 'Ciudad'),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                _fechaLlegada == null
-                    ? 'Fecha de llegada'
-                    : _formatoFecha.format(_fechaLlegada!),
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => _elegirFecha(esLlegada: true),
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                _fechaSalida == null ? 'Fecha de salida' : _formatoFecha.format(_fechaSalida!),
-              ),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => _elegirFecha(esLlegada: false),
-            ),
-            Row(
-              children: [
-                const Text('Cantidad de huéspedes'),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: _huespedes > 1 ? () => setState(() => _huespedes--) : null,
-                ),
-                Text('$_huespedes'),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => setState(() => _huespedes++),
-                ),
-              ],
+            Text(
+              'Hola, $primerNombre',
+              style: Theme.of(context).textTheme.headlineSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _buscar, child: const Text('Buscar')),
-            TextButton(
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: _ciudadController,
+                      decoration: const InputDecoration(labelText: 'Ciudad'),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CampoFecha(
+                            etiqueta: 'Llegada',
+                            fecha: _fechaLlegada,
+                            formato: _formatoFecha,
+                            onTap: () => _elegirFecha(esLlegada: true),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: CampoFecha(
+                            etiqueta: 'Salida',
+                            fecha: _fechaSalida,
+                            formato: _formatoFecha,
+                            onTap: () => _elegirFecha(esLlegada: false),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Cantidad de huéspedes',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ContadorHuespedes(
+                          cantidad: _huespedes,
+                          onQuitar: _huespedes > 1 ? () => setState(() => _huespedes--) : null,
+                          onAgregar: () => setState(() => _huespedes++),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: _buscar,
+                      icon: const Icon(Icons.search),
+                      label: const Text('Buscar'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const BusquedaAvanzadaScreen()),
               ),
-              child: const Text('Búsqueda avanzada'),
+              icon: const Icon(Icons.tune),
+              label: const Text('Búsqueda avanzada'),
             ),
-            TextButton(
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const MisReservasScreen()),
               ),
-              child: const Text('Ver reservas'),
+              icon: const Icon(Icons.event_note_outlined),
+              label: const Text('Ver reservas'),
             ),
           ],
         ),

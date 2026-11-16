@@ -2,9 +2,11 @@
 // parciales de la busqueda) para mostrar siempre la version mas reciente.
 import 'package:flutter/material.dart';
 
+import '../config/tema.dart';
 import '../model/lugar_model.dart';
 import '../service/lugar_service.dart';
-import '../utils/conversiones.dart';
+import '../widget/barra_reservar.dart';
+import '../widget/caracteristicas_lugar.dart';
 import '../widget/galeria_fotos.dart';
 import '../widget/vista_estado.dart';
 import 'confirmar_reserva_screen.dart';
@@ -48,54 +50,78 @@ class _DetalleLugarScreenState extends State<DetalleLugarScreen> {
     }
   }
 
+  void _irAConfirmar(LugarModel lugar) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ConfirmarReservaScreen(lugar: lugar)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final lugar = _lugar;
+
     return Scaffold(
-      appBar: AppBar(title: Text(_lugar?.nombre ?? 'Detalle')),
+      appBar: AppBar(title: Text(lugar?.nombre ?? 'Detalle')),
       body: VistaEstado(
         cargando: _cargando,
         error: _error,
         vacio: false,
         mensajeVacio: '',
-        child: _lugar == null ? const SizedBox() : _buildContenido(context, _lugar!),
+        child: lugar == null ? const SizedBox() : _buildContenido(context, lugar),
       ),
+      // Solo aparece cuando el lugar ya cargo: mientras carga o si hubo un
+      // error no tiene sentido ofrecer "Reservar".
+      bottomNavigationBar: lugar == null
+          ? null
+          : BarraReservar(precioNoche: lugar.precioNoche, onReservar: () => _irAConfirmar(lugar)),
     );
   }
 
   Widget _buildContenido(BuildContext context, LugarModel lugar) {
-    final parqueo = lugar.cantVehiculosParqueo > 0
-        ? 'Parqueo para ${lugar.cantVehiculosParqueo} vehículos'
-        : 'No tiene parqueo';
-
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
         GaleriaFotos(fotos: lugar.fotos),
         const SizedBox(height: 16),
-        Text(lugar.nombre, style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          lugar.nombre,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          lugar.ciudad,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: colorTextoSecundario),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              child: Text(
+                lugar.nombreAnfitrion.isEmpty ? '?' : lugar.nombreAnfitrion[0].toUpperCase(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Anfitrión: ${lugar.nombreAnfitrion}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        CaracteristicasLugar(lugar: lugar),
+        const SizedBox(height: 24),
+        Text('Acerca de este lugar', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         Text(lugar.descripcion),
-        const SizedBox(height: 16),
-        Text('${lugar.cantPersonas} personas'),
-        Text('${lugar.cantCamas} camas'),
-        Text('${lugar.cantBanios} baños'),
-        Text('${lugar.cantHabitaciones} habitaciones'),
-        Text('Anfitrión: ${lugar.nombreAnfitrion}'),
-        Text('Wifi: ${lugar.tieneWifi ? 'Sí' : 'No'}'),
-        Text(parqueo),
-        const SizedBox(height: 8),
-        Text(
-          '${formatearPrecio(lugar.precioNoche)} por noche',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => ConfirmarReservaScreen(lugar: lugar)),
-          ),
-          child: const Text('Reservar'),
-        ),
       ],
     );
   }

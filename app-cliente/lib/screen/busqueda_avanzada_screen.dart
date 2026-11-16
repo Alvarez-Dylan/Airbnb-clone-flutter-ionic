@@ -208,6 +208,14 @@ class _BusquedaAvanzadaScreenState extends State<BusquedaAvanzadaScreen> {
               DropdownMenuItem(value: true, child: Text('Sí')),
               DropdownMenuItem(value: false, child: Text('No')),
             ],
+            // Con nada elegido (null = no filtrar) el campo se ve vacio en vez
+            // de mostrar "Cualquiera"; al abrir el menu esa opcion sigue ahi
+            // por si se quiere volver a "no filtrar" despues de elegir algo.
+            selectedItemBuilder: (context) => const [
+              SizedBox.shrink(),
+              Text('Sí'),
+              Text('No'),
+            ],
             onChanged: (valor) => setState(() => _tieneWifi = valor),
           ),
           const SizedBox(height: 24),

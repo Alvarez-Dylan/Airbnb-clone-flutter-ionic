@@ -1,9 +1,11 @@
-// Item de la lista de "mis reservas": foto, nombre del lugar, noches,
-// fechas, anfitrion y precio total.
+// Item de la lista de "mis reservas": foto, nombre del lugar, fechas, noches,
+// anfitrion y precio total (los datos que pide RC-16).
 import 'package:flutter/material.dart';
 
+import '../config/tema.dart';
 import '../model/reserva_model.dart';
 import '../utils/conversiones.dart';
+import 'foto_lugar.dart';
 
 class ReservaCard extends StatelessWidget {
   final ReservaModel reserva;
@@ -13,25 +15,63 @@ class ReservaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        leading: SizedBox(
-          width: 56,
-          height: 56,
-          child: reserva.primeraFotoUrl == null
-              ? const Icon(Icons.image)
-              : Image.network(
-                  urlFoto(reserva.primeraFotoUrl!),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 80,
+              height: 80,
+              child: FotoLugar(url: reserva.primeraFotoUrl, radio: 12),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    reserva.nombreLugar,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        size: 14,
+                        color: colorTextoSecundario,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          '${formatearFecha(reserva.fechaInicio)} a ${formatearFecha(reserva.fechaFin)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: colorTextoSecundario),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${reserva.noches} noches · Anfitrión: ${reserva.nombreAnfitrion}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: colorTextoSecundario),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    formatearPrecio(reserva.precioTotal),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text(reserva.nombreLugar),
-        subtitle: Text(
-          '${reserva.noches} noches · ${formatearFecha(reserva.fechaInicio)} a '
-          '${formatearFecha(reserva.fechaFin)}\nAnfitrión: ${reserva.nombreAnfitrion}',
-        ),
-        isThreeLine: true,
-        trailing: Text(formatearPrecio(reserva.precioTotal)),
       ),
     );
   }

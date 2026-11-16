@@ -33,10 +33,15 @@ class _MisReservasScreenState extends State<MisReservasScreen> {
         error: reservaProvider.errorReservas,
         vacio: reservaProvider.reservas.isEmpty,
         mensajeVacio: 'No tienes reservas todavía',
+        icono: Icons.event_busy_outlined,
         child: ListView.builder(
+          padding: const EdgeInsets.all(16),
           itemCount: reservaProvider.reservas.length,
           itemBuilder: (context, indice) {
-            return ReservaCard(reserva: reservaProvider.reservas[indice]);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ReservaCard(reserva: reservaProvider.reservas[indice]),
+            );
           },
         ),
       ),
