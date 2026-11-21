@@ -42,7 +42,8 @@ class MapaLugares extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: colorScheme.surface,
+                    // El acento (dorado) es fondo solo para destacar precios.
+                    color: colorScheme.tertiary,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -57,7 +58,7 @@ class MapaLugares extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: colorScheme.primary,
+                      color: colorScheme.onTertiary,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),

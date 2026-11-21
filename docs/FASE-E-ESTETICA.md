@@ -24,10 +24,11 @@ git checkout -b mejora-estetica
 
 | Elemento | Valor |
 |---|---|
-| Color de marca (primario) | `#E8505B` (coral) |
-| Texto principal | `#222222` |
-| Texto secundario | `#717171` |
-| Fondo de pantalla | `#F7F7F7` |
+| Color de marca (primario) | `#0B6E4F` (verde, bandera de Santa Cruz), texto encima `#FFFFFF` |
+| Acento (solo fondo de precios) | `#E9A23B` (dorado), texto encima `#1D2622` — nunca texto blanco sobre el acento |
+| Texto principal | `#1D2622` |
+| Texto secundario | `#66706B` |
+| Fondo de pantalla | `#F6F2EA` |
 | Superficie (tarjetas) | `#FFFFFF` |
 | Bordes redondeados | 12 en campos y botones; 16 en tarjetas y fotos |
 | Espaciado base | múltiplos de 8 (8, 16, 24) |
@@ -66,8 +67,8 @@ Ejecuta la subfase E1 de docs/FASE-E-ESTETICA.md siguiendo CLAUDE.md y app-clien
 
 **Hacer (en orden)**
 1. **`lib/config/tema.dart`** con una función `crearTema()` que devuelve `ThemeData`:
-   - `colorScheme: ColorScheme.fromSeed(seedColor: colorMarca, dynamicSchemeVariant: DynamicSchemeVariant.fidelity)` (fidelity mantiene el coral parecido al elegido);
-   - `scaffoldBackgroundColor` `#F7F7F7`;
+   - `colorScheme: ColorScheme.fromSeed(seedColor: colorMarca, dynamicSchemeVariant: DynamicSchemeVariant.fidelity).copyWith(primary: colorMarca, onPrimary: Colors.white, tertiary: colorAcento, onTertiary: textoSobreAcento)` (fidelity + el `copyWith` fijan el verde y el dorado exactos, no un tono calculado);
+   - `scaffoldBackgroundColor` `#F6F2EA`;
    - `appBarTheme`: fondo blanco, sin sombra, título a la izquierda;
    - `inputDecorationTheme`: relleno blanco, `OutlineInputBorder` con radio 12;
    - `filledButtonTheme` y `outlinedButtonTheme`: alto mínimo 48, radio 12;
@@ -84,7 +85,7 @@ Ejecuta la subfase E1 de docs/FASE-E-ESTETICA.md siguiendo CLAUDE.md y app-clien
 9. **Mis reservas (`ReservaCard`)**: foto de 80×80 redondeada a la izquierda; nombre del lugar en negrita; fila con ícono de calendario y fechas; "N noches · Anfitrión: X"; total en negrita a la derecha.
 10. **`VistaEstado`**: ícono grande gris arriba del mensaje (`Icons.search_off` para vacío, `Icons.wifi_off` o `Icons.error_outline` para error), mediante un parámetro opcional `icono`.
 
-**Listo cuando**: todas las pantallas usan el coral como color principal, ninguna tiene colores escritos a mano fuera de `tema.dart` y del mapa, y el flujo completo (login → buscar → lista/mapa → detalle → reservar → mis reservas) funciona igual que antes.
+**Listo cuando**: todas las pantallas usan el verde como color principal (y el dorado solo para destacar precios), ninguna tiene colores escritos a mano fuera de `tema.dart` y del mapa, y el flujo completo (login → buscar → lista/mapa → detalle → reservar → mis reservas) funciona igual que antes.
 
 ---
 
@@ -96,14 +97,14 @@ Ejecuta la subfase E2 de docs/FASE-E-ESTETICA.md siguiendo CLAUDE.md y app-arren
 ```
 
 **Hacer (en orden)**
-1. **Tema** en `src/theme/variables.scss`: `--ion-color-primary` y sus variantes (`-rgb`, `-contrast`, `-shade`, `-tint`) con el coral `#E8505B`; `--ion-background-color` `#F7F7F7`; `--ion-text-color` `#222222`. En `global.scss`: comentar el import de `dark.system.css` (solo modo claro) y agregar dos clases reutilizables: `.estado-vacio` (ícono grande + texto centrados) y `.foto-portada` (`object-fit: cover`, radio 16). En `index.html`: `<meta name="color-scheme" content="light">`.
-2. **Login y registro**: encabezado con ícono `home-outline` en un círculo coral, "bnb" y el subtítulo "Para anfitriones"; campos con la sintaxis moderna de Ionic (`<ion-input label="Email" labelPlacement="floating" fill="outline">`) en vez de `ion-item` + `ion-label`; botón principal con `shape="round"` o radio 12.
-3. **Mis lugares**: cada lugar como `ion-card` con la foto como portada (16:9), `ion-card-title` con el nombre, `ion-card-subtitle` con ícono de ubicación + ciudad, y el precio en negrita. Cerrar sesión como botón de ícono (`log-out-outline`). Estado vacío con ícono, el texto "Todavía no tienes lugares publicados" y un botón "Publicar mi primer lugar".
+1. **Tema** en `src/theme/variables.scss`: `--ion-color-primary` `#0B6E4F` (rgb `11,110,79`; contrast `#ffffff`; shade `#0a6146`; tint `#237d61`) y `--ion-color-secondary` `#E9A23B` (rgb `233,162,59`; contrast `#1d2622`; shade `#cd8f34`; tint `#ebab4f`, usado solo para destacar precios); `--ion-background-color` `#F6F2EA`; `--ion-text-color` `#1D2622`. En `global.scss`: comentar el import de `dark.system.css` (solo modo claro) y agregar dos clases reutilizables: `.estado-vacio` (ícono grande + texto centrados) y `.foto-portada` (`object-fit: cover`, radio 16). En `index.html`: `<meta name="color-scheme" content="light">`.
+2. **Login y registro**: encabezado con ícono `home-outline` en un círculo del color de marca, "bnb" y el subtítulo "Para anfitriones"; campos con la sintaxis moderna de Ionic (`<ion-input label="Email" labelPlacement="floating" fill="outline">`) en vez de `ion-item` + `ion-label`; botón principal con `shape="round"` o radio 12.
+3. **Mis lugares**: cada lugar como `ion-card` con la foto como portada (16:9), `ion-card-title` con el nombre, `ion-card-subtitle` con ícono de ubicación + ciudad, y el precio como `ion-badge color="secondary"` (el dorado, para destacarlo). Cerrar sesión como botón de ícono (`log-out-outline`). Estado vacío con ícono, el texto "Todavía no tienes lugares publicados" y un botón "Publicar mi primer lugar".
 4. **Formulario de lugar** en secciones con `ion-list` `inset` y `ion-list-header`: **Fotos**, **Información** (nombre, descripción con `ion-textarea`, ciudad), **Capacidad** (personas y camas en una fila; baños y habitaciones en otra, con `ion-grid`/`ion-row`/`ion-col`), **Servicios** (wifi y parqueo con íconos `wifi-outline` y `car-outline`), **Precios** (noche y limpieza en una fila) y **Ubicación** (mapa con esquinas redondeadas). Fotos en una grilla de 3 columnas con esquinas redondeadas y el botón "+" del mismo tamaño que una foto. El botón "Guardar" fijo en un `ion-footer`. "Ver reservas" con ícono `calendar-outline`.
 5. **Reservas del lugar**: cada reserva como `ion-card` o `ion-item` con la foto del lugar, el nombre del cliente con ícono de persona, una fila con `ion-chip` "N noches", las fechas con ícono de calendario y el total en negrita a la derecha. Estado vacío con ícono.
-6. **Marcador del mapa selector** con el color de marca: `L.circleMarker` con `color` y `fillColor` coral y `fillOpacity` 0.9.
+6. **Marcador del mapa selector** con el color de marca: `L.circleMarker` con `color` y `fillColor` leídos de `--ion-color-primary` vía `getComputedStyle(document.documentElement)` (sin escribir el valor a mano, para no duplicar el color del tema) y `fillOpacity` 0.9.
 
-**Listo cuando**: el coral es el color principal en todas las páginas, el formulario se lee por secciones y el flujo (login → mis lugares → nuevo / editar con fotos y mapa → ver reservas → volver) funciona igual que antes.
+**Listo cuando**: el verde es el color principal en todas las páginas (el dorado solo aparece destacando precios), el formulario se lee por secciones y el flujo (login → mis lugares → nuevo / editar con fotos y mapa → ver reservas → volver) funciona igual que antes.
 
 ---
 

@@ -3,10 +3,14 @@
 // estas constantes en vez de colores escritos a mano (ver CLAUDE.md, Fase E).
 import 'package:flutter/material.dart';
 
-const colorMarca = Color(0xFFE8505B);
-const colorTextoPrincipal = Color(0xFF222222);
-const colorTextoSecundario = Color(0xFF717171);
-const _colorFondo = Color(0xFFF7F7F7);
+// Verde de la bandera de Santa Cruz: identidad propia (varios compañeros
+// usan el mismo coral de Airbnb). El dorado es solo para destacar precios.
+const colorMarca = Color(0xFF0B6E4F);
+const colorAcento = Color(0xFFE9A23B);
+const textoSobreAcento = Color(0xFF1D2622);
+const colorTextoPrincipal = Color(0xFF1D2622);
+const colorTextoSecundario = Color(0xFF66706B);
+const _colorFondo = Color(0xFFF6F2EA);
 
 const _radioCampo = 12.0;
 const _radioTarjeta = 16.0;
@@ -16,6 +20,14 @@ ThemeData crearTema() {
   final colorScheme = ColorScheme.fromSeed(
     seedColor: colorMarca,
     dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+  ).copyWith(
+    // fromSeed calcula un tono propio a partir de la semilla; se fija el
+    // primario exacto para que sea el mismo verde de la bandera, no una
+    // variante. El acento (dorado) solo se usa como fondo de precios.
+    primary: colorMarca,
+    onPrimary: Colors.white,
+    tertiary: colorAcento,
+    onTertiary: textoSobreAcento,
   );
 
   return ThemeData(
