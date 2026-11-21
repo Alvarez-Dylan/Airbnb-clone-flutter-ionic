@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Explorar Alojamientos - Santa Cruz de la Sierra</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Public+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {},
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+          spacing: {},
+          fontFamily: {
+            "headline": ["Plus Jakarta Sans"],
+            "display": ["Plus Jakarta Sans"],
+            "body": ["Inter"],
+            "label": ["Public Sans"]
+          },
+          fontSize: {}
+        },
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1;
+    }
+    /* Hide scrollbar for clean filter pill display */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full bg-[#F6F2EA] text-[#1D2622] font-body antialiased overflow-hidden select-none">
+<!-- Main Mobile App Canvas -->
+<div class="relative w-full h-full max-w-md mx-auto overflow-hidden bg-[#F6F2EA] flex flex-col justify-between shadow-2xl">
+<!-- MAP CANVAS (Vectorial Santa Cruz Rings & Landmarks) -->
+<div class="absolute inset-0 z-0 w-full h-full bg-[#EFE9DF] overflow-hidden" id="map-container">
+<svg class="w-full h-full object-cover scale-110 sm:scale-100 transition-transform duration-700" fill="none" viewbox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Urban textures & subtle green areas -->
+<pattern height="40" id="grid" patternunits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E3DC CF" stroke-width="0.75"></path>
+</pattern>
+<filter height="140%" id="marker-glow" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="4" flood-color="#0B6E4F" flood-opacity="0.3" stddeviation="4"></fedropshadow>
+</filter>
+<filter height="140%" id="pill-shadow" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="3" flood-color="#000000" flood-opacity="0.18" stddeviation="3"></fedropshadow>
+</filter>
+</defs>
+<!-- Background base -->
+<rect fill="#F4EFE6" height="900" width="600"></rect>
+<!-- Rio Piraí (Water curve to the west) -->
+<path d="M 70 -50 C 60 150, 40 320, 80 500 C 110 640, 70 780, 50 950" fill="none" stroke="#CCE2D8" stroke-linecap="round" stroke-width="36"></path>
+<path d="M 70 -50 C 60 150, 40 320, 80 500 C 110 640, 70 780, 50 950" fill="none" stroke="#B8D8CB" stroke-linecap="round" stroke-width="18"></path>
+<!-- Green Spaces / Parques (Curichi La Madre & Jardín Botánico vectors) -->
+<path d="M 40 280 Q 95 290 85 380 Q 30 390 40 280 Z" fill="#D9EADF" opacity="0.8"></path>
+<path d="M 480 320 Q 560 300 580 420 Q 510 460 480 320 Z" fill="#D9EADF" opacity="0.8"></path>
+<path d="M 330 200 Q 390 190 380 250 Q 320 260 330 200 Z" fill="#E2EEE6" opacity="0.9"></path>
+<!-- Anillos Característicos de Santa Cruz de la Sierra (Centro a 4to Anillo) -->
+<!-- 4to Anillo -->
+<circle cx="300" cy="460" fill="none" r="230" stroke="#E3DBD0" stroke-width="10"></circle>
+<!-- 3er Anillo Interno / Externo -->
+<circle cx="300" cy="460" fill="none" r="170" stroke="#DAD1C4" stroke-width="9"></circle>
+<!-- 2do Anillo -->
+<circle cx="300" cy="460" fill="none" r="115" stroke="#D1C7B7" stroke-width="8"></circle>
+<!-- 1er Anillo -->
+<circle cx="300" cy="460" fill="none" r="60" stroke="#C8BCA9" stroke-width="6.5"></circle>
+<!-- Avenidas Radiales Típicas -->
+<!-- Av. Cristo Redentor / Banzer (Norte) -->
+<line stroke="#DAD1C4" stroke-width="8" x1="300" x2="285" y1="460" y2="0"></line>
+<!-- Av. San Martín (Equipetrol) -->
+<line stroke="#DAD1C4" stroke-width="7" x1="260" x2="160" y1="410" y2="100"></line>
+<!-- Av. Busch -->
+<line stroke="#E3DBD0" stroke-width="6" x1="270" x2="140" y1="430" y2="280"></line>
+<!-- Av. Santos Dumont (Sur) -->
+<line stroke="#DAD1C4" stroke-width="7" x1="300" x2="310" y1="460" y2="900"></line>
+<!-- Av. Monseñor Rivero -->
+<line stroke="#DAD1C4" stroke-width="6" x1="300" x2="295" y1="400" y2="280"></line>
+<!-- Doble Vía La Guardia -->
+<line stroke="#E3DBD0" stroke-width="6.5" x1="270" x2="90" y1="490" y2="720"></line>
+<!-- Av. Virgen de Cotoca (Este) -->
+<line stroke="#DAD1C4" stroke-width="7" x1="340" x2="600" y1="460" y2="520"></line>
+<!-- Av. Tres Pasos Al Frente -->
+<line stroke="#E3DBD0" stroke-width="5" x1="330" x2="570" y1="490" y2="690"></line>
+<!-- Calles Secundarias Urbanas -->
+<g stroke="#ECE5D9" stroke-linecap="round" stroke-width="3">
+<line x1="160" x2="260" y1="180" y2="200"></line>
+<line x1="180" x2="270" y1="230" y2="250"></line>
+<line x1="150" x2="250" y1="310" y2="350"></line>
+<line x1="320" x2="420" y1="210" y2="180"></line>
+<line x1="330" x2="440" y1="280" y2="260"></line>
+<line x1="330" x2="450" y1="360" y2="380"></line>
+<line x1="210" x2="180" y1="520" y2="640"></line>
+<line x1="270" x2="300" y1="560" y2="700"></line>
+<line x1="340" x2="410" y1="550" y2="670"></line>
+</g>
+<!-- Etiquetas de Distritos / Barrios de Santa Cruz -->
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="12" font-weight="700" letter-spacing="1" x="180" y="275">EQUIPETROL</text>
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" letter-spacing="0.5" x="145" y="210">SIRARI</text>
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="11" font-weight="700" letter-spacing="1" x="278" y="465">CENTRO</text>
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" letter-spacing="0.5" x="360" y="320">BARRIO NORTE</text>
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" letter-spacing="0.5" x="185" y="470">URBARÍ</text>
+<text fill="#66706B" font-family="Plus Jakarta Sans" font-size="10" font-weight="600" letter-spacing="0.5" x="350" y="580">LAS PALMAS</text>
+</svg>
+</div>
+<!-- MARKERS OVERLAY (Interactive Geo Pins & Golden Price Badges) -->
+<div class="absolute inset-0 pointer-events-none z-10">
+<!-- MARCADOR 1: ACTIVO / SELECCIONADO (Equipetrol Norte - $us 45) -->
+<div class="absolute top-[32%] left-[26%] -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer group flex flex-col items-center z-30 transition-transform active:scale-95">
+<!-- Glow / Halo Pulsante -->
+<span class="absolute -inset-2 rounded-full bg-[#0B6E4F]/25 animate-ping duration-1000"></span>
+<!-- Precio en Pastilla Dorada (#E9A23B) con texto contrastado (#1D2622) -->
+<div class="relative flex items-center gap-1 bg-[#E9A23B] text-[#1D2622] font-headline font-extrabold text-xs px-2.5 py-1 rounded-full shadow-lg border-2 border-white ring-2 ring-[#0B6E4F]">
+<span class="text-[10px] font-semibold opacity-90">$us</span>
+<span class="text-sm tracking-tight">45</span>
+</div>
+<!-- Pin Verde Santa Cruz (#0B6E4F) con icono de alojamiento -->
+<div class="w-8 h-8 -mt-1 rounded-full bg-[#0B6E4F] text-white flex items-center justify-center shadow-md border-2 border-white">
+<span class="material-symbols-outlined text-[17px] fill">home</span>
+</div>
+<!-- Pin point triangle -->
+<div class="w-2 h-2 bg-[#0B6E4F] rotate-45 -mt-1.5 rounded-xs"></div>
+</div>
+<!-- MARCADOR 2: Sirari / Av. Busch ($us 65) -->
+<div class="absolute top-[22%] left-[44%] -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center z-20 hover:scale-105 active:scale-95 transition-all">
+<div class="flex items-center gap-0.5 bg-[#E9A23B] text-[#1D2622] font-headline font-bold text-xs px-2 py-0.5 rounded-full shadow-md border border-white/90">
+<span class="text-[10px]">$us</span>
+<span>65</span>
+</div>
+<div class="w-6 h-6 -mt-1 rounded-full bg-[#0B6E4F] text-white flex items-center justify-center shadow border border-white">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+</div>
+</div>
+<!-- MARCADOR 3: Centro Histórico ($us 28) -->
+<div class="absolute top-[49%] left-[51%] -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center z-20 hover:scale-105 active:scale-95 transition-all">
+<div class="flex items-center gap-0.5 bg-[#E9A23B] text-[#1D2622] font-headline font-bold text-xs px-2 py-0.5 rounded-full shadow-md border border-white/90">
+<span class="text-[10px]">$us</span>
+<span>28</span>
+</div>
+<div class="w-6 h-6 -mt-1 rounded-full bg-[#0B6E4F] text-white flex items-center justify-center shadow border border-white">
+<span class="material-symbols-outlined text-[14px]">bed</span>
+</div>
+</div>
+<!-- MARCADOR 4: Barrio Norte / Cristo Redentor ($us 52) -->
+<div class="absolute top-[26%] left-[68%] -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center z-20 hover:scale-105 active:scale-95 transition-all">
+<div class="flex items-center gap-0.5 bg-[#E9A23B] text-[#1D2622] font-headline font-bold text-xs px-2 py-0.5 rounded-full shadow-md border border-white/90">
+<span class="text-[10px]">$us</span>
+<span>52</span>
+</div>
+<div class="w-6 h-6 -mt-1 rounded-full bg-[#0B6E4F] text-white flex items-center justify-center shadow border border-white">
+<span class="material-symbols-outlined text-[14px]">hotel</span>
+</div>
+</div>
+<!-- MARCADOR 5: Las Palmas ($us 80) -->
+<div class="absolute top-[60%] left-[34%] -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center z-20 hover:scale-105 active:scale-95 transition-all">
+<div class="flex items-center gap-0.5 bg-[#E9A23B] text-[#1D2622] font-headline font-bold text-xs px-2 py-0.5 rounded-full shadow-md border border-white/90">
+<span class="text-[10px]">$us</span>
+<span>80</span>
+</div>
+<div class="w-6 h-6 -mt-1 rounded-full bg-[#0B6E4F] text-white flex items-center justify-center shadow border border-white">
+<span class="material-symbols-outlined text-[14px]">villa</span>
+</div>
+</div>
+</div>
+<!-- TOP SECTION: HEADER & QUICK FILTERS (Z-40) -->
+<header class="relative z-40 pt-3 pb-2 px-3 flex flex-col gap-2">
+<!-- Pill Search Bar (Airbnb Style Floating Pill) -->
+<div class="w-full bg-white/95 backdrop-blur-md rounded-full shadow-md px-3.5 py-2.5 flex items-center justify-between transition-all duration-200">
+<!-- Search Leading Icon & Search Query Context -->
+<button class="flex items-center gap-3 text-left flex-1 min-w-0 pr-2 focus:outline-none">
+<div class="w-9 h-9 rounded-full bg-[#0B6E4F]/10 text-[#0B6E4F] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline font-bold text-[13px] text-[#1D2622] truncate">Santa Cruz de la Sierra</span>
+<span class="font-label text-[11px] text-[#66706B] truncate">2 huéspedes · 15-20 Mar</span>
+</div>
+</button>
+<!-- Trailing Filter Icon Button -->
+<button aria-label="Filtros avanzados" class="w-9 h-9 rounded-full border border-[#66706B]/20 bg-white hover:bg-[#0B6E4F]/5 text-[#1D2622] flex items-center justify-center shrink-0 shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[19px]" data-icon="tune">tune</span>
+</button>
+</div>
+<!-- Quick Horizontal Filter Chips -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-3 px-3">
+<!-- Active Chip -->
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0B6E4F] text-white text-xs font-label font-semibold shadow-sm shrink-0 whitespace-nowrap active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[15px] fill">apartment</span>
+          Departamentos enteros
+        </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[#1D2622] text-xs font-label font-medium shadow-sm shrink-0 whitespace-nowrap hover:bg-[#0B6E4F]/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[15px]" data-icon="pool">pool</span>
+          Con piscina
+        </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[#1D2622] text-xs font-label font-medium shadow-sm shrink-0 whitespace-nowrap hover:bg-[#0B6E4F]/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[15px]" data-icon="location_on">location_on</span>
+          Equipetrol
+        </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[#1D2622] text-xs font-label font-medium shadow-sm shrink-0 whitespace-nowrap hover:bg-[#0B6E4F]/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[15px]" data-icon="verified">verified</span>
+          Superanfitrión
+        </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[#1D2622] text-xs font-label font-medium shadow-sm shrink-0 whitespace-nowrap hover:bg-[#0B6E4F]/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[15px]" data-icon="attach_money">attach_money</span>
+          Rango de precio
+        </button>
+</div>
+</header>
+<!-- FLOATING MAP CONTROLS (Right Side Tools & Bottom Map Switcher) -->
+<div class="relative z-30 pointer-events-none px-4 flex flex-col justify-end flex-grow pb-3">
+<!-- Right Utility Buttons (Layers & GPS) -->
+<div class="self-end flex flex-col gap-2 pointer-events-auto mb-3">
+<button aria-label="Cambiar capas de mapa" class="w-10 h-10 rounded-full bg-white text-[#1D2622] shadow-md flex items-center justify-center hover:bg-[#0B6E4F]/5 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]" data-icon="layers">layers</span>
+</button>
+<button aria-label="Centrar en mi ubicación" class="w-10 h-10 rounded-full bg-white text-[#0B6E4F] shadow-md flex items-center justify-center hover:bg-[#0B6E4F]/5 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]" data-icon="my_location">my_location</span>
+</button>
+</div>
+<!-- Center 'Ver lista (142)' Floating Pill Button -->
+<div class="self-center pointer-events-auto mb-2.5">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D2622] text-white font-label text-xs font-semibold shadow-lg hover:bg-black active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[17px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+<span>Ver lista (142)</span>
+</button>
+</div>
+<!-- BOTTOM POPUP CARD: SELECTED ACCOMMODATION (Equipetrol Loft) -->
+<div class="pointer-events-auto w-full bg-white rounded-2xl shadow-xl overflow-hidden p-3 transition-all duration-200">
+<div class="flex gap-3">
+<!-- Property Image Preview -->
+<div class="relative w-28 h-28 rounded-xl overflow-hidden shrink-0 bg-neutral-100">
+<img class="w-full h-full object-cover" data-alt="Modern high-end luxury studio loft interior in Equipetrol Santa Cruz de la Sierra with floor-to-ceiling glass doors opening onto a sunny tropical balcony surrounded by palm trees. The living space is furnished with organic wood, white linen sofa, deep green indoor monstera plants, and warm golden morning sunlight illuminating the clean architectural lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwCKEwod8QQo6Ma81YyKrLtUzGE-gvyrGfoqEiU40CLYorfZOiPJceKlewPztlh85vOt_zpTFOLIFTyCfxBc6fPb4lrZczvrLhp4ORwxnqlk3auPsOF01MO9IOWzBiEVpT7qvpp1jji3LYAxHBzQ3UZ7jsJWr177w48bnZZv1F40uZEOtBacJKvxSpGEy6w6a2CGbsHqWAP8wHlm232bTYftmrcjTlj94TNmSsdrphHP8uu1cjs5GNhzJ57fhS361b2g59az70gDI"/>
+<!-- Superhost Badge over image -->
+<div class="absolute top-1.5 left-1.5 bg-white/95 backdrop-blur-xs text-[#0B6E4F] text-[9px] font-headline font-bold px-1.5 py-0.5 rounded shadow-xs flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[11px] fill">verified</span>
+<span>SUPERHOST</span>
+</div>
+<!-- Favorite Quick Heart -->
+<button aria-label="Guardar en favoritos" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/30 backdrop-blur-xs text-white flex items-center justify-center active:scale-80 transition-transform">
+<span class="material-symbols-outlined text-[14px]">favorite</span>
+</button>
+</div>
+<!-- Property Content & Details -->
+<div class="flex flex-col justify-between flex-1 min-w-0">
+<div>
+<!-- Rating & Zone -->
+<div class="flex items-center justify-between gap-1 mb-0.5">
+<span class="text-[11px] font-label font-semibold text-[#66706B] uppercase tracking-wide truncate">Equipetrol Norte</span>
+<div class="flex items-center gap-1 shrink-0 text-[#1D2622] font-semibold text-xs">
+<span class="material-symbols-outlined text-[14px] text-[#E9A23B] fill">star</span>
+<span>4.92</span>
+<span class="text-[#66706B] font-normal text-[10px]">(38)</span>
+</div>
+</div>
+<!-- Title -->
+<h2 class="font-headline font-bold text-sm text-[#1D2622] leading-tight truncate">
+                Moderno Loft en Equipetrol Norte
+              </h2>
+<!-- Amenities string -->
+<p class="font-body text-[11px] text-[#66706B] truncate mt-0.5">
+                2 huéspedes · 1 dorm · 1 baño · Wifi
+              </p>
+</div>
+<!-- Price Highlight & CTA Button -->
+<div class="flex items-center justify-between pt-1.5 border-t border-neutral-100 mt-1">
+<!-- Golden Price Pill: #E9A23B with dark text #1D2622 (strictly adhering to brand guidelines) -->
+<div class="bg-[#E9A23B] text-[#1D2622] px-2 py-0.5 rounded-full flex items-baseline gap-1">
+<span class="font-headline font-extrabold text-xs">$us 45</span>
+<span class="font-body text-[10px] text-[#1D2622]/80 font-medium">/ noche</span>
+</div>
+<!-- Primary Action Button: #0B6E4F -->
+<button class="bg-[#0B6E4F] hover:bg-[#09573e] text-white text-[11px] font-label font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center gap-1">
+<span>Ver detalle</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM NAVIGATION BAR (Mandatory Shared Component from JSON) -->
+<!-- Destination Rule: Top-level Explorer screen; active tab is Explorar with style_active_navigation -->
+<nav class="relative z-50 w-full bg-white dark:bg-[#1D2622] shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex justify-around items-center px-4 py-2 pb-5">
+<!-- Tab 1: Explorar (Active State: text-[#0B6E4F]) -->
+<a class="flex flex-col items-center justify-center text-[#0B6E4F] dark:text-[#0B6E4F] py-1 px-3 transition-colors active:scale-90 transition-transform duration-150 group" href="#explorar">
+<span class="material-symbols-outlined text-[23px] fill" data-icon="explore">explore</span>
+<span class="font-label text-[11px] font-semibold mt-0.5 tracking-tight">Explorar</span>
+</a>
+<!-- Tab 2: Favoritos (Inactive: text-[#66706B]) -->
+<a class="flex flex-col items-center justify-center text-[#66706B] dark:text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 transition-transform duration-150 group" href="#favoritos">
+<span class="material-symbols-outlined text-[23px]" data-icon="favorite">favorite</span>
+<span class="font-label text-[11px] font-semibold mt-0.5 tracking-tight">Favoritos</span>
+</a>
+<!-- Tab 3: Reservas (Inactive: text-[#66706B]) -->
+<a class="flex flex-col items-center justify-center text-[#66706B] dark:text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 transition-transform duration-150 group" href="#reservas">
+<span class="material-symbols-outlined text-[23px]" data-icon="calendar_today">calendar_today</span>
+<span class="font-label text-[11px] font-semibold mt-0.5 tracking-tight">Reservas</span>
+</a>
+<!-- Tab 4: Perfil (Inactive: text-[#66706B]) -->
+<a class="flex flex-col items-center justify-center text-[#66706B] dark:text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 transition-transform duration-150 group" href="#perfil">
+<span class="material-symbols-outlined text-[23px]" data-icon="person">person</span>
+<span class="font-label text-[11px] font-semibold mt-0.5 tracking-tight">Perfil</span>
+</a>
+</nav>
+</div>
+</body></html>

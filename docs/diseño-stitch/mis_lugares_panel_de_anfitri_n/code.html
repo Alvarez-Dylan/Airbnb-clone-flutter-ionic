@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Mis lugares | Anfitrión Santa Cruz</title>
+<!-- Google Fonts: Plus Jakarta Sans, Inter, Public Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Public+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {},
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+          spacing: {},
+          fontFamily: {
+            headline: ["Plus Jakarta Sans", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+            label: ["Public Sans", "sans-serif"]
+          },
+          fontSize: {}
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Safe padding for modern devices */
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+    }
+    /* Hide scrollbars for slick mobile look */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#F6F2EA] text-[#1D2622] font-body min-h-screen flex flex-col justify-between selection:bg-[#0B6E4F]/20 selection:text-[#0B6E4F]">
+<!-- Top App Bar / Header Estilo Ionic Fijo -->
+<header class="fixed top-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#66706B]/10 pt-safe">
+<div class="px-5 pt-3 pb-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3.5">
+<div class="relative cursor-pointer group">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#0B6E4F]/20 group-hover:ring-[#0B6E4F] transition-all" data-alt="Close up portrait photograph of a friendly Bolivian male host smiling warmly with lush green Santa Cruz tropical plants blurred in the background. High key natural lighting, warm and welcoming, dressed in a contemporary casual linen shirt." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz0kOl7qL3UGvQsV-7KHE0tmIOH8YBRv67suIlWaEqn3JKEHKt6BLS-SUTD8Q7nuX5nohlsM-Ug5kjgEjOUWjmxP0LWJlPRbNM1MhXjTEcKIBrTBOgTUonzvOsoV3rljSLcPe3lqOTtgIwaxHjUu3bS9uHGchXYjbVaYMCR_hJM5ocB0sMSmYX-87NVjaIxrXJAyMVlR4Sx_jypPqhaqnhtht7ez7LVKkoHFQZaOES9eO16HKXwaryziQ8FPIsOibxU9xO4s5Wifk"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-[#0B6E4F] rounded-full border-2 border-white"></span>
+</div>
+<div>
+<h1 class="font-headline text-lg font-bold tracking-tight text-[#1D2622] leading-tight">Mis lugares</h1>
+<p class="font-label text-xs font-medium text-[#66706B] flex items-center gap-1.5 mt-0.5">
+<span class="inline-block w-2 h-2 rounded-full bg-[#0B6E4F]"></span>
+            3 alojamientos publicados
+          </p>
+</div>
+</div>
+<div class="flex items-center space-x-1.5">
+<button aria-label="Filtros y ajustes" class="w-10 h-10 rounded-full flex items-center justify-center text-[#1D2622] hover:bg-[#0B6E4F]/5 active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]">tune</span>
+</button>
+<button aria-label="Notificaciones" class="w-10 h-10 rounded-full flex items-center justify-center text-[#1D2622] hover:bg-[#0B6E4F]/5 active:scale-95 transition-all relative" type="button">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-[#E9A23B] rounded-full ring-2 ring-white"></span>
+</button>
+</div>
+</div>
+<!-- Quick Filter Tabs / Sub-header bar -->
+<div class="px-5 pb-3 flex items-center space-x-2 overflow-x-auto text-xs font-label">
+<button class="px-3.5 py-1.5 rounded-full bg-[#0B6E4F] text-white font-semibold shadow-sm transition-all">Todos (3)</button>
+<button class="px-3.5 py-1.5 rounded-full bg-white text-[#66706B] border border-[#66706B]/20 font-medium hover:border-[#0B6E4F] transition-all">Activos (3)</button>
+<button class="px-3.5 py-1.5 rounded-full bg-white text-[#66706B] border border-[#66706B]/20 font-medium hover:border-[#0B6E4F] transition-all">En revisión (0)</button>
+<button class="px-3.5 py-1.5 rounded-full bg-white text-[#66706B] border border-[#66706B]/20 font-medium hover:border-[#0B6E4F] transition-all">Borradores (1)</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[124px] pb-24 px-4 max-w-lg mx-auto w-full space-y-4">
+<!-- Quick Revenue Overview Banner (Ionic Card Compact) -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-[#66706B]/10 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-11 h-11 rounded-lg bg-[#0B6E4F]/10 flex items-center justify-center text-[#0B6E4F]">
+<span class="material-symbols-outlined text-2xl">payments</span>
+</div>
+<div>
+<span class="font-label text-[11px] font-semibold uppercase tracking-wider text-[#66706B]">Ingresos estimados (Mes)</span>
+<div class="font-headline text-lg font-bold text-[#1D2622]">$us 2,420</div>
+</div>
+</div>
+<div class="text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[#0B6E4F]/10 text-[#0B6E4F]">
+<span class="material-symbols-outlined text-xs mr-0.5">trending_up</span> +18%
+        </span>
+<div class="font-label text-[10px] text-[#66706B] mt-1">vs mes anterior</div>
+</div>
+</div>
+<!-- TARJETA 1: Moderno Loft en Equipetrol Norte -->
+<article class="bg-white rounded-xl shadow-sm border border-[#66706B]/10 overflow-hidden transition-all duration-200 hover:shadow-md">
+<!-- Media Container with Status Badge & Price Badge -->
+<div class="relative h-52 w-full overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" data-alt="Interior architecture photograph of a bright, modern luxury loft apartment in Equipetrol Norte, Santa Cruz. Floor-to-ceiling windows with soft light, contemporary minimalist furniture in warm earthy tones, wooden accents, and a lush green potted monstera plant reflecting modern Bolivian upscale living." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJyBi81y7I1zm6-KBDiCzfO5PQXIZBgg5np9zzONdaxpE6SSDDn0covH1rgE72WKqcxBhpaxg11NrCFI68ExQvBXdWVbp-g360Loqicl-5B22_xKWYn4vcnO2un-zHL2fyAwm9OOTTM7KIakOfo8GOHheQWjTzDCHJT2NOEPECzMtqZ1_01BJt3BpG9hreQBsuMK_OAstpHCkvy98ccICZCKFO_88OEGSY_XLmhJaaRtQyiXtJIquHeCeROmchLuU_X59pTpqtowo"/>
+<!-- Estado Activo (Badge Verde Claro / Primario translúcido) -->
+<div class="absolute top-3.5 left-3.5 flex items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#0B6E4F] animate-pulse"></span>
+<span class="font-label text-xs font-bold text-[#0B6E4F]">Activo</span>
+</div>
+<!-- Badge / Pastilla Dorada de Precio (Regla: Fondo Dorado #E9A23B con texto oscuro #1D2622 para legibilidad máxima) -->
+<div class="absolute top-3.5 right-3.5 bg-[#E9A23B] text-[#1D2622] px-3.5 py-1.5 rounded-full shadow-md font-headline font-bold text-xs tracking-tight flex items-center gap-1">
+<span>$us 45</span>
+<span class="text-[10px] font-medium text-[#1D2622]/85">/ noche</span>
+</div>
+<!-- Metric Floating Overlay on Image Bottom -->
+<div class="absolute bottom-3 left-3.5 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-xs font-label flex items-center space-x-2">
+<span class="flex items-center text-amber-300 font-bold">
+<span class="material-symbols-outlined text-[14px] mr-1 text-amber-300 material-symbols-fill">star</span> 4.95
+          </span>
+<span class="text-white/60">•</span>
+<span class="text-white/90">28 reseñas</span>
+</div>
+</div>
+<!-- Card Body Content -->
+<div class="p-4">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="font-headline text-base font-bold text-[#1D2622] leading-snug line-clamp-1">
+              Moderno Loft en Equipetrol Norte
+            </h2>
+<p class="font-body text-xs text-[#66706B] flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[15px] text-[#0B6E4F]">location_on</span>
+              Equipetrol Norte, Santa Cruz de la Sierra
+            </p>
+</div>
+<button aria-label="Opciones del alojamiento" class="text-[#66706B] hover:text-[#1D2622] p-1 rounded-full hover:bg-gray-100" type="button">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+<!-- Quick Spec Tags -->
+<div class="flex items-center gap-3 mt-3 pt-3 border-t border-[#66706B]/10 text-xs font-label text-[#66706B]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">bed</span> 1 cama king</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">bathtub</span> 1 baño</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">wifi</span> Alta velocidad</span>
+</div>
+<!-- Action Buttons Footer -->
+<div class="grid grid-cols-2 gap-2.5 mt-4">
+<!-- Botón Editar (Outline con verde primario) -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg border border-[#0B6E4F] text-[#0B6E4F] font-headline text-xs font-bold hover:bg-[#0B6E4F]/5 active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+<span>Editar</span>
+</button>
+<!-- Botón Ver reservas (Verde primario con texto blanco y contador) -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg bg-[#0B6E4F] text-white font-headline text-xs font-bold shadow hover:bg-[#09573e] active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span>Ver reservas</span>
+<span class="ml-1 bg-white text-[#0B6E4F] text-[10px] font-extrabold px-1.5 py-0.2 rounded-full shadow-xs">2</span>
+</button>
+</div>
+</div>
+</article>
+<!-- TARJETA 2: Penthouse con Terraza y Parrillero -->
+<article class="bg-white rounded-xl shadow-sm border border-[#66706B]/10 overflow-hidden transition-all duration-200 hover:shadow-md">
+<!-- Media Container with Status Badge & Price Badge -->
+<div class="relative h-52 w-full overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" data-alt="Cinematic architectural photography of an exclusive luxury penthouse rooftop terrace in Barrio Sirari, Santa Cruz de la Sierra. Shows a sleek turquoise plunge pool, custom stainless steel parrillero barbecue grill, stylish outdoor patio lounge furniture, and panoramic views of the city at golden hour." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIRiVIXONiQTM_ip_5pWhzCaZNsaKjUltEYQIhV4Ra3QAQq-Ctz9jCJ9GjksFIVOnZ6CjLmoYF_kY_-klHqi7_sxRKB7amP9ybX9pXc0988bseuhj31gx75FsTL2dApuTx-JVexVKalRiBz5r7CQIfDrb2rYVGa204QuBJSJSXuAUo0ddpyjH8BkTgjCbrW8-ecKCtxJwUTC2jZFBzJaIJPdsR_U71zrZUF9b5JQ8jjtfLIMerpqmoyTEnd1d2ZucnMxzomBS5C7w"/>
+<!-- Estado Activo -->
+<div class="absolute top-3.5 left-3.5 flex items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#0B6E4F] animate-pulse"></span>
+<span class="font-label text-xs font-bold text-[#0B6E4F]">Activo</span>
+</div>
+<!-- Pastilla Dorada de Precio -->
+<div class="absolute top-3.5 right-3.5 bg-[#E9A23B] text-[#1D2622] px-3.5 py-1.5 rounded-full shadow-md font-headline font-bold text-xs tracking-tight flex items-center gap-1">
+<span>$us 65</span>
+<span class="text-[10px] font-medium text-[#1D2622]/85">/ noche</span>
+</div>
+<!-- Metric Floating Overlay on Image Bottom -->
+<div class="absolute bottom-3 left-3.5 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-xs font-label flex items-center space-x-2">
+<span class="flex items-center text-amber-300 font-bold">
+<span class="material-symbols-outlined text-[14px] mr-1 text-amber-300 material-symbols-fill">star</span> 4.9
+          </span>
+<span class="text-white/60">•</span>
+<span class="text-white/90">12 reservas este mes</span>
+</div>
+</div>
+<!-- Card Body Content -->
+<div class="p-4">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="font-headline text-base font-bold text-[#1D2622] leading-snug line-clamp-1">
+              Penthouse con Terraza y Parrillero
+            </h2>
+<p class="font-body text-xs text-[#66706B] flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[15px] text-[#0B6E4F]">location_on</span>
+              Barrio Sirari, Santa Cruz de la Sierra
+            </p>
+</div>
+<button aria-label="Opciones del alojamiento" class="text-[#66706B] hover:text-[#1D2622] p-1 rounded-full hover:bg-gray-100" type="button">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+<!-- Quick Spec Tags -->
+<div class="flex items-center gap-3 mt-3 pt-3 border-t border-[#66706B]/10 text-xs font-label text-[#66706B]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">outdoor_grill</span> Parrillero</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">pool</span> Piscina privada</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">group</span> 6 huéspedes</span>
+</div>
+<!-- Action Buttons Footer -->
+<div class="grid grid-cols-2 gap-2.5 mt-4">
+<!-- Botón Editar -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg border border-[#0B6E4F] text-[#0B6E4F] font-headline text-xs font-bold hover:bg-[#0B6E4F]/5 active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+<span>Editar</span>
+</button>
+<!-- Botón Ver reservas -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg bg-[#0B6E4F] text-white font-headline text-xs font-bold shadow hover:bg-[#09573e] active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span>Ver reservas</span>
+<span class="ml-1 bg-white text-[#0B6E4F] text-[10px] font-extrabold px-1.5 py-0.2 rounded-full shadow-xs">4</span>
+</button>
+</div>
+</div>
+</article>
+<!-- TARJETA 3: Casa Quinta Campestre en Las Palmas / Urbarí -->
+<article class="bg-white rounded-xl shadow-sm border border-[#66706B]/10 overflow-hidden transition-all duration-200 hover:shadow-md">
+<!-- Media Container with Status Badge & Price Badge -->
+<div class="relative h-52 w-full overflow-hidden bg-gray-100">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" data-alt="Editorial real estate photography of a tropical country estate garden villa in Las Palmas or Urbarí Santa Cruz de la Sierra. Shows a large crystal blue swimming pool surrounded by verdant royal palm trees, manicured emerald lawn, rustic wooden cabana with hammocks, warm tropical sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDUYeF94r556zDZf1arDn9NdDfSJjwt-UYHpGSsV_Um_IqE4_r0quZHEON-BUBgLoemFQZpr1MFCs-09aILZ4HG-40vrdSOsaXrJavIzUE7JB27keJkRNLyr05o2ds9TG-CdnCNqo3U2HpJK8MYkYnIE0khUZlHR6vKH2eJRHXcYZV48Kr2HFR7l2Z96QEmRe5UXkINXGvo2ZI3o7fn2P2Y-tKu5h9StdGu7Q0Tm_rsnOMijc_SSrUvJmdaCFQmS8eQsKqL8VHxfI"/>
+<!-- Estado Activo -->
+<div class="absolute top-3.5 left-3.5 flex items-center space-x-1.5 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#0B6E4F] animate-pulse"></span>
+<span class="font-label text-xs font-bold text-[#0B6E4F]">Activo</span>
+</div>
+<!-- Pastilla Dorada de Precio -->
+<div class="absolute top-3.5 right-3.5 bg-[#E9A23B] text-[#1D2622] px-3.5 py-1.5 rounded-full shadow-md font-headline font-bold text-xs tracking-tight flex items-center gap-1">
+<span>$us 80</span>
+<span class="text-[10px] font-medium text-[#1D2622]/85">/ noche</span>
+</div>
+<!-- Metric Floating Overlay on Image Bottom -->
+<div class="absolute bottom-3 left-3.5 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-xs font-label flex items-center space-x-2">
+<span class="flex items-center text-amber-300 font-bold">
+<span class="material-symbols-outlined text-[14px] mr-1 text-amber-300 material-symbols-fill">star</span> 5.0
+          </span>
+<span class="text-white/60">•</span>
+<span class="text-white/90">Superhost</span>
+</div>
+</div>
+<!-- Card Body Content -->
+<div class="p-4">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="font-headline text-base font-bold text-[#1D2622] leading-snug line-clamp-1">
+              Casa Quinta Campestre
+            </h2>
+<p class="font-body text-xs text-[#66706B] flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[15px] text-[#0B6E4F]">location_on</span>
+              Las Palmas / Urbarí, Santa Cruz de la Sierra
+            </p>
+</div>
+<button aria-label="Opciones del alojamiento" class="text-[#66706B] hover:text-[#1D2622] p-1 rounded-full hover:bg-gray-100" type="button">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+<!-- Quick Spec Tags -->
+<div class="flex items-center gap-3 mt-3 pt-3 border-t border-[#66706B]/10 text-xs font-label text-[#66706B]">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">park</span> Jardín amplio</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">pool</span> Piscina</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">garage_home</span> Parqueo (3)</span>
+</div>
+<!-- Action Buttons Footer -->
+<div class="grid grid-cols-2 gap-2.5 mt-4">
+<!-- Botón Editar -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg border border-[#0B6E4F] text-[#0B6E4F] font-headline text-xs font-bold hover:bg-[#0B6E4F]/5 active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+<span>Editar</span>
+</button>
+<!-- Botón Ver reservas -->
+<button class="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-lg bg-[#0B6E4F] text-white font-headline text-xs font-bold shadow hover:bg-[#09573e] active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span>Ver reservas</span>
+<span class="ml-1 bg-white text-[#0B6E4F] text-[10px] font-extrabold px-1.5 py-0.2 rounded-full shadow-xs">1</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Bottom Spacing for Floating Action Button and Nav Bar -->
+<div class="h-6"></div>
+</main>
+<!-- Botón de Acción Flotante (FAB) Estilo Ionic para publicar nuevo alojamiento -->
+<aside class="fixed bottom-20 right-5 z-40">
+<button aria-label="Publicar nuevo alojamiento" class="group flex items-center justify-center space-x-2 bg-[#0B6E4F] text-white h-14 px-5 rounded-full shadow-[0_8px_20px_rgba(11,110,79,0.35)] hover:bg-[#09573e] active:scale-90 transition-all duration-150" type="button">
+<span class="material-symbols-outlined text-2xl font-bold">add</span>
+<span class="font-headline text-sm font-bold tracking-tight pr-1">Publicar nuevo</span>
+</button>
+</aside>
+<!-- Barra de Navegación Inferior Móvil (BottomNavBar) Coherente con app de anfitrión -->
+<nav aria-label="Navegación principal de anfitrión" class="fixed bottom-0 left-0 w-full z-50 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.06)] border-t border-[#66706B]/10 flex justify-around items-center px-4 py-2 pb-safe">
+<!-- Tab 1: Mis lugares (ACTIVO) -->
+<a aria-current="page" class="flex flex-col items-center justify-center text-[#0B6E4F] py-1 px-3 transition-colors active:scale-90 duration-150" href="#lugares">
+<span class="material-symbols-outlined text-[24px] material-symbols-fill">apartment</span>
+<span class="font-label text-[11px] font-bold mt-1">Mis lugares</span>
+</a>
+<!-- Tab 2: Reservas -->
+<a class="flex flex-col items-center justify-center text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 duration-150 relative" href="#reservas">
+<span class="material-symbols-outlined text-[24px]">calendar_today</span>
+<span class="absolute top-1 right-2.5 w-2 h-2 bg-[#0B6E4F] rounded-full"></span>
+<span class="font-label text-[11px] font-semibold mt-1">Reservas</span>
+</a>
+<!-- Tab 3: Mensajes -->
+<a class="flex flex-col items-center justify-center text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 duration-150" href="#mensajes">
+<span class="material-symbols-outlined text-[24px]">chat_bubble_outline</span>
+<span class="font-label text-[11px] font-semibold mt-1">Mensajes</span>
+</a>
+<!-- Tab 4: Ganancias / Perfil -->
+<a class="flex flex-col items-center justify-center text-[#66706B] py-1 px-3 transition-colors hover:text-[#0B6E4F] active:scale-90 duration-150" href="#perfil">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+<span class="font-label text-[11px] font-semibold mt-1">Ganancias</span>
+</a>
+</nav>
+</body></html>

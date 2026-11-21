@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { theme: { extend: { colors: { primary: '#0B6E4F', 'on-primary': '#FFFFFF', accent: '#E9A23B', 'on-accent': '#1D2622', background: '#F6F2EA', surface: '#FFFFFF', 'on-surface': '#1D2622', 'on-surface-variant': '#66706B' } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#F6F2EA;color:#1D2622;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-background font-sans flex flex-col min-h-screen text-on-surface"><header class="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-4 flex items-center justify-between"><div class="flex items-center gap-1"><button aria-label="Volver" class="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="text-lg font-bold tracking-tight text-on-surface line-clamp-1">Reservas Del Lugar</h1></div><div class="flex items-center gap-2"><button aria-label="Filtros" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[22px]">tune</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-background pb-safe"><div class="flex flex-col w-full pb-8">
+<!-- Propiedad Contextual Hero Card -->
+<section class="px-4 pt-3 pb-2">
+<div class="bg-surface rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+<span class="material-symbols-outlined text-[24px]">apartment</span>
+</div>
+<div class="min-w-0">
+<span class="text-xs font-semibold text-primary uppercase tracking-wider block">Propiedad activa</span>
+<h2 class="text-base font-bold text-on-surface truncate">Moderno Loft en Equipetrol Norte</h2>
+</div>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          3 activas
+        </span>
+</div>
+<!-- Quick Metrics Ribbon -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t-0 bg-[#F6F2EA]/60 p-2.5 rounded-xl">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">event_available</span>
+<div class="flex flex-col leading-tight">
+<span class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">Ocupación Mar</span>
+<span class="text-xs font-bold text-on-surface">82% (13 noches)</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent text-[18px]">payments</span>
+<div class="flex flex-col leading-tight">
+<span class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">Ingresos activos</span>
+<span class="text-xs font-bold text-on-surface">$us 585,00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Segmented Status Tabs -->
+<nav aria-label="Filtrar por estado" class="px-4 py-2 overflow-x-auto scrollbar-none flex items-center gap-2">
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-on-primary shadow-sm transition-all whitespace-nowrap flex items-center gap-1.5">
+<span>Todas</span>
+<span class="w-4 h-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center">3</span>
+</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-surface text-on-surface-variant shadow-sm hover:text-primary transition-all whitespace-nowrap">
+      Llegan hoy (1)
+    </button>
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-surface text-on-surface-variant shadow-sm hover:text-primary transition-all whitespace-nowrap">
+      Próximas (2)
+    </button>
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-surface text-on-surface-variant shadow-sm hover:text-primary transition-all whitespace-nowrap">
+      En curso
+    </button>
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-surface text-on-surface-variant shadow-sm hover:text-primary transition-all whitespace-nowrap">
+      Pasadas
+    </button>
+</nav>
+<!-- Lista de Reservas -->
+<section class="px-4 py-2 flex flex-col gap-3.5">
+<!-- Tarjeta Reserva 1 (Llega hoy) -->
+<article class="bg-surface rounded-2xl p-4 shadow-sm transition-all duration-200 hover:shadow-md relative overflow-hidden flex flex-col gap-3">
+<div class="flex gap-3.5">
+<!-- Miniatura Foto Loft Santa Cruz -->
+<div class="relative w-24 h-24 aspect-square rounded-xl overflow-hidden flex-shrink-0 shadow-inner">
+<img class="w-full h-full object-cover" data-alt="Modern high-end studio loft in Santa Cruz Bolivia with warm wood panels, lush indoor tropical plants, floor-to-ceiling balcony windows showing Equipetrol skyline, soft afternoon natural golden sunlight, cozy cream linen bedding and sleek minimalist Scandinavian furniture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAymga4AfUL9PB5oAWsanoPcKiXEt2yt4LqKShgUdwL4nxr1A1XYawC0qQyZU6EbK85-6yRKvm0EkCSxqtuZ5br710Ev1ZZXh3AKO8g-GiO2bKhQ6wCq3RwgaR6VnMb06VF0wY0wWTO5Kj_mI0fB6Mz91YVfeSLCsLE_OtiCKq49UwWFp7tLlz6CQAQjlyCwPfSF9LhgZw1wZW8_dCdlXTxosBGermu7vNKCUtW8KvqeVUjkt_5G4nHBQY2TY7wLst44ztv2f1uAOk"/>
+<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-primary text-on-primary font-bold text-[9px] uppercase tracking-wider shadow">
+            Hoy
+          </span>
+</div>
+<!-- Contenido Derecho -->
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<!-- Fila 1: Huésped y Badge -->
+<div class="flex items-start justify-between gap-1.5">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">account_circle</span>
+<h3 class="font-bold text-sm text-on-surface truncate">Carlos Eduardo Banzer</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-tight whitespace-nowrap flex-shrink-0">
+              Llega hoy
+            </span>
+</div>
+<!-- Fila 2: Fechas Calendario -->
+<div class="flex items-center gap-1.5 text-xs text-on-surface font-medium pt-0.5">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">calendar_month</span>
+<span class="truncate">14 Mar – 18 Mar, 2025</span>
+</div>
+<!-- Fila 3: Chips de estadía y huéspedes -->
+<div class="flex items-center gap-1.5 pt-0.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F0EBE1] text-on-surface text-[11px] font-medium">
+              4 noches
+            </span>
+<span class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[13px]">group</span> 2 personas
+            </span>
+</div>
+<!-- Fila 4: Total pagado con Acento Dorado Cruceño -->
+<div class="flex items-center justify-between pt-1 mt-0.5">
+<span class="text-[11px] text-on-surface-variant font-medium">Total neto:</span>
+<span class="bg-accent text-[#1D2622] font-black px-2.5 py-0.5 rounded-lg text-sm tracking-tight shadow-sm">
+              $us 180
+            </span>
+</div>
+</div>
+</div>
+<!-- Acciones de reserva integradas -->
+<div class="pt-2.5 mt-0.5 flex items-center justify-between bg-background/50 -mx-4 -mb-4 px-4 py-2.5 rounded-b-2xl">
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span> Check-in: 15:00 hrs
+        </span>
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:opacity-80 transition-opacity">
+<span>Ver detalle</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Tarjeta Reserva 2 (Confirmada / Próxima) -->
+<article class="bg-surface rounded-2xl p-4 shadow-sm transition-all duration-200 hover:shadow-md relative overflow-hidden flex flex-col gap-3">
+<div class="flex gap-3.5">
+<!-- Miniatura Foto Loft Santa Cruz -->
+<div class="relative w-24 h-24 aspect-square rounded-xl overflow-hidden flex-shrink-0 shadow-inner">
+<img class="w-full h-full object-cover" data-alt="Interior architecture detail of a luxury loft living area in Santa Cruz Bolivia, featuring an emerald green velvet sofa, native tropical hardwood coffee table, polished concrete floors, and warm golden architectural accent lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC072Leo0Zqj8S0eMP3UK8skfPuKUbRx2mhFCsPq7_w7YIDePyEz_4ix0-mbciCFfCM8E4ce-OaH6Ku6ePrePReFVFYIEcP4TqovdgtnHQ54vdCnEO_NktPP_8P0MSImf-BmkQa4wMT34C2C6tUgY099mtqdxtoWwFpbjAL3ju7l5Yqk25yhhw3JmOEPAo2s_QfF-Ed7Jr-6I7poIXbkj_pPynsaXILkNpaV3slfIFZEkHOFF3z89PXMPjyg-5ChDyP-HIu94jlPmQ"/>
+</div>
+<!-- Contenido Derecho -->
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<!-- Fila 1: Huésped y Badge -->
+<div class="flex items-start justify-between gap-1.5">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">account_circle</span>
+<h3 class="font-bold text-sm text-on-surface truncate">Mariana Ribera Morales</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-primary text-[10px] font-bold tracking-tight whitespace-nowrap flex-shrink-0">
+              Confirmada
+            </span>
+</div>
+<!-- Fila 2: Fechas Calendario -->
+<div class="flex items-center gap-1.5 text-xs text-on-surface font-medium pt-0.5">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">calendar_month</span>
+<span class="truncate">22 Mar – 25 Mar, 2025</span>
+</div>
+<!-- Fila 3: Chips de estadía y huéspedes -->
+<div class="flex items-center gap-1.5 pt-0.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F0EBE1] text-on-surface text-[11px] font-medium">
+              3 noches
+            </span>
+<span class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[13px]">group</span> 1 huésped
+            </span>
+</div>
+<!-- Fila 4: Total pagado con Acento Dorado Cruceño -->
+<div class="flex items-center justify-between pt-1 mt-0.5">
+<span class="text-[11px] text-on-surface-variant font-medium">Total neto:</span>
+<span class="bg-accent text-[#1D2622] font-black px-2.5 py-0.5 rounded-lg text-sm tracking-tight shadow-sm">
+              $us 135
+            </span>
+</div>
+</div>
+</div>
+<!-- Acciones de reserva integradas -->
+<div class="pt-2.5 mt-0.5 flex items-center justify-between bg-background/50 -mx-4 -mb-4 px-4 py-2.5 rounded-b-2xl">
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-accent">notifications_active</span> En 8 días
+        </span>
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:opacity-80 transition-opacity">
+<span>Ver detalle</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Tarjeta Reserva 3 (Próxima estadía larga) -->
+<article class="bg-surface rounded-2xl p-4 shadow-sm transition-all duration-200 hover:shadow-md relative overflow-hidden flex flex-col gap-3">
+<div class="flex gap-3.5">
+<!-- Miniatura Foto Loft Santa Cruz -->
+<div class="relative w-24 h-24 aspect-square rounded-xl overflow-hidden flex-shrink-0 shadow-inner">
+<img class="w-full h-full object-cover" data-alt="Sunlit open-plan kitchen and dining counter in a luxury apartment Equipetrol Santa Cruz de la Sierra, sleek quartz surfaces, matte green barstools, modern espresso maker, warm ambient pendant lights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcDbdvSfEhVsrxl9xPvZA2SJN-ekSVfqbHX213nnctCn4SdQnz-wcbupQf4yUBGxy2MibffRHD8lPBWvHHbchMn4sUCzagr1PFxSx5GJ-KKJfTBaHDoWdz3KZqtAeubLSf2TZAJ40jjoV0lFCb68BAnxQzkBY63paFEh98D_q-xOJhm2Nle0EpA0Knoe4tS0ce9j3IP6VGY7l96gnj7v7fcEiKZEyQ8lxwFrqvS_IbjyOcm2cBy2ygZoxaNxfpkH3b2BoSEVYmmR4"/>
+</div>
+<!-- Contenido Derecho -->
+<div class="flex-1 flex flex-col justify-between min-w-0">
+<!-- Fila 1: Huésped y Badge -->
+<div class="flex items-start justify-between gap-1.5">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">account_circle</span>
+<h3 class="font-bold text-sm text-on-surface truncate">Mateo Justiniano Suárez</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-tight whitespace-nowrap flex-shrink-0">
+              Próxima
+            </span>
+</div>
+<!-- Fila 2: Fechas Calendario -->
+<div class="flex items-center gap-1.5 text-xs text-on-surface font-medium pt-0.5">
+<span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">calendar_month</span>
+<span class="truncate">02 Abr – 08 Abr, 2025</span>
+</div>
+<!-- Fila 3: Chips de estadía y huéspedes -->
+<div class="flex items-center gap-1.5 pt-0.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#F0EBE1] text-on-surface text-[11px] font-medium">
+              6 noches
+            </span>
+<span class="inline-flex items-center gap-1 text-[11px] text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[13px]">group</span> 3 personas
+            </span>
+</div>
+<!-- Fila 4: Total pagado con Acento Dorado Cruceño -->
+<div class="flex items-center justify-between pt-1 mt-0.5">
+<span class="text-[11px] text-on-surface-variant font-medium">Total neto:</span>
+<span class="bg-accent text-[#1D2622] font-black px-2.5 py-0.5 rounded-lg text-sm tracking-tight shadow-sm">
+              $us 270
+            </span>
+</div>
+</div>
+</div>
+<!-- Acciones de reserva integradas -->
+<div class="pt-2.5 mt-0.5 flex items-center justify-between bg-background/50 -mx-4 -mb-4 px-4 py-2.5 rounded-b-2xl">
+<span class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">verified</span> Depósito verificado
+        </span>
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:opacity-80 transition-opacity">
+<span>Ver detalle</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+</section>
+<!-- Tarjeta Resumen Financiero al pie -->
+<section class="px-4 pt-3">
+<div class="bg-surface rounded-2xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Proyección de ingresos</h4>
+<p class="text-[11px] text-on-surface-variant">Marzo - Abril 2025</p>
+</div>
+</div>
+<span class="text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+          13 noches reservadas
+        </span>
+</div>
+<div class="p-3 bg-[#F6F2EA] rounded-xl flex items-center justify-between">
+<div>
+<span class="text-xs text-on-surface-variant font-medium block">Total previsto confirmado</span>
+<span class="text-xs text-primary font-semibold flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">lock</span> Cobros garantizados
+          </span>
+</div>
+<div class="text-right">
+<span class="text-2xl font-black text-primary tracking-tight block">
+            $us 585<span class="text-sm font-bold">,00</span>
+</span>
+<span class="text-[10px] text-on-surface-variant">≈ Bs 4.071,60</span>
+</div>
+</div>
+</div>
+</section>
+</div></main></body></html>
