@@ -24,10 +24,14 @@ ThemeData crearTema() {
     // fromSeed calcula un tono propio a partir de la semilla; se fija el
     // primario exacto para que sea el mismo verde de la bandera, no una
     // variante. El acento (dorado) solo se usa como fondo de precios.
+    // surface se fija igual al blanco que ya usan cardTheme/appBarTheme/
+    // inputDecorationTheme, para que un widget que lea colorScheme.surface
+    // (en vez de un ThemeData.of(...).algo) obtenga la misma superficie.
     primary: colorMarca,
     onPrimary: Colors.white,
     tertiary: colorAcento,
     onTertiary: textoSobreAcento,
+    surface: Colors.white,
   );
 
   return ThemeData(

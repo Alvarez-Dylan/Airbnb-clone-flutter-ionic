@@ -7,3 +7,6 @@ app-arrendatario/CLAUDE.md
 # Logs y capturas locales
 *.log
 screen.png
+
+# Credenciales del script de carga de lugares de prueba
+scripts/cargar-lugares/credenciales.json

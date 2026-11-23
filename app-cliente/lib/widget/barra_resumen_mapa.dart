@@ -22,7 +22,7 @@ class BarraResumenMapa extends StatelessWidget {
         : textoHuespedes;
 
     return Material(
-      color: Colors.white,
+      color: colorScheme.surface,
       elevation: 3,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(

@@ -12,6 +12,13 @@ escritos para ayudar al usuario (Dylan) a ubicarse en su propio editor
 y poder señalar la linea exacta cuando el docente pregunte "mostrame
 donde hace eso". No inventes codigo que no este citado aca.
 
+Este documento incluye la Fase E (mejora estetica, rama
+mejora-estetica): las dos apps pasaron de los widgets/componentes por
+defecto a un tema propio (verde + dorado, bandera de Santa Cruz), y la
+app arrendatario ademas pasa a correr tambien como app nativa Android
+con Capacitor. La logica de negocio (calculos, validaciones, rutas de
+la API) NO cambio en la Fase E.
+
 ------------------------------------------------------------
 0. QUE ES EL PROYECTO
 ------------------------------------------------------------
@@ -27,7 +34,10 @@ todo el curso, Laravel):
 - APP ARRENDATARIO: carpeta app-arrendatario/, hecha en Ionic +
   Angular standalone (TypeScript) + HttpClient + signal(). Permite
   publicar lugares (con fotos y ubicacion en un mapa) y ver las
-  reservas que le hicieron. Se prueba en el navegador (ionic serve).
+  reservas que le hicieron. Se prueba en el navegador (ionic serve) Y,
+  desde la Fase E2, tambien como app nativa Android empaquetada con
+  Capacitor (npm run build && npx cap sync android && npx cap run
+  android) - ver seccion 6.4.
 
 El enunciado exige que cada app use una tecnologia distinta vista en
 clase. Es un proyecto INDIVIDUAL: el docente evalua que el autor
@@ -36,6 +46,10 @@ nombres en español y patrones simples (sin librerias de estado
 "magicas" como Bloc/Riverpod/NgRx, sin generadores de codigo).
 
 Las dos apps NO comparten ningun archivo de codigo.
+
+Durante TODO el desarrollo (incluida la Fase E) las dos apps corren
+contra un mock local (Mockoon), no contra la API real - ver seccion
+2 (URL de cada app segun como corre) y seccion 7 (comandos).
 
 ------------------------------------------------------------
 1. ARQUITECTURA DE CADA APP (resumen rapido)
@@ -55,11 +69,15 @@ Capas, de abajo hacia arriba:
                  context.watch<T>() y ejecutan acciones con
                  context.read<T>()
   widget/     -> piezas reutilizables mas chicas (una tarjeta, un
-                 mapa, una galeria)
+                 mapa, una galeria, el tema visual)
 
-Carpeta completa: app-cliente/lib/
+Carpeta completa: app-cliente/lib/ (la Fase E agrego config/tema.dart
+y 7 widgets nuevos, marcados con [E]; el resto ya existia de las fases
+A-C):
   main.dart                 - arranque: decide pantalla inicial
-  config/api_config.dart    - URL unica de la API + cliente Dio
+  config/
+    api_config.dart         - URL unica de la API + cliente Dio
+    tema.dart            [E] - crearTema(): unico lugar con los colores
   model/
     usuario_model.dart
     lugar_model.dart
@@ -87,10 +105,24 @@ Carpeta completa: app-cliente/lib/
     galeria_fotos.dart
     vista_estado.dart
     reserva_card.dart
+    barra_reservar.dart       [E] - barra inferior fija del detalle
+    barra_resumen_mapa.dart   [E] - tarjeta flotante sobre el mapa
+    campo_fecha.dart          [E] - campo de fecha con estilo de tema
+    contador_huespedes.dart   [E] - botones -/+ de huespedes
+    caracteristicas_lugar.dart [E] - chips de personas/camas/.../wifi
+    encabezado_bnb.dart       [E] - icono + "bnb" (login y registro)
+    foto_lugar.dart           [E] - Image.network con placeholder/error
   utils/
     conversiones.dart
     calculo_reserva.dart
     manejar_error.dart
+
+Ningun archivo de model/, service/, repository/ ni utils/ se toco en
+la Fase E (regla de la fase: "solo cambios visuales"), asi que sus
+numeros de linea en este documento son los mismos de las fases A-C.
+Los que SI cambiaron son los de screen/ y widget/ (y ganaron widgets
+nuevos), por eso casi todas las citas de esas dos carpetas tienen
+numeros de linea distintos a versiones anteriores de este documento.
 
 --- APP ARRENDATARIO (Ionic + Angular standalone) ---
 
@@ -105,10 +137,12 @@ Capas:
   pages/      -> componentes standalone de pantalla completa. Se
                  suscriben con .subscribe({next, error}) y guardan
                  los datos en signal()
-  components/ -> piezas reutilizables (el selector de mapa)
+  components/ -> piezas reutilizables (el selector de mapa y, desde
+                 la Fase E2, el selector de cantidad)
   utils/      -> funciones sueltas de conversion/formato
 
-Carpeta completa: app-arrendatario/src/app/
+Carpeta completa: app-arrendatario/src/app/ (sin cambios de nombre en
+la Fase E salvo el componente nuevo components/selector-cantidad/):
   app.routes.ts              - todas las rutas + el guard
   guards/auth.guard.ts
   models/
@@ -121,14 +155,30 @@ Carpeta completa: app-arrendatario/src/app/
     reservas.service.ts
   utils/
     manejar-error.ts
-    formato.ts
-  components/mapa-selector/mapa-selector.component.ts (+.html/.scss)
+    formato.ts               - gano pluralizar() en la Fase E, ver 6.6
+  components/
+    mapa-selector/mapa-selector.component.ts (+.html/.scss)
+    selector-cantidad/selector-cantidad.component.ts (+.html/.scss) [E]
   pages/
     login/login.page.ts (+.html/.scss)
     registro/registro.page.ts (+.html/.scss)
     mis-lugares/mis-lugares.page.ts (+.html/.scss)
     lugar-form/lugar-form.page.ts (+.html/.scss)   [crea Y edita]
     reservas-lugar/reservas-lugar.page.ts (+.html/.scss)
+
+Fuera de src/app/ (el tema visual de la Fase E, ver seccion 6.1):
+  src/theme/variables.scss    - colores de marca (verde/dorado)
+  src/global.scss             - clases CSS reutilizables
+  capacitor.config.ts         - Android con Capacitor, ver seccion 6.4
+  src/environments/environment.ts       - URL para ionic serve
+  src/environments/environment.prod.ts  - URL para el build de Android
+
+Al igual que en el cliente, ningun archivo de services/, models/,
+guards/ ni utils/ (salvo formato.ts, que solo GANO una funcion) se
+toco en la Fase E: sus lineas en este documento son las mismas de las
+fases A. Los que si cambiaron son pages/ (todas las .html, y los .ts
+donde se agregaron iconos/pluralizar) y components/mapa-selector
+(color del marcador leido del tema en vez de escrito a mano).
 
 Patron clave para explicar: "notaSeleccionada" (del practico 2). Una
 sola pagina (lugar-form) sirve para CREAR y EDITAR un lugar: si la
@@ -140,7 +190,8 @@ de RA-09 mas abajo.
 2. CONTRATO DE LA API (lo esencial para poder defender)
 ------------------------------------------------------------
 
-Backend Laravel compartido por todo el curso. Reglas clave:
+Backend Laravel compartido por todo el curso. Reglas clave (SIN
+cambios en la Fase E: la fase es solo visual):
 
 - TODOS los errores (validacion, no encontrado, credenciales malas)
   responden HTTP 404, salvo el login con contraseña incorrecta, que da
@@ -198,6 +249,23 @@ Backend Laravel compartido por todo el curso. Reglas clave:
   arreglo "reservas" adentro (cada reserva trae su "cliente" anidado).
   No es un arreglo plano de reservas.
 
+URL de la API segun cada app y como corre (actualizado en la Fase E,
+reemplaza cualquier URL anterior de este documento):
+  - Cliente (app-cliente/lib/config/api_config.dart, linea 6): SIEMPRE
+    http://10.0.2.2:3001/api (la app solo corre en el emulador
+    Android, nunca en el navegador).
+  - Arrendatario con `ionic serve` (navegador, misma PC):
+    src/environments/environment.ts, linea 8 -> http://localhost:3001/api.
+  - Arrendatario empaquetado con Capacitor (`npm run build`, lo que
+    usa `npx cap sync android`/`npx cap run android`):
+    src/environments/environment.prod.ts, linea 6 -> http://10.0.2.2:3001/api
+    (10.0.2.2 es el alias fijo con el que el emulador de Android llega
+    a la PC que lo hospeda; "localhost" dentro del emulador apuntaria
+    al propio emulador, no a la PC con Mockoon).
+  Las tres URLs apuntan al mock local de Mockoon durante todo el
+  desarrollo (ver seccion 7); la API real se activa en los 3 archivos
+  recien antes de la defensa.
+
 ------------------------------------------------------------
 3. CUERPO PRINCIPAL: REQUISITO POR REQUISITO
 ------------------------------------------------------------
@@ -236,7 +304,8 @@ ARCHIVOS:
   Arrendatario: app-arrendatario/src/app/app.routes.ts
     lineas 18, 24, 29, 35 (canActivate: [authGuard] en cada ruta
     protegida)
-  Cliente: app-cliente/lib/main.dart lineas 17-18 y 46
+  Cliente: app-cliente/lib/main.dart lineas 18-19 (cargarSesion) y 48
+    (home: ... haySesion ...)
 
 SNIPPET (auth.guard.ts, lineas 8-18):
   export const authGuard: CanActivateFn = () => {
@@ -251,7 +320,10 @@ SNIPPET (auth.guard.ts, lineas 8-18):
     return false;
   };
 
-SNIPPET (main.dart, linea 46):
+SNIPPET (main.dart, lineas 18-19 y 48):
+  final authProvider = AuthProvider();
+  await authProvider.cargarSesion();
+  ...
   home: authProvider.haySesion ? const BusquedaScreen() : const LoginScreen(),
 
 FLUJO (arrendatario):
@@ -262,7 +334,7 @@ FLUJO (arrendatario):
      /login y bloquea la ruta (return false).
 
 FLUJO (cliente):
-  1. main() (lineas 13-21 de main.dart) espera authProvider.
+  1. main() (lineas 14-22 de main.dart) espera authProvider.
      cargarSesion() ANTES de llamar a runApp.
   2. Segun authProvider.haySesion (true si hay un usuario cargado),
      MaterialApp.home es BusquedaScreen o LoginScreen directamente -
@@ -280,11 +352,12 @@ PREGUNTAS:
 RG-03 - Codigo propio y explicable: cada fase tiene su entrada en
 docs/ESTUDIO.md
 ------------------------------------------------------------
-ARCHIVO: docs/ESTUDIO.md completo (14 entradas: Fase 1, A1-A6, C1-C7).
-  Cada entrada documenta que se hizo, que archivos se tocaron, el
-  flujo de datos paso a paso, los conceptos nuevos, las decisiones y
-  3 preguntas probables del docente POR FASE. Esto en si es la prueba
-  de que el proyecto se hizo de forma explicable.
+ARCHIVO: docs/ESTUDIO.md completo (19 entradas: Fase 1, A1-A6, C1-C7,
+  E0, E1, E2, "Ajustes entre E2 y E3" y E3). Cada entrada documenta
+  que se hizo, que archivos se tocaron, el flujo de datos paso a paso,
+  los conceptos nuevos, las decisiones y preguntas probables del
+  docente POR FASE. Esto en si es la prueba de que el proyecto se hizo
+  de forma explicable, incluida la fase estetica.
 
 ============================================================
 APP CLIENTE (RC) - Flutter
@@ -295,15 +368,15 @@ RC-01 - Login con email y contrasena
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/login_screen.dart
-    lineas 28-49  (metodo _iniciarSesion)
-    lineas 64-69  (campo Email + validator)
-    lineas 71-77  (campo Contrasena + validator)
-    lineas 79-82  (boton)
+    lineas 29-50  (metodo _iniciarSesion)
+    lineas 68-77  (campo Email + validator)
+    lineas 79-88  (campo Contrasena + validator)
+    lineas 90-93  (boton FilledButton)
   app-cliente/lib/service/auth_service.dart lineas 11-21 (iniciarSesion)
   app-cliente/lib/repository/auth_provider.dart lineas 32-48
     (iniciarSesion del provider)
 
-SNIPPET (login_screen.dart, 28-48):
+SNIPPET (login_screen.dart, 29-49):
   Future<void> _iniciarSesion() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -327,7 +400,7 @@ SNIPPET (login_screen.dart, 28-48):
     }
   }
 
-SNIPPET (auth_service.dart, 11-21):
+SNIPPET (auth_service.dart, 11-21 - SIN cambios desde la Fase C1):
   Future<UsuarioModel> iniciarSesion(String email, String password) async {
     try {
       final respuesta = await _dio.post(
@@ -342,26 +415,28 @@ SNIPPET (auth_service.dart, 11-21):
 
 FLUJO COMPLETO:
   1. Usuario escribe email y contrasena en los TextFormField (lineas
-     64-77), cada uno con un validator que exige que no esten vacios.
-  2. Toca "Iniciar sesion" -> _iniciarSesion() (linea 28). Primero
-     corre la validacion local del Form (linea 29); si falla, no
-     llama a nada.
+     68-88), cada uno con un validator y un prefixIcon (icono de
+     email/candado, Fase E). Todo el formulario esta dentro de un
+     SingleChildScrollView (linea 59) para que el teclado no tape los
+     campos, y hay un EncabezadoBnb (linea 66: icono + "bnb" +
+     subtitulo) arriba.
+  2. Toca "Iniciar sesion" (FilledButton, linea 90) -> _iniciarSesion()
+     (linea 29). Primero corre la validacion local del Form (linea
+     30); si falla, no llama a nada.
   3. context.read<AuthProvider>().iniciarSesion(email, password)
      (auth_provider.dart linea 32): pone _cargando=true y notifica
      (el boton se deshabilita, ver RX-05), llama a AuthService.
   4. AuthService.iniciarSesion (linea 11 de auth_service.dart) hace
      POST /cliente/login con {email, password}.
   5. Si la API responde 200: UsuarioModel.fromJson parsea la
-     respuesta (usuario_model.dart lineas 15-22). El provider guarda
-     el usuario y llama a _guardarSesion() (shared_preferences, ver
-     RX-02), pone _cargando=false, devuelve true.
-  6. Si la API responde error: DioException se atrapa (linea 18 de
-     auth_service.dart) y se relanza como Exception con el mensaje
-     armado por mensajeDeError() (ver seccion de hallazgos de API).
-     El provider guarda ese mensaje en _error y devuelve false.
-  7. La pantalla espera el bool: si true, navega a BusquedaScreen
-     (linea 40); si false, muestra un SnackBar con el error (linea
-     45).
+     respuesta. El provider guarda el usuario y llama a
+     _guardarSesion() (shared_preferences, ver RX-02), pone
+     _cargando=false, devuelve true.
+  6. Si la API responde error: DioException se atrapa y se relanza
+     como Exception con el mensaje armado por mensajeDeError(). El
+     provider guarda ese mensaje en _error y devuelve false.
+  7. La pantalla espera el bool: si true, navega a BusquedaScreen con
+     pushReplacement; si false, muestra un SnackBar con el error.
 
 PREGUNTAS:
   "¿Donde se decide si el login fue exitoso?" -> AuthProvider.
@@ -376,13 +451,13 @@ RC-02 - Registro con email, nombre completo, contrasena y telefono
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/registro_screen.dart
-    lineas 31-58  (metodo _registrar)
-    lineas 73-101 (los 4 campos del formulario)
+    lineas 32-59  (metodo _registrar)
+    lineas 77-119 (los 4 campos del formulario)
   app-cliente/lib/service/auth_service.dart lineas 23-43 (registrar)
   app-cliente/lib/repository/auth_provider.dart lineas 50-79
     (registrar del provider, que ADEMAS llama a iniciarSesion)
 
-SNIPPET (registro_screen.dart, 44-52 - navegacion tras exito):
+SNIPPET (registro_screen.dart, 45-53 - navegacion tras exito):
   if (exito) {
     // pushAndRemoveUntil y no pushReplacement: esta pantalla se abrio
     // encima de LoginScreen, asi que hay que sacar toda la pila (si no,
@@ -393,7 +468,8 @@ SNIPPET (registro_screen.dart, 44-52 - navegacion tras exito):
       (ruta) => false,
     );
 
-SNIPPET (auth_provider.dart, 60-69 - registro + login automatico):
+SNIPPET (auth_provider.dart, 60-69 - registro + login automatico, SIN
+  cambios desde la Fase C1):
   await _authService.registrar(
     nombrecompleto: nombrecompleto,
     email: email,
@@ -407,8 +483,9 @@ SNIPPET (auth_provider.dart, 60-69 - registro + login automatico):
 
 FLUJO COMPLETO:
   1. Usuario llena los 4 campos (nombre, email, contrasena, telefono),
-     cada uno validado (registro_screen.dart lineas 73-101).
-  2. _registrar() (linea 31) llama a authProvider.registrar(...).
+     cada uno con prefixIcon (persona/email/candado/telefono, Fase E)
+     y validado (registro_screen.dart lineas 77-119).
+  2. _registrar() (linea 32) llama a authProvider.registrar(...).
   3. AuthProvider.registrar (auth_provider.dart linea 50) llama
      PRIMERO a AuthService.registrar -> POST /cliente/registro.
   4. Si eso sale bien, SIN esperar que el usuario haga nada mas, el
@@ -422,10 +499,9 @@ FLUJO COMPLETO:
 PREGUNTA: "¿Por que pushAndRemoveUntil y no pushReplacement?" ->
   RegistroScreen se abrio con push() ENCIMA de LoginScreen. pushReplacement
   solo reemplaza RegistroScreen en la pila, pero LoginScreen sigue
-  debajo, as apareceria una fiecha "atras" que vuelve al login estando
+  debajo, asi aparece una flecha "atras" que vuelve al login estando
   ya logueado. pushAndRemoveUntil(..., (ruta) => false) saca TODA la
-  pila. (Este bug se encontro probando la app en el emulador real, no
-  fue un error teorico.)
+  pila.
 
 ------------------------------------------------------------
 RC-03 - Pantalla principal con buscador: ciudad, fecha llegada, fecha
@@ -433,53 +509,86 @@ salida y cantidad de huespedes
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/busqueda_screen.dart
-    lineas 20-26  (variables de estado: _ciudadController,
-                   _fechaLlegada, _fechaSalida, _huespedes)
-    lineas 34-49  (_elegirFecha: showDatePicker)
-    lineas 101-104 (campo Ciudad)
-    lineas 106-123 (los dos ListTile de fecha, cada uno abre el picker)
-    lineas 124-138 (contador de huespedes con botones +/-)
+    lineas 23-28  (variables de estado: _ciudadController,
+                   _formatoFecha, _fechaLlegada, _fechaSalida,
+                   _huespedes)
+    lineas 36-60  (_elegirFecha, ver tambien hallazgo de Fase E0:
+                   la salida no puede empezar antes de la llegada+1)
+    lineas 126-129 (campo Ciudad)
+    lineas 131-151 (Row con dos CampoFecha: llegada y salida)
+    lineas 153-168 (ContadorHuespedes de huespedes)
+  app-cliente/lib/widget/campo_fecha.dart (archivo completo, 38 lineas) [E]
+  app-cliente/lib/widget/contador_huespedes.dart (archivo completo, 34
+    lineas) [E]
 
-SNIPPET (lineas 34-49):
+SNIPPET (lineas 36-60 - incluye el ajuste de la Fase E0 sobre la
+  fecha de salida):
   Future<void> _elegirFecha({required bool esLlegada}) async {
+    final hoy = DateTime.now();
+    // La llegada se limita a hoy + 364 dias para que su dia siguiente (el
+    // primer dia posible de salida) nunca pase del lastDate de la salida.
+    final primerDiaSalida = _fechaLlegada?.add(const Duration(days: 1)) ?? hoy;
     final fecha = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: esLlegada ? hoy : primerDiaSalida,
+      firstDate: esLlegada ? hoy : primerDiaSalida,
+      lastDate: hoy.add(Duration(days: esLlegada ? 364 : 365)),
     );
     if (fecha == null) return;
     setState(() {
       if (esLlegada) {
         _fechaLlegada = fecha;
+        if (_fechaSalida != null && !_fechaSalida!.isAfter(fecha)) {
+          _fechaSalida = null;
+        }
       } else {
         _fechaSalida = fecha;
       }
     });
   }
 
-FLUJO: el usuario escribe la ciudad (TextField linea 101), toca cada
-  ListTile de fecha (lineas 106 y 116) que llama _elegirFecha con
-  esLlegada true/false; cada llamado abre el dialogo nativo
-  showDatePicker (ahora en español, gracias a flutter_localizations
-  configurado en main.dart lineas 39-45) y guarda el resultado con
-  setState. Los botones +/- de huespedes (lineas 128-136) suman o
-  restan 1 a _huespedes con setState.
+SNIPPET (campo_fecha.dart COMPLETO - campo "falso" con el aspecto de
+  un TextField del tema, pero que abre un DatePicker):
+  class CampoFecha extends StatelessWidget {
+    ...
+    Widget build(BuildContext context) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: InputDecorator(
+          decoration: InputDecoration(
+            labelText: etiqueta,
+            prefixIcon: const Icon(Icons.calendar_today_outlined),
+          ),
+          child: Text(fecha == null ? '' : formato.format(fecha!), ...),
+        ),
+      );
+    }
+  }
+
+FLUJO: el usuario escribe la ciudad (TextField linea 127), toca cada
+  CampoFecha (lineas 134 y 143) que llama _elegirFecha con esLlegada
+  true/false; cada llamado abre showDatePicker y guarda el resultado
+  con setState (si la nueva llegada empata o pasa la salida ya
+  elegida, la salida se borra para forzar a elegirla de nuevo). El
+  ContadorHuespedes (linea 162) suma o resta 1 a _huespedes con
+  setState, deshabilitando el boton "-" cuando ya esta en 1 (linea
+  164: onQuitar: _huespedes > 1 ? ... : null).
 
 PREGUNTA: "¿Que pasa si cancelo el selector de fecha?" ->
-  showDatePicker devuelve null; la linea "if (fecha == null) return;"
-  corta ahi mismo sin tocar el estado.
+  showDatePicker devuelve null; "if (fecha == null) return;" corta ahi
+  mismo sin tocar el estado.
 
 ------------------------------------------------------------
 RC-04 - La busqueda simple es por ciudad
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/service/lugar_service.dart lineas 11-20 (buscar)
-  app-cliente/lib/screen/busqueda_screen.dart lineas 51-75 (_buscar)
+  app-cliente/lib/screen/busqueda_screen.dart lineas 62-86 (_buscar)
   app-cliente/lib/repository/busqueda_provider.dart lineas 25-41
     (buscar del provider)
 
-SNIPPET (lugar_service.dart, 11-20):
+SNIPPET (lugar_service.dart, 11-20 - SIN cambios desde la Fase C2):
   Future<List<LugarModel>> buscar(String ciudad) async {
     try {
       // Busqueda simple: solo la ciudad, como dice el enunciado.
@@ -491,7 +600,8 @@ SNIPPET (lugar_service.dart, 11-20):
     }
   }
 
-SNIPPET (busqueda_provider.dart, 25-41 - filtro local por huespedes):
+SNIPPET (busqueda_provider.dart, 25-41 - filtro local por huespedes,
+  SIN cambios desde la Fase C2):
   Future<void> buscar() async {
     _cargando = true;
     _error = null;
@@ -506,15 +616,14 @@ SNIPPET (busqueda_provider.dart, 25-41 - filtro local por huespedes):
     } catch (error) { ... }
   }
 
-FLUJO: _buscar() en busqueda_screen.dart (linea 51) valida localmente
+FLUJO: _buscar() en busqueda_screen.dart (linea 62) valida localmente
   (ciudad no vacia, fechas elegidas, salida posterior a llegada -
-  lineas 52-63), copia los criterios a BusquedaProvider (lineas
-  65-69, porque la Fase C5/confirmar reserva los necesita despues) y
-  llama a provider.buscar() (linea 71). El provider pide POST
-  /lugares/search con SOLO {"search": ciudad} (la API no recibe
-  fechas ni huespedes en esta ruta), y DESPUES de recibir la
-  respuesta filtra localmente los lugares cuya cantPersonas sea
-  mayor o igual a huespedes.
+  lineas 63-74), copia los criterios a BusquedaProvider (lineas 76-80,
+  porque la Fase C5/confirmar reserva los necesita despues) y llama a
+  provider.buscar() (linea 82). El provider pide POST /lugares/search
+  con SOLO {"search": ciudad}, y DESPUES de recibir la respuesta
+  filtra localmente los lugares cuya cantPersonas sea mayor o igual a
+  huespedes.
 
 PREGUNTA: "¿Por que la cantidad de huespedes no se manda a la API?"
   -> La ruta lugares/search solo acepta el campo "search" (la ciudad);
@@ -527,15 +636,15 @@ los campos del lugar, menos foto y anfitrion
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/busqueda_avanzada_screen.dart
-    lineas 66-113 (_buscar: arma el mapa de filtros)
-    lineas 115-209 (build: todos los campos del formulario)
-    lineas 194-203 (el Dropdown de wifi con 3 estados)
+    lineas 75-122 (_buscar: arma el mapa de filtros y navega)
+    lineas 89-110 (el armado dinamico del body)
+    lineas 203-220 (el Dropdown de wifi con 3 estados)
   app-cliente/lib/repository/busqueda_provider.dart lineas 46-60
     (buscarAvanzado)
   app-cliente/lib/service/lugar_service.dart lineas 22-30
     (busquedaAvanzada)
 
-SNIPPET (busqueda_avanzada_screen.dart, 80-101 - armado dinamico del body):
+SNIPPET (busqueda_avanzada_screen.dart, 89-110 - armado dinamico del body):
   final filtros = <String, dynamic>{};
   if (_descripcionController.text.trim().isNotEmpty) {
     filtros['descripcion'] = _descripcionController.text.trim();
@@ -548,19 +657,27 @@ SNIPPET (busqueda_avanzada_screen.dart, 80-101 - armado dinamico del body):
     filtros['tieneWifi'] = _tieneWifi! ? 1 : 0;
   }
 
-SNIPPET (busqueda_avanzada_screen.dart, 194-203 - dropdown de 3 estados):
+SNIPPET (busqueda_avanzada_screen.dart, 203-220 - dropdown de 3 estados,
+  con el ajuste visual de la Fase E0 para que se vea vacio por defecto):
   DropdownButtonFormField<bool?>(
     initialValue: _tieneWifi,
     decoration: const InputDecoration(labelText: 'Wifi'),
     items: const [
       DropdownMenuItem(value: null, child: Text('Cualquiera')),
-      DropdownMenuItem(value: true, child: Text('Si')),
+      DropdownMenuItem(value: true, child: Text('Sí')),
       DropdownMenuItem(value: false, child: Text('No')),
+    ],
+    // Con nada elegido (null = no filtrar) el campo se ve vacio en vez
+    // de mostrar "Cualquiera"; al abrir el menu esa opcion sigue ahi.
+    selectedItemBuilder: (context) => const [
+      SizedBox.shrink(),
+      Text('Sí'),
+      Text('No'),
     ],
     onChanged: (valor) => setState(() => _tieneWifi = valor),
   ),
 
-SNIPPET (busqueda_provider.dart, 46-51 - buscarAvanzado):
+SNIPPET (busqueda_provider.dart, 46-51 - buscarAvanzado, SIN cambios):
   Future<void> buscarAvanzado(Map<String, dynamic> filtrosLugar) async {
     _cargando = true;
     _error = null;
@@ -569,16 +686,12 @@ SNIPPET (busqueda_provider.dart, 46-51 - buscarAvanzado):
       final lugares = await _lugarService.busquedaAvanzada({...filtrosLugar, 'ciudad': ciudad});
 
 FLUJO: el usuario llena ciudad+fechas (obligatorios, misma validacion
-  que la busqueda simple, lineas 66-78) y cualquier combinacion de los
+  que la busqueda simple, lineas 75-87) y cualquier combinacion de los
   campos opcionales del lugar (descripcion, camas, banios,
   habitaciones, vehiculos, precio, wifi). _buscar() arma un Map vacio
-  y SOLO agrega una clave si el campo tiene texto (el "if" por
-  campo). Nunca se agrega una clave con valor 0 por defecto - si el
-  usuario no toco el campo, la clave directamente no existe en el
-  mapa. Para wifi se usa un Dropdown de 3 opciones (no un Switch de
-  2) porque hace falta poder representar "no filtrar" ademas de
-  si/no. El mapa final se pasa a BusquedaProvider.buscarAvanzado(),
-  que le agrega 'ciudad' y llama a POST /lugares/advancedsearch.
+  y SOLO agrega una clave si el campo tiene texto. El mapa final se
+  pasa a BusquedaProvider.buscarAvanzado(), que le agrega 'ciudad' y
+  llama a POST /lugares/advancedsearch.
 
 PREGUNTA: "¿Por que no se usa un switch normal para wifi?" -> Un
   Switch de Flutter solo tiene true/false; la API necesita un tercer
@@ -589,18 +702,19 @@ PREGUNTA: "¿Por que no se usa un switch normal para wifi?" -> Un
 RC-06 - Boton "Ver reservas": lista de reservas anteriores del cliente
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/screen/busqueda_screen.dart lineas 148-154 (el
-    TextButton que navega)
+  app-cliente/lib/screen/busqueda_screen.dart lineas 189-196 (el
+    OutlinedButton.icon que navega)
   app-cliente/lib/screen/mis_reservas_screen.dart (archivo completo,
-    45 lineas - ver detalle en RC-16)
+    50 lineas - ver detalle en RC-16)
 
-SNIPPET (busqueda_screen.dart, 148-154):
-  TextButton(
+SNIPPET (busqueda_screen.dart, 189-196):
+  OutlinedButton.icon(
     onPressed: () => Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const MisReservasScreen()),
     ),
-    child: const Text('Ver reservas'),
+    icon: const Icon(Icons.event_note_outlined),
+    label: const Text('Ver reservas'),
   ),
 
 (El detalle completo de que hace MisReservasScreen esta en RC-16, mas
@@ -611,63 +725,81 @@ RC-07 - Resultados en lista: primera foto, nombre, descripcion,
 cantidad de personas y precio por noche
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/widget/lugar_card.dart (archivo completo, 47 lineas)
-  app-cliente/lib/screen/resultados_screen.dart lineas 44-50
+  app-cliente/lib/widget/lugar_card.dart (archivo completo, 80 lineas)
+  app-cliente/lib/screen/resultados_screen.dart lineas 68-78
     (ListView.builder que usa LugarCard)
+  app-cliente/lib/widget/foto_lugar.dart (archivo completo, 42 lineas) [E]
 
-SNIPPET (lugar_card.dart, 13-46 completo):
+SNIPPET (lugar_card.dart, 17-79 completo - al estilo de un listado de
+  alojamientos, Fase E1):
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
+      child: InkWell(
         onTap: onTap,
-        leading: SizedBox(
-          width: 56,
-          height: 56,
-          // Un lugar puede no tener fotos: nunca se usa fotos[0] sin revisar antes.
-          child: lugar.fotos.isEmpty
-              ? const Icon(Icons.image)
-              : Image.network(
-                  urlFoto(lugar.fotos[0].url),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
-                ),
-        ),
-        title: Text(lugar.nombre),
-        subtitle: Text(lugar.descripcion, maxLines: 2, overflow: TextOverflow.ellipsis),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${lugar.cantPersonas} personas'),
-            Text(formatearPrecio(lugar.precioNoche)),
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: FotoLugar(
+                url: lugar.fotos.isEmpty ? null : lugar.fotos.first.url,
+                radio: 0,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(lugar.nombre, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(lugar.descripcion, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: colorTextoSecundario)),
+                  Row(
+                    children: [
+                      const Icon(Icons.people_outline, size: 16, color: colorTextoSecundario),
+                      Expanded(
+                        child: Text(pluralizar(lugar.cantPersonas, 'huésped', 'huéspedes'), ...),
+                      ),
+                      Text('${formatearPrecio(lugar.precioNoche)} noche',
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-FLUJO: ResultadosScreen (lineas 44-50) recorre
+FLUJO: ResultadosScreen (lineas 68-78) recorre
   busquedaProvider.resultados con ListView.builder y crea un
-  LugarCard por cada LugarModel. Cada card decide su propia foto
-  (icono generico si fotos esta vacio, linea 22-23 de lugar_card.dart;
-  errorBuilder si la URL no carga, linea 27), nombre, descripcion
-  (recortada a 2 lineas) y a la derecha personas+precio.
+  LugarCard por cada LugarModel: foto 16:9 arriba (widget FotoLugar,
+  que ya maneja "sin foto" y "foto rota" con un placeholder), nombre
+  en negrita, descripcion en 2 lineas, y una fila con icono de persona
+  + cantidad de huespedes (pluralizado) a la izquierda y el precio en
+  negrita a la derecha. Sigue mostrando los mismos 5 datos de RC-07,
+  solo que con otro aspecto visual (Fase E1).
 
-PREGUNTA: "¿Que pasa si el lugar no tiene fotos?" -> lugar.fotos.
-  isEmpty (linea 22) muestra un Icon generico en vez de intentar
-  cargar fotos[0], que lanzaria un error de rango si la lista
-  estuviera vacia.
+PREGUNTA: "¿Que pasa si el lugar no tiene fotos?" -> FotoLugar recibe
+  url: null y dibuja directamente el placeholder (un Container gris
+  con un Icon), sin intentar lugar.fotos[0].
 
 ------------------------------------------------------------
 RC-08 - Boton "Vista de mapa": los mismos lugares como marcadores
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/widget/mapa_lugares.dart (archivo completo, 64 lineas)
+  app-cliente/lib/widget/mapa_lugares.dart (archivo completo, 115 lineas)
   app-cliente/lib/screen/resultados_screen.dart
-    lineas 42-43 (elige MapaLugares o la lista segun _verMapa)
-    lineas 52-61 (el boton que cambia _verMapa)
+    lineas 53-67 (elige MapaLugares+BarraResumenMapa o la lista segun
+    _verMapa)
+    lineas 81-90 (el FloatingActionButton.extended que cambia _verMapa)
 
-SNIPPET (mapa_lugares.dart, 24-62 - estructura del mapa):
+SNIPPET (mapa_lugares.dart, 38-113 - estructura del mapa, Fase E1 +
+  rediseño posterior del marcador: pastilla de precio + circulo con
+  icono de casa sobre la coordenada exacta):
   return FlutterMap(
     options: MapOptions(initialCenter: centro, initialZoom: 13),
     children: [
@@ -679,30 +811,38 @@ SNIPPET (mapa_lugares.dart, 24-62 - estructura del mapa):
         markers: lugares.map((lugar) {
           return Marker(
             point: LatLng(lugar.latitud, lugar.longitud),
-            width: 90,
-            height: 50,
+            width: _anchoMarcador,
+            height: _altoMarcador,
+            alignment: _alineacionMarcador,
             child: GestureDetector(
               onTap: () => onTapLugar(lugar),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(/* ... precio con fondo de color ... */),
-                  Icon(Icons.location_pin, ...),
+                  Container(/* pastilla dorada con el precio */),
+                  const SizedBox(height: _separacionMarcador),
+                  Container(/* circulo verde con Icons.home */),
                 ],
               ),
             ),
           );
         }).toList(),
       ),
+      // OpenStreetMap exige mostrar esta atribucion sobre el mapa (Fase E0).
+      SimpleAttributionWidget(source: const Text('OpenStreetMap contributors')),
     ],
   );
 
 FLUJO: ResultadosScreen ya tiene los resultados cargados (desde
   RC-04/RC-05, no pide nada nuevo a la API). Segun el bool local
-  _verMapa (linea 21 de resultados_screen.dart, estado de ESTA
-  pantalla, no del provider), el body muestra MapaLugares o el
-  ListView de siempre. MapaLugares arma un Marker por lugar con un
-  precio arriba y un pin abajo, centrado en el primer resultado (o en
-  Santa Cruz por defecto si la lista viene vacia, linea 20-22).
+  _verMapa (linea 23 de resultados_screen.dart), el body muestra un
+  Stack con MapaLugares + una BarraResumenMapa flotante arriba (ver
+  6.2) o el ListView de siempre. MapaLugares arma un Marker por lugar:
+  una pastilla con el precio (colorScheme.tertiary, el dorado) y,
+  debajo, un circulo del color de marca con un icono de casa que cae
+  exactamente sobre la coordenada (el Marker se centra en el circulo,
+  no en toda la columna, con un Alignment calculado). Se centra en el
+  primer resultado, o en Santa Cruz por defecto si la lista viene vacia.
 
 PREGUNTA: "¿Por que _verMapa no esta en el provider?" -> Es un
   detalle de COMO se muestra esta pantalla puntual, no un dato de la
@@ -713,41 +853,42 @@ PREGUNTA: "¿Por que _verMapa no esta en el provider?" -> Es un
 RC-09 - En el mapa, boton "Vista de lista" para volver
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/screen/resultados_screen.dart linea 21 (bool
-    _verMapa), lineas 52-61 (el mismo boton que alterna)
+  app-cliente/lib/screen/resultados_screen.dart linea 23 (bool
+    _verMapa), lineas 80-90 (el FloatingActionButton.extended, Fase
+    E1 - antes era un ElevatedButton en bottomNavigationBar)
 
-SNIPPET (lineas 52-61):
-  bottomNavigationBar: hayResultados
-      ? SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: ElevatedButton(
-              onPressed: () => setState(() => _verMapa = !_verMapa),
-              child: Text(_verMapa ? 'Vista de lista' : 'Vista de mapa'),
-            ),
-          ),
+SNIPPET (lineas 80-90):
+  floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+  floatingActionButton: hayResultados
+      ? FloatingActionButton.extended(
+          onPressed: () => setState(() => _verMapa = !_verMapa),
+          // En la vista de mapa, pastilla oscura (como en el diseño de referencia).
+          backgroundColor: _verMapa ? colorScheme.onSurface : null,
+          foregroundColor: _verMapa ? colorScheme.surface : null,
+          icon: Icon(_verMapa ? Icons.list : Icons.map_outlined),
+          label: Text(_verMapa ? 'Vista de lista' : 'Vista de mapa'),
         )
       : null,
 
-FLUJO: es el MISMO boton de RC-08: un solo ElevatedButton que invierte
-  _verMapa con setState y cambia su propio texto segun el estado
-  actual (linea 58: si _verMapa es true, dice "Vista de lista"; si
-  es false, dice "Vista de mapa").
+FLUJO: es el MISMO boton de RC-08: un solo FloatingActionButton.extended
+  (centrado abajo, FloatingActionButtonLocation.centerFloat) que
+  invierte _verMapa con setState y cambia su propio icono/texto/color
+  segun el estado actual.
 
 ------------------------------------------------------------
 RC-10 - Al seleccionar un lugar (lista o mapa) se abre su detalle
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/screen/resultados_screen.dart lineas 23-28
+  app-cliente/lib/screen/resultados_screen.dart lineas 25-30
     (_irADetalle, la funcion que navega)
-  app-cliente/lib/widget/lugar_card.dart linea 17 (onTap: onTap, de
-    la tarjeta de la lista)
-  app-cliente/lib/widget/mapa_lugares.dart linea 39 (onTap del
+  app-cliente/lib/widget/lugar_card.dart linea 20 (onTap: onTap, del
+    InkWell de la tarjeta de la lista)
+  app-cliente/lib/widget/mapa_lugares.dart linea 55 (onTap del
     GestureDetector de cada marcador)
-  app-cliente/lib/screen/detalle_lugar_screen.dart lineas 12-19
+  app-cliente/lib/screen/detalle_lugar_screen.dart lineas 14-21
     (constructor que recibe solo el id)
 
-SNIPPET (resultados_screen.dart, 23-28):
+SNIPPET (resultados_screen.dart, 25-30):
   void _irADetalle(LugarModel lugar) {
     Navigator.push(
       context,
@@ -755,11 +896,11 @@ SNIPPET (resultados_screen.dart, 23-28):
     );
   }
 
-FLUJO: tanto el onTap de un LugarCard de la lista (linea 48 de
+FLUJO: tanto el onTap de un LugarCard de la lista (linea 75 de
   resultados_screen.dart: "onTap: () => _irADetalle(lugar)") como el
-  onTap de un marcador del mapa (mapa_lugares.dart linea 39:
+  onTap de un marcador del mapa (mapa_lugares.dart linea 55:
   "onTap: () => onTapLugar(lugar)", donde onTapLugar ES _irADetalle,
-  pasado como parametro en resultados_screen.dart linea 43) llaman a
+  pasado como parametro en resultados_screen.dart linea 56) llaman a
   la MISMA funcion _irADetalle, que navega a DetalleLugarScreen
   pasando SOLO el id (no el LugarModel completo) por el constructor.
 
@@ -772,54 +913,64 @@ RC-11 - Detalle: primera foto en grande y las demas chicas debajo;
 tocar una chica la muestra en grande
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/widget/galeria_fotos.dart (archivo completo, 78
-    lineas)
+  app-cliente/lib/widget/galeria_fotos.dart (archivo completo, 67
+    lineas - reescrito en la Fase E1 para usar FotoLugar en vez de
+    Image.network repetido)
     linea 18 (_indiceSeleccionado, el estado)
-    lineas 33-41 (foto grande)
-    lineas 44-73 (fila de miniaturas)
-    linea 53 (tocar una miniatura cambia el indice)
+    lineas 26-32 (foto grande)
+    lineas 35-62 (fila de miniaturas, con borde del color de marca)
+    linea 44 (tocar una miniatura cambia el indice)
 
-SNIPPET (lineas 17-41):
+SNIPPET (lineas 17-32):
   class _GaleriaFotosState extends State<GaleriaFotos> {
     int _indiceSeleccionado = 0;
 
     @override
     Widget build(BuildContext context) {
-      if (widget.fotos.isEmpty) { /* placeholder gris */ }
-
+      if (widget.fotos.isEmpty) {
+        return const SizedBox(height: 220, child: FotoLugar(url: null));
+      }
       return Column(
         children: [
           SizedBox(
             height: 220,
             width: double.infinity,
-            child: Image.network(
-              urlFoto(widget.fotos[_indiceSeleccionado].url),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 64),
-            ),
+            child: FotoLugar(url: widget.fotos[_indiceSeleccionado].url),
           ),
           ...
 
-SNIPPET (lineas 50-53 - tocar una miniatura):
+SNIPPET (lineas 41-57 - miniatura con borde del color de marca si esta
+  seleccionada):
   itemBuilder: (context, indice) {
     final seleccionada = indice == _indiceSeleccionado;
     return GestureDetector(
       onTap: () => setState(() => _indiceSeleccionado = indice),
+      child: Container(
+        width: 64,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: seleccionada ? Theme.of(context).colorScheme.primary : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: FotoLugar(url: widget.fotos[indice].url, radio: 8),
+      ),
+    );
+  },
 
-FLUJO: GaleriaFotos es un StatefulWidget propio (no usa ningun
-  provider). _indiceSeleccionado (linea 18) arranca en 0 (la primera
-  foto). La foto grande (lineas 33-41) siempre muestra
-  widget.fotos[_indiceSeleccionado]. Debajo, si hay mas de 1 foto
-  (linea 42: "if (widget.fotos.length > 1)"), se dibuja una fila
-  horizontal de miniaturas con ListView.separated; cada una tiene un
-  GestureDetector que al tocarla hace setState cambiando
+FLUJO: GaleriaFotos es un StatefulWidget propio. _indiceSeleccionado
+  (linea 18) arranca en 0. La foto grande (lineas 26-32) siempre
+  muestra widget.fotos[_indiceSeleccionado] a traves de FotoLugar (que
+  ya resuelve urlFoto() y el placeholder/error). Si hay mas de 1 foto
+  (linea 33), se dibuja una fila horizontal de miniaturas; cada una
+  tiene un GestureDetector que al tocarla hace setState cambiando
   _indiceSeleccionado, lo que reconstruye SOLO la foto grande y el
-  borde de color de la miniatura activa (lineas 56-62).
+  borde de color de la miniatura activa.
 
 PREGUNTA: "¿Donde vive el indice de la foto seleccionada?" -> Dentro
   de GaleriaFotos mismo, no en DetalleLugarScreen ni en ningun
-  provider: es un detalle de como se ve ESTE widget en particular, no
-  un dato compartido.
+  provider: es un detalle de como se ve ESTE widget en particular.
 
 ------------------------------------------------------------
 RC-12 - Detalle: nombre, descripcion, personas, camas, banios,
@@ -827,45 +978,72 @@ anfitrion, precio, habitaciones, wifi y parqueo
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/detalle_lugar_screen.dart
-    lineas 12-19 (constructor: recibe solo idLugar)
-    lineas 28-49 (initState + _cargarLugar: pide GET lugares/{id})
-    lineas 65-101 (_buildContenido: donde se pintan todos los datos)
+    lineas 14-21 (constructor: recibe solo idLugar)
+    lineas 30-34 y 36-51 (initState + _cargarLugar: pide GET
+                  lugares/{id})
+    lineas 81-127 (_buildContenido: donde se pintan nombre,
+                   ciudad, anfitrion, caracteristicas y descripcion)
+  app-cliente/lib/widget/caracteristicas_lugar.dart (archivo completo,
+    50 lineas) [E] - personas, camas, banios, habitaciones, wifi,
+    parqueo, cada uno pluralizado
   app-cliente/lib/model/lugar_model.dart
     lineas 52-76 (fromJson, incluido nombreAnfitrion desde
                   "arrendatario" anidado, linea 70)
 
-SNIPPET (detalle_lugar_screen.dart, 65-91 - cada dato en su linea):
+SNIPPET (detalle_lugar_screen.dart, 81-126 - _buildContenido):
   Widget _buildContenido(BuildContext context, LugarModel lugar) {
-    final parqueo = lugar.cantVehiculosParqueo > 0
-        ? 'Parqueo para ${lugar.cantVehiculosParqueo} vehiculos'
-        : 'No tiene parqueo';
-
     return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
-        GaleriaFotos(fotos: lugar.fotos),                              // RC-11
-        Text(lugar.nombre, ...),                                       // linea 75
-        Text(lugar.descripcion),                                       // linea 77
-        Text('${lugar.cantPersonas} personas'),                        // linea 79
-        Text('${lugar.cantCamas} camas'),                               // linea 80
-        Text('${lugar.cantBanios} banios'),                             // linea 81
-        Text('${lugar.cantHabitaciones} habitaciones'),                 // linea 82
-        Text('Anfitrion: ${lugar.nombreAnfitrion}'),                    // linea 83
-        Text('Wifi: ${lugar.tieneWifi ? 'Si' : 'No'}'),                 // linea 84
-        Text(parqueo),                                                  // linea 85
-        Text('${formatearPrecio(lugar.precioNoche)} por noche', ...),   // lineas 87-90
-        ElevatedButton(/* Reservar, ver RC-13 */),
+        GaleriaFotos(fotos: lugar.fotos),
+        Text(lugar.nombre, style: Theme.of(context).textTheme.headlineSmall),
+        Text(lugar.ciudad, style: const TextStyle(color: colorTextoSecundario)),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              child: Text(lugar.nombreAnfitrion.isEmpty ? '?' : lugar.nombreAnfitrion[0].toUpperCase()),
+            ),
+            Expanded(child: Text('Anfitrión: ${lugar.nombreAnfitrion}', ...)),
+          ],
+        ),
+        CaracteristicasLugar(lugar: lugar),
+        Text('Acerca de este lugar', style: Theme.of(context).textTheme.titleMedium),
+        Text(lugar.descripcion),
       ],
     );
   }
 
-SNIPPET (lugar_model.dart, 52-76 - de donde sale cada dato):
+SNIPPET (caracteristicas_lugar.dart, 14-49 completo - Wrap de Chips):
+  Widget build(BuildContext context) {
+    final parqueo = lugar.cantVehiculosParqueo > 0
+        ? 'Parqueo para ${pluralizar(lugar.cantVehiculosParqueo, 'vehículo', 'vehículos')}'
+        : 'No tiene parqueo';
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        Chip(avatar: const Icon(Icons.people_outline, size: 18),
+            label: Text(pluralizar(lugar.cantPersonas, 'persona', 'personas'))),
+        Chip(avatar: const Icon(Icons.bed_outlined, size: 18),
+            label: Text(pluralizar(lugar.cantCamas, 'cama', 'camas'))),
+        Chip(avatar: const Icon(Icons.bathtub_outlined, size: 18),
+            label: Text(pluralizar(lugar.cantBanios, 'baño', 'baños'))),
+        Chip(avatar: const Icon(Icons.door_front_door_outlined, size: 18),
+            label: Text(pluralizar(lugar.cantHabitaciones, 'habitación', 'habitaciones'))),
+        Chip(avatar: Icon(lugar.tieneWifi ? Icons.wifi : Icons.wifi_off, size: 18),
+            label: Text(lugar.tieneWifi ? 'Wifi: Sí' : 'Wifi: No')),
+        Chip(avatar: const Icon(Icons.local_parking_outlined, size: 18), label: Text(parqueo)),
+      ],
+    );
+  }
+
+SNIPPET (lugar_model.dart, 52-76 - de donde sale cada dato, SIN
+  cambios desde la Fase C4):
   factory LugarModel.fromJson(Map<String, dynamic> json) {
     final arrendatario = json['arrendatario'] as Map<String, dynamic>?;
     return LugarModel(
       id: json['id'] as int,
-      nombre: json['nombre'] as String,
-      descripcion: json['descripcion'] as String,
-      cantPersonas: aEntero(json['cantPersonas']),
       ...
       tieneWifi: aBool(json['tieneWifi']),
       precioNoche: aDecimal(json['precioNoche']),
@@ -875,14 +1053,14 @@ SNIPPET (lugar_model.dart, 52-76 - de donde sale cada dato):
     );
   }
 
-FLUJO: al entrar a la pantalla, initState() (linea 29) llama
-  _cargarLugar() (linea 34), que pide GET /lugares/{id} de NUEVO (no
-  reutiliza los datos parciales de la busqueda, a proposito, para
-  mostrar siempre la version mas actual del lugar). La respuesta ya
-  trae "arrendatario" (objeto) y "fotos" (arreglo) anidados -no hace
-  falta ninguna peticion extra para el nombre del anfitrion ni las
-  fotos. aEntero/aDecimal/aBool (de utils/conversiones.dart) toleran
-  que esos campos vengan como texto o numero.
+FLUJO: al entrar a la pantalla, initState() (linea 31) llama
+  _cargarLugar() (linea 33), que pide GET /lugares/{id} de NUEVO (no
+  reutiliza los datos parciales de la busqueda). La respuesta ya trae
+  "arrendatario" y "fotos" anidados. aEntero/aDecimal/aBool toleran
+  texto, numero o null. _buildContenido() pinta nombre, ciudad,
+  anfitrion (con una inicial en un CircleAvatar) y CaracteristicasLugar
+  (el Wrap de Chips con personas/camas/banios/habitaciones/wifi/
+  parqueo, cada cantidad correctamente pluralizada).
 
 PREGUNTA: "¿Por que el detalle pide los datos de nuevo si la lista ya
   los tenia?" -> Para mostrar siempre la version mas reciente (el
@@ -892,22 +1070,48 @@ PREGUNTA: "¿Por que el detalle pide los datos de nuevo si la lista ya
 RC-13 - Detalle: boton "Reservar" que lleva a confirmar reserva
 ------------------------------------------------------------
 ARCHIVOS:
-  app-cliente/lib/screen/detalle_lugar_screen.dart lineas 92-98
+  app-cliente/lib/screen/detalle_lugar_screen.dart
+    lineas 53-58 (_irAConfirmar)
+    lineas 75-77 (bottomNavigationBar: BarraReservar, solo si el lugar
+                  ya cargo)
+  app-cliente/lib/widget/barra_reservar.dart (archivo completo, 43
+    lineas) [E]
 
-SNIPPET:
-  ElevatedButton(
-    onPressed: () => Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ConfirmarReservaScreen(lugar: lugar)),
-    ),
-    child: const Text('Reservar'),
-  ),
+SNIPPET (detalle_lugar_screen.dart, 73-77):
+  // Solo aparece cuando el lugar ya cargo: mientras carga o si hubo un
+  // error no tiene sentido ofrecer "Reservar".
+  bottomNavigationBar: lugar == null
+      ? null
+      : BarraReservar(precioNoche: lugar.precioNoche, onReservar: () => _irAConfirmar(lugar)),
+
+SNIPPET (barra_reservar.dart, 13-41 completo - barra inferior fija):
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Expanded(child: Text('${formatearPrecio(precioNoche)} / noche', ...)),
+              FilledButton(onPressed: onReservar, child: const Text('Reservar')),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
 FLUJO: a diferencia de RC-10 (que pasa solo un id), aca se pasa el
-  LugarModel COMPLETO por el constructor a ConfirmarReservaScreen:
-  esa pantalla va a necesitar precioNoche y costoLimpieza para
-  calcular el total, y ya se tienen disponibles sin pedir nada de
-  nuevo a la API.
+  LugarModel COMPLETO por el constructor a ConfirmarReservaScreen (ver
+  _irAConfirmar, lineas 53-58): esa pantalla necesita precioNoche y
+  costoLimpieza para calcular el total, y ya se tienen disponibles sin
+  pedir nada de nuevo a la API. La barra con el boton vive en un
+  widget aparte (BarraReservar, Fase E1) y se usa como
+  bottomNavigationBar del Scaffold para quedar siempre visible abajo.
 
 ------------------------------------------------------------
 RC-14 - Confirmar reserva: precio total por noches, limpieza, servicio
@@ -915,7 +1119,8 @@ y total sumado
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/utils/calculo_reserva.dart (archivo completo, 24
-    lineas - son funciones puras, sin HTTP ni estado)
+    lineas - funciones puras, sin HTTP ni estado, SIN cambios desde
+    la Fase C5)
     linea 4   (const porcentajeServicio = 0.10)
     lineas 6-8   (calcularNoches)
     lineas 10-12 (calcularSubtotal)
@@ -923,11 +1128,11 @@ ARCHIVOS:
     lineas 18-20 (calcularTotal)
     lineas 22-24 (_redondear, a 2 decimales)
   app-cliente/lib/screen/confirmar_reserva_screen.dart
-    lineas 60-77 (build: calcula los 4 numeros)
-    lineas 86-96 (muestra cada fila del desglose)
-    lineas 107-121 (_filaPrecio, helper de UI)
+    lineas 77-81 (calcula los 4 numeros en build)
+    lineas 90-106 (Card de desglose, con "noche"/"noches" pluralizado)
+    lineas 174-190 (_filaPrecio, helper de UI)
 
-SNIPPET (calculo_reserva.dart COMPLETO):
+SNIPPET (calculo_reserva.dart COMPLETO, sin cambios):
   const double porcentajeServicio = 0.10;
 
   int calcularNoches(DateTime llegada, DateTime salida) {
@@ -950,21 +1155,33 @@ SNIPPET (calculo_reserva.dart COMPLETO):
     return double.parse(valor.toStringAsFixed(2));
   }
 
-SNIPPET (confirmar_reserva_screen.dart, 73-77):
+SNIPPET (confirmar_reserva_screen.dart, 77-81):
   final noches = calcularNoches(llegada, salida);
   final subtotal = calcularSubtotal(noches, widget.lugar.precioNoche);
   final limpieza = widget.lugar.costoLimpieza;
   final servicio = calcularServicio(subtotal);
   final total = calcularTotal(subtotal, limpieza, servicio);
 
-FLUJO: llegada/salida salen de BusquedaProvider (elegidas varias
-  pantallas atras, en la busqueda). precioNoche/costoLimpieza salen
-  del LugarModel que llego por el constructor (ver RC-13). Formula
-  completa: noches = diferencia en dias; subtotal = noches x
-  precioNoche; servicio = subtotal x 10%; total = subtotal + limpieza
-  + servicio. CADA funcion redondea a 2 decimales ANTES de devolver
-  (asi la suma final no arrastra errores de coma flotante, ej. que
-  120+5+12 de 136.999999 en vez de 137 exacto).
+SNIPPET (confirmar_reserva_screen.dart, 95-103 - desglose, con la
+  correccion de pluralizacion posterior a la Fase E2):
+  _filaPrecio(
+    '${pluralizar(noches, 'noche', 'noches')} x ${formatearPrecio(widget.lugar.precioNoche)}',
+    formatearPrecio(subtotal),
+  ),
+  _filaPrecio('Limpieza', formatearPrecio(limpieza)),
+  _filaPrecio('Servicio', formatearPrecio(servicio)),
+  const Divider(),
+  _filaPrecio('Total', formatearPrecio(total), destacado: true),
+
+FLUJO: llegada/salida salen de BusquedaProvider. precioNoche/
+  costoLimpieza salen del LugarModel que llego por el constructor (ver
+  RC-13). Formula completa: noches = diferencia en dias; subtotal =
+  noches x precioNoche; servicio = subtotal x 10%; total = subtotal +
+  limpieza + servicio. CADA funcion redondea a 2 decimales ANTES de
+  devolver. Arriba del desglose hay una Card de resumen nueva (Fase
+  E1, ver _tarjetaResumen, lineas 127-172) con miniatura, nombre,
+  fechas y huespedes; el total queda con fontSize mayor y en negrita
+  (destacado: true, linea 102).
 
 PREGUNTA: "¿Por que el 10% de servicio es una constante y no viene de
   la API?" -> Porque ni la API ni el enunciado lo definen; es una
@@ -977,14 +1194,14 @@ RC-15 - Boton "Confirmar reserva" que envia la reserva a la API
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/screen/confirmar_reserva_screen.dart
-    lineas 25-57 (metodo _confirmar completo)
-    lineas 97-100 (el boton)
+    lineas 28-61 (metodo _confirmar completo)
+    lineas 109-123 (barra inferior fija con el boton)
   app-cliente/lib/repository/reserva_provider.dart lineas 40-73
     (confirmarReserva)
   app-cliente/lib/service/reserva_service.dart lineas 22-46
     (crearReserva)
 
-SNIPPET (confirmar_reserva_screen.dart, 25-56):
+SNIPPET (confirmar_reserva_screen.dart, 28-60):
   Future<void> _confirmar() async {
     final busquedaProvider = context.read<BusquedaProvider>();
     final authProvider = context.read<AuthProvider>();
@@ -1009,13 +1226,13 @@ SNIPPET (confirmar_reserva_screen.dart, 25-56):
 
     if (!mounted) return;
     if (exito) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Reserva confirmada')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reserva confirmada')));
       Navigator.popUntil(context, (ruta) => ruta.isFirst);
     } else { /* SnackBar con el error */ }
   }
 
-SNIPPET (reserva_service.dart, 32-42 - el POST real):
+SNIPPET (reserva_service.dart, 33-42 - el POST real, SIN cambios desde
+  la Fase C5):
   await _dio.post('/reservas', data: {
     'lugar_id': lugarId,
     'cliente_id': clienteId,
@@ -1027,30 +1244,26 @@ SNIPPET (reserva_service.dart, 32-42 - el POST real):
     'precioTotal': precioTotal.toStringAsFixed(2),
   });
 
-SNIPPET (confirmar_reserva_screen.dart, 97-100 - boton deshabilitado):
-  ElevatedButton(
+SNIPPET (confirmar_reserva_screen.dart, 117-120 - boton deshabilitado,
+  ahora dentro de una barra inferior fija con fondo del tema):
+  FilledButton(
     onPressed: reservaProvider.cargando ? null : _confirmar,
     child: Text(reservaProvider.cargando ? 'Enviando...' : 'Confirmar reserva'),
   ),
 
 FLUJO: al tocar el boton, _confirmar() arma TODOS los numeros de
-  nuevo con las funciones puras de RC-14, junto con lugarId,
-  clienteId (de AuthProvider.usuario.id, la sesion activa) y las
-  fechas formateadas a "yyyy-MM-dd" (formato que la API exige, linea
-  23: DateFormat('yyyy-MM-dd')). Llama a
-  ReservaProvider.confirmarReserva(...), que pone _cargando=true (el
-  boton se deshabilita y cambia su texto a "Enviando...") y llama a
+  nuevo con las funciones puras de RC-14, junto con lugarId, clienteId
+  (de AuthProvider.usuario.id) y las fechas formateadas a "yyyy-MM-dd".
+  Llama a ReservaProvider.confirmarReserva(...), que pone
+  _cargando=true (el boton se deshabilita y cambia su texto) y llama a
   ReservaService.crearReserva, que hace POST /reservas con los 4
-  precios como TEXTO con 2 decimales (toStringAsFixed(2), igual que
-  pide el contrato de la API). Si la API responde 200: SnackBar de
-  exito y Navigator.popUntil((ruta) => ruta.isFirst) -vuelve DIRECTO
-  a la pantalla principal, saltandose detalle y resultados (asi lo
-  pide el wireframe).
+  precios como TEXTO con 2 decimales. Si la API responde 200: SnackBar
+  de exito y Navigator.popUntil((ruta) => ruta.isFirst) - vuelve
+  DIRECTO a la pantalla principal.
 
 PREGUNTA: "¿Que pasa si la reserva falla?" -> ReservaProvider.error
   queda con el mensaje de la API (o uno generico sin conexion) y se
-  muestra en un SnackBar, SIN salir de la pantalla - el usuario puede
-  reintentar sin perder los datos.
+  muestra en un SnackBar, SIN salir de la pantalla.
 
 ------------------------------------------------------------
 RC-16 - (Wireframe) Lista de reservas del cliente: foto, nombre del
@@ -1058,19 +1271,18 @@ lugar, noches, fecha inicio, fecha fin y precio
 ------------------------------------------------------------
 ARCHIVOS:
   app-cliente/lib/model/reserva_model.dart (archivo completo, 56
-    lineas)
+    lineas, SIN cambios desde la Fase C6)
     linea 31      (getter noches, reutiliza calcularNoches de RC-14)
     lineas 33-55  (fromJson, incluido el parseo del arreglo "lugar")
-  app-cliente/lib/widget/reserva_card.dart (archivo completo, 38
-    lineas)
+  app-cliente/lib/widget/reserva_card.dart (archivo completo, 78 lineas)
   app-cliente/lib/screen/mis_reservas_screen.dart
-    lineas 19-23 (initState pide las reservas)
-    lineas 36-41 (ListView.builder con ReservaCard)
+    lineas 18-23 (initState pide las reservas)
+    lineas 37-46 (ListView.builder con ReservaCard dentro de VistaEstado)
   app-cliente/lib/service/reserva_service.dart lineas 12-20
     (obtenerReservasCliente)
 
-SNIPPET (reserva_model.dart, 31 y 33-39 - lo mas importante: "lugar"
-  es un ARREGLO de 1 elemento, no un objeto):
+SNIPPET (reserva_model.dart, 31 y 33-39 - "lugar" es un ARREGLO de 1
+  elemento, no un objeto; sin cambios):
   int get noches => calcularNoches(fechaInicio, fechaFin);
 
   factory ReservaModel.fromJson(Map<String, dynamic> json) {
@@ -1078,53 +1290,50 @@ SNIPPET (reserva_model.dart, 31 y 33-39 - lo mas importante: "lugar"
     final lugar = (lugares != null && lugares.isNotEmpty)
         ? lugares[0] as Map<String, dynamic>
         : null;
-    final fotos = lugar?['fotos'] as List<dynamic>?;
-    final arrendatario = lugar?['arrendatario'] as Map<String, dynamic>?;
     ...
 
-SNIPPET (reserva_card.dart, 13-37 completo):
+SNIPPET (reserva_card.dart, 16-77 completo - foto 80x80, Fase E1 + la
+  pluralizacion de "noches" agregada despues):
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        leading: SizedBox(
-          child: reserva.primeraFotoUrl == null
-              ? const Icon(Icons.image)
-              : Image.network(urlFoto(reserva.primeraFotoUrl!), ...),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            SizedBox(width: 80, height: 80, child: FotoLugar(url: reserva.primeraFotoUrl, radio: 12)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(reserva.nombreLugar, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Row(children: [
+                    const Icon(Icons.calendar_today_outlined, size: 14, color: colorTextoSecundario),
+                    Expanded(child: Text('${formatearFecha(reserva.fechaInicio)} a ${formatearFecha(reserva.fechaFin)}', ...)),
+                  ]),
+                  Text('${pluralizar(reserva.noches, 'noche', 'noches')} · Anfitrión: ${reserva.nombreAnfitrion}', ...),
+                  Text(formatearPrecio(reserva.precioTotal), style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
         ),
-        title: Text(reserva.nombreLugar),
-        subtitle: Text(
-          '${reserva.noches} noches . ${formatearFecha(reserva.fechaInicio)} a '
-          '${formatearFecha(reserva.fechaFin)}\nAnfitrion: ${reserva.nombreAnfitrion}',
-        ),
-        trailing: Text(formatearPrecio(reserva.precioTotal)),
       ),
     );
   }
 
-SNIPPET (reserva_service.dart, 12-19):
-  Future<List<ReservaModel>> obtenerReservasCliente(int clienteId) async {
-    try {
-      final respuesta = await _dio.get('/reservas/cliente/$clienteId');
-      final lista = respuesta.data as List<dynamic>;
-      return lista.map((json) => ReservaModel.fromJson(json as Map<String, dynamic>)).toList();
-    } on DioException catch (error) { ... }
-  }
-
 FLUJO: al entrar a MisReservasScreen, initState() (linea 19) llama
   ReservaProvider.cargarReservas(clienteId) con el id del usuario
-  logueado (AuthProvider.usuario.id). El provider pide GET
-  /reservas/cliente/{id}. CADA elemento del arreglo se convierte con
-  ReservaModel.fromJson, que entra al arreglo "lugar" (viene asi
-  desde la API, confirmado en la Fase 0) y saca el PRIMER (y unico)
-  elemento para obtener nombreLugar, primeraFotoUrl y
-  nombreAnfitrion - sin pedir GET /lugares/{id} aparte, porque la API
-  ya los manda anidados. noches (linea 31) es un getter calculado,
-  NO un campo que venga de la API: reutiliza calcularNoches de
-  calculo_reserva.dart (RC-14) en vez de repetir la resta de fechas.
+  logueado. El provider pide GET /reservas/cliente/{id}. CADA elemento
+  se convierte con ReservaModel.fromJson, que entra al arreglo "lugar"
+  y saca el PRIMER elemento para obtener nombreLugar, primeraFotoUrl y
+  nombreAnfitrion. noches es un getter calculado (reutiliza
+  calcularNoches de calculo_reserva.dart). Toda la pantalla esta
+  envuelta en VistaEstado (ver RX-04), con icono Icons.event_busy_outlined
+  para el estado vacio.
 
 PREGUNTA: "¿Por que 'lugar' es un arreglo y no un objeto?" -> Asi lo
-  devuelve la API (confirmado en la Fase 0 de verificacion); el
-  modelo simplemente toma el primer elemento del arreglo.
+  devuelve la API (confirmado en la Fase 0); el modelo simplemente
+  toma el primer elemento del arreglo.
 
 ============================================================
 APP ARRENDATARIO (RA) - Ionic + Angular
@@ -1135,15 +1344,16 @@ RA-01 - Login con email y contrasena
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/login/login.page.ts
-    lineas 38-65 (clase LoginPage completa)
-    lineas 47-65 (metodo iniciarSesion)
+    lineas 44-76 (clase LoginPage completa)
+    lineas 57-75 (metodo iniciarSesion)
   app-arrendatario/src/app/pages/login/login.page.html
-    lineas 8-16 (campos email/password)
-    lineas 18-25 (boton)
+    lineas 21-31 (campo email, sintaxis moderna ion-input, Fase E2)
+    lineas 33-43 (campo contrasena con ion-input-password-toggle)
+    lineas 45-53 (boton)
   app-arrendatario/src/app/services/auth.service.ts lineas 16-18
-    (iniciarSesion del service)
+    (iniciarSesion del service, SIN cambios)
 
-SNIPPET (login.page.ts, 47-65):
+SNIPPET (login.page.ts, 57-75):
   iniciarSesion(): void {
     this.enviando.set(true);
     this.authService.iniciarSesion(this.email, this.password).subscribe({
@@ -1164,33 +1374,54 @@ SNIPPET (login.page.ts, 47-65):
     });
   }
 
-SNIPPET (auth.service.ts, 16-18):
-  iniciarSesion(email: string, password: string): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.urlBase}/login`, { email, password });
-  }
+SNIPPET (login.page.html, 8-19 - encabezado de marca, Fase E2, segun
+  el diseño de referencia de Stitch "iniciar_sesi_n_bnb_anfitriones"):
+  <div class="encabezado-marca">
+    <div class="icono-marca"><ion-icon name="home-outline"></ion-icon></div>
+    <h1>bnb</h1>
+    <span class="pastilla-marca">Para anfitriones</span>
+  </div>
+  <ion-card class="tarjeta-formulario">
+    <ion-card-content>
+      <h2>Bienvenido de vuelta</h2>
+      <p class="subtitulo">Gestiona tus espacios y reservas en Santa Cruz</p>
+      ...
 
-FLUJO: los dos ion-input estan ligados con [(ngModel)] a email/password
-  (propiedades normales de la clase, lineas 43-44). Al tocar el
-  boton (login.page.html linea 22, "(click)=iniciarSesion()"),
+SNIPPET (login.page.html, 21-31 - sintaxis moderna de ion-input, en
+  vez de ion-item + ion-label):
+  <ion-input
+    class="campo-arena"
+    label="Correo electrónico"
+    labelPlacement="stacked"
+    fill="solid"
+    type="email"
+    [(ngModel)]="email"
+    name="email"
+  >
+    <ion-icon slot="end" name="mail-outline"></ion-icon>
+  </ion-input>
+
+FLUJO: los dos ion-input estan ligados con [(ngModel)] a email/
+  password (propiedades normales de la clase). Al tocar el boton
+  (login.page.html linea 49, "(click)=iniciarSesion()"),
   enviando.set(true) (el boton se deshabilita, ver RX-05) y se llama
   a authService.iniciarSesion(...).subscribe({next, error}). next:
   guarda la sesion (guardarSesion, ver RX-02) y navega a mis-lugares.
-  error: muestra un ToastController con el mensaje que arma
-  mensajeDeError() (ver seccion de hallazgos).
+  error: muestra un ToastController con el mensaje de mensajeDeError().
 
 ------------------------------------------------------------
 RA-02 - Registro con email, nombre completo, contrasena y telefono
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/registro/registro.page.ts
-    lineas 38-88 (clase RegistroPage)
-    lineas 49-78 (metodo registrar, con el login automatico adentro)
+    lineas 44-103 (clase RegistroPage)
+    lineas 64-93  (metodo registrar, con el login automatico adentro)
   app-arrendatario/src/app/pages/registro/registro.page.html
-    lineas 8-26 (los 4 campos)
+    lineas 21-64  (los 4 campos)
   app-arrendatario/src/app/services/auth.service.ts lineas 20-27
-    (registrar del service)
+    (registrar del service, SIN cambios)
 
-SNIPPET (registro.page.ts, 49-78 - subscribe anidado a proposito):
+SNIPPET (registro.page.ts, 64-93 - subscribe anidado a proposito):
   registrar(): void {
     this.enviando.set(true);
     this.authService
@@ -1215,14 +1446,11 @@ FLUJO: igual idea que en el cliente (RC-02), pero con RxJS: el
   .subscribe() del registro, en su "next", abre OTRO .subscribe()
   anidado llamando a iniciarSesion con el mismo email/password. Esto
   es a proposito (no se usa switchMap ni ningun operador encadenado):
-  CLAUDE.md prohibe explicitamente RxJS avanzado en este proyecto,
-  asi que se anida un subscribe dentro de otro, mas verboso pero mas
-  facil de leer paso a paso.
+  CLAUDE.md prohibe explicitamente RxJS avanzado en este proyecto.
 
 PREGUNTA: "¿Por que no se uso switchMap para encadenar registro y
-  login?" -> Esta prohibido en CLAUDE.md del proyecto (los operadores
-  RxJS encadenados no se vieron en clase); se prefirio anidar dos
-  .subscribe() simples, aunque sea mas lineas.
+  login?" -> Esta prohibido en CLAUDE.md del proyecto; se prefirio
+  anidar dos .subscribe() simples, aunque sea mas lineas.
 
 ------------------------------------------------------------
 RA-03 - Pantalla principal: lista de lugares con foto, nombre, ciudad
@@ -1230,15 +1458,16 @@ y precio
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/mis-lugares/mis-lugares.page.ts
-    lineas 52-111 (clase completa)
-    lineas 71-73  (ionViewWillEnter)
-    lineas 75-93  (cargarLugares)
+    lineas 58-140 (clase completa)
+    lineas 91-93  (ionViewWillEnter)
+    lineas 95-113 (cargarLugares)
   app-arrendatario/src/app/pages/mis-lugares/mis-lugares.page.html
-    lineas 20-42  (el ion-list)
+    lineas 31-93  (la lista de ion-card, Fase E2 - antes era un
+                   ion-list de ion-item)
   app-arrendatario/src/app/services/lugares.service.ts lineas 14-16
-    (misLugares)
+    (misLugares, SIN cambios)
 
-SNIPPET (mis-lugares.page.ts, 69-93):
+SNIPPET (mis-lugares.page.ts, 91-113):
   // Se carga aca y no en ngOnInit: Ionic mantiene viva la pagina al navegar
   // al formulario y volver, asi que ngOnInit no se repetiria.
   ionViewWillEnter(): void {
@@ -1263,57 +1492,66 @@ SNIPPET (mis-lugares.page.ts, 69-93):
     });
   }
 
-SNIPPET (lugares.service.ts, 14-16):
-  misLugares(idArrendatario: number): Observable<Lugar[]> {
-    return this.http.get<Lugar[]>(`${this.urlBase}/arrendatario/${idArrendatario}`);
-  }
-
-SNIPPET (mis-lugares.page.html, 20-39 - un item de la lista):
-  <ion-item button (click)="irAEditarLugar(lugar.id)">
-    <ion-thumbnail slot="start">
-      @if (lugar.fotos.length > 0) {
-        <img [src]="urlFoto(lugar.fotos[0].url)" [alt]="lugar.nombre" (error)="ocultarImagenRota($event)" />
+SNIPPET (mis-lugares.page.html, 33-50 - una tarjeta, Fase E2: foto de
+  portada 16:9, badge dorado de precio superpuesto, caracteristicas
+  con iconos):
+  <ion-card button (click)="irAEditarLugar(lugar.id)">
+    <div class="portada-lugar">
+      @if (lugar.fotos.length > 0 && !fotosRotas.has(lugar.id)) {
+        <img class="foto-portada" [src]="urlFoto(lugar.fotos[0].url)" [alt]="lugar.nombre"
+             (error)="marcarFotoRota(lugar.id)" />
       } @else {
-        <ion-icon name="image-outline" size="large"></ion-icon>
+        <div class="foto-portada placeholder-foto"><ion-icon name="image-outline"></ion-icon></div>
       }
-    </ion-thumbnail>
-    <ion-label>
+      <ion-badge color="secondary" class="precio-portada">
+        {{ formatearPrecio(lugar.precioNoche) }} / noche
+      </ion-badge>
+    </div>
+    <ion-card-content>
       <h2>{{ lugar.nombre }}</h2>
-      <p>{{ lugar.ciudad }}</p>
-      <p>{{ formatearPrecio(lugar.precioNoche) }} / noche</p>
-    </ion-label>
-  </ion-item>
+      <p class="ubicacion-lugar"><ion-icon name="location-outline"></ion-icon> {{ lugar.ciudad }}</p>
+      <div class="caracteristicas-lugar">
+        <span><ion-icon name="bed-outline"></ion-icon> {{ pluralizar(lugar.cantCamas, 'cama', 'camas') }}</span>
+        <span><ion-icon name="water-outline"></ion-icon> {{ pluralizar(lugar.cantBanios, 'baño', 'baños') }}</span>
+        @if (lugar.tieneWifi) { <span><ion-icon name="wifi-outline"></ion-icon> Wifi</span> }
+      </div>
+      ...
 
 FLUJO: ionViewWillEnter() (NO ngOnInit) se dispara CADA VEZ que esta
-  pagina vuelve a quedar visible (incluido volver de crear/editar un
-  lugar). Llama a cargarLugares(), que lee el usuario logueado,
-  pone cargando=true y pide GET /lugares/arrendatario/{id}. Cada
-  Lugar de la respuesta se pinta con foto (o icono si no hay fotos),
-  nombre, ciudad y precio.
+  pagina vuelve a quedar visible. Llama a cargarLugares(), que lee el
+  usuario logueado, pone cargando=true y pide GET
+  /lugares/arrendatario/{id}. Cada Lugar se pinta como una ion-card
+  con foto de portada (o placeholder), el precio en una ion-badge
+  dorada superpuesta, el nombre, la ciudad y camas/banios/wifi con
+  iconos (Fase E2, sobre el diseño de Stitch "mis_lugares_panel_de_
+  anfitrion" - ver 6.7).
 
 PREGUNTA: "¿Por que ionViewWillEnter y no ngOnInit?" -> Ionic por
-  defecto mantiene las paginas visitadas vivas en el DOM (para animar
-  la transicion); ngOnInit solo correria la PRIMERA vez que se crea
-  la pagina, as la lista no se actualizaria al volver de crear un
-  lugar nuevo.
+  defecto mantiene las paginas visitadas vivas en el DOM; ngOnInit
+  solo correria la PRIMERA vez que se crea la pagina, asi la lista no
+  se actualizaria al volver de crear un lugar nuevo.
 
 ------------------------------------------------------------
 RA-04 - Boton para agregar un lugar nuevo
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/mis-lugares/mis-lugares.page.html
-    lineas 44-48 (ion-fab)
+    lineas 96-101 (el boton flotante "Publicar nuevo", Fase E2 - un
+                   ion-button normal dentro de ion-fab, no un
+                   ion-fab-button, para poder llevar texto ademas del
+                   icono)
   app-arrendatario/src/app/pages/mis-lugares/mis-lugares.page.ts
-    lineas 95-97 (irANuevoLugar)
+    lineas 115-117 (irANuevoLugar)
 
-SNIPPET (html, 44-48):
+SNIPPET (html, 96-101):
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="irANuevoLugar()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+    <ion-button shape="round" (click)="irANuevoLugar()">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Publicar nuevo
+    </ion-button>
   </ion-fab>
 
-SNIPPET (ts, 95-97):
+SNIPPET (ts, 115-117):
   irANuevoLugar(): void {
     this.router.navigate(['lugar/nuevo']);
   }
@@ -1328,13 +1566,19 @@ habitaciones, wifi si/no, parqueo, precio, costo limpieza, ciudad
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.html
-    lineas 46-118 (TODOS los campos del formulario, uno por ion-item)
+    lineas 56-210 (TODO el formulario, reorganizado por secciones en
+                   la Fase E2: Fotos, Informacion, Capacidad,
+                   Servicios, Precios, Ubicacion - antes era una lista
+                   plana de ion-item)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 33-46 (interface FormularioLugar: forma del objeto que
-                  liga el formulario)
-    lineas 186-202 (armado del body que se manda a la API)
+    lineas 57-70   (interface FormularioLugar: forma del objeto que
+                    liga el formulario)
+    lineas 251-267 (armado del body que se manda a la API)
+  app-arrendatario/src/app/components/selector-cantidad/
+    selector-cantidad.component.ts (archivo completo, 33 lineas) [E]
 
-SNIPPET (lugar-form.page.ts, 33-46 - forma del formulario):
+SNIPPET (lugar-form.page.ts, 57-70 - forma del formulario, SIN
+  cambios desde la Fase A3):
   interface FormularioLugar {
     nombre: string;
     descripcion: string;
@@ -1350,25 +1594,50 @@ SNIPPET (lugar-form.page.ts, 33-46 - forma del formulario):
     ciudad: string;
   }
 
-SNIPPET (lugar-form.page.html, 80-99 - wifi toggle y parqueo condicional):
-  <ion-item>
-    <ion-label>Tiene wifi</ion-label>
-    <ion-toggle [(ngModel)]="formulario.tieneWifi" name="tieneWifi"></ion-toggle>
-  </ion-item>
+SNIPPET (lugar-form.page.html, 99-137 - seccion "Capacidad y espacios"
+  con selector-cantidad en una grilla de 2 columnas, Fase E2):
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <app-selector-cantidad
+          etiqueta="Personas" icono="people-outline"
+          [valor]="obtenerCantidad('cantPersonas')"
+          (cambio)="actualizarCantidad('cantPersonas', $event)"
+        ></app-selector-cantidad>
+      </ion-col>
+      <ion-col size="6">
+        <app-selector-cantidad
+          etiqueta="Camas" icono="bed-outline"
+          [valor]="obtenerCantidad('cantCamas')"
+          (cambio)="actualizarCantidad('cantCamas', $event)"
+        ></app-selector-cantidad>
+      </ion-col>
+    </ion-row>
+    <!-- misma fila para Banios/Habitaciones -->
+  </ion-grid>
 
-  <ion-item>
-    <ion-label>Tiene parqueo</ion-label>
-    <ion-toggle [(ngModel)]="formulario.tieneParqueo" name="tieneParqueo"></ion-toggle>
-  </ion-item>
+SNIPPET (selector-cantidad.component.ts COMPLETO - componente
+  reutilizable con input()/output(), usado 4 veces en el formulario):
+  export class SelectorCantidadComponent {
+    etiqueta = input('');
+    icono = input('');
+    valor = input(1);
+    minimo = input(1);
+    cambio = output<number>();
 
-  @if (formulario.tieneParqueo) {
-    <ion-item>
-      <ion-label position="floating">Vehiculos de parqueo</ion-label>
-      <ion-input type="number" [(ngModel)]="formulario.cantVehiculosParqueo" ...></ion-input>
-    </ion-item>
+    sumar(): void {
+      this.cambio.emit(this.valor() + 1);
+    }
+
+    restar(): void {
+      if (this.valor() > this.minimo()) {
+        this.cambio.emit(this.valor() - 1);
+      }
+    }
   }
 
-SNIPPET (lugar-form.page.ts, 186-202 - conversion de tipos al armar el body):
+SNIPPET (lugar-form.page.ts, 251-267 - conversion de tipos al armar el
+  body, SIN cambios de fondo desde la Fase A3):
   const f = this.formulario;
   const body = {
     nombre: f.nombre,
@@ -1387,31 +1656,35 @@ SNIPPET (lugar-form.page.ts, 186-202 - conversion de tipos al armar el body):
     arrendatario_id: usuario.id,
   };
 
-FLUJO: todos los campos usan [(ngModel)] sobre el objeto plano
-  "formulario" (NO un signal, porque ngModel necesita una propiedad
-  normal para ligar en dos vias). Los campos numericos se guardan
-  como TEXTO en el formulario (asi devuelve ion-input type="number")
-  y se convierten con Number() recien al armar el body (lineas
-  186-202). wifi se convierte de boolean a 1/0; el campo de
-  vehiculos de parqueo solo se muestra si tieneParqueo esta prendido
-  (el @if de la linea 90), y si esta apagado se manda 0 directamente
-  (linea 195) sin mostrar el campo.
+FLUJO: todos los campos de texto usan [(ngModel)] sobre el objeto
+  plano "formulario". Los 4 campos de cantidad (personas, camas,
+  banios, habitaciones) ya NO son ion-input type="number": pasaron a
+  app-selector-cantidad (Fase E2), que recibe el numero actual con
+  [valor]="obtenerCantidad('cantCamas')" (lugar-form.page.ts, lineas
+  222-225: convierte el texto del formulario a numero, nunca deja
+  pasar NaN ni menos de 1) y, al tocar +/-, emite el nuevo numero con
+  (cambio)="actualizarCantidad('cantCamas', $event)" (lineas 227-229:
+  convierte de vuelta a texto). wifi se convierte de boolean a 1/0 al
+  armar el body; vehiculos de parqueo sigue siendo un ion-input
+  numerico normal (no se le agrego selector-cantidad), y se manda 0
+  si tieneParqueo esta apagado.
 
-PREGUNTA: "¿Por que los numeros se guardan como texto en el
-  formulario?" -> Porque ion-input type="number" siempre devuelve un
-  string al navegador; convertir ahi mismo mezclaria tipos en el
-  ngModel. Se convierte una sola vez, al armar el body final.
+PREGUNTA: "¿Como decide selector-cantidad si puede seguir restando?"
+  -> No lo decide solo: el padre le pasa minimo (siempre 1 aca) como
+  input(), y restar() compara valor() > minimo() antes de emitir; si
+  ya esta en el minimo, el boton "-" queda deshabilitado.
 
 ------------------------------------------------------------
 RA-06 - Formulario: elegir en un mapa la ubicacion exacta
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/components/mapa-selector/
-    mapa-selector.component.ts (archivo completo, 72 lineas)
+    mapa-selector.component.ts (archivo completo, 85 lineas)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.html
-    lineas 120-125 (uso del componente)
+    lineas 204-208 (uso del componente, dentro de la seccion
+                    "Ubicación")
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 151-153 (alSeleccionarUbicacion)
+    lineas 201-203 (alSeleccionarUbicacion)
 
 SNIPPET (mapa-selector.component.ts, 26-57 - lo esencial):
   latitud = input<number | null>(null);
@@ -1437,60 +1710,55 @@ SNIPPET (mapa-selector.component.ts, 26-57 - lo esencial):
     setTimeout(() => this.mapa.invalidateSize(), 300);
   }
 
+SNIPPET (mapa-selector.component.ts, 59-79 - colocarMarcador, con el
+  color leido del tema, Fase E2 (antes el color venia por defecto de
+  Leaflet)):
   private colocarMarcador(lat: number, lng: number): void {
     if (this.marcador) {
       this.marcador.setLatLng([lat, lng]);
       return;
     }
-    // circleMarker en vez de marker: el icono por defecto de Leaflet sale roto
-    // con el empaquetador de Angular, asi se evita configurar assets.
-    this.marcador = L.circleMarker([lat, lng], { radius: 8 }).addTo(this.mapa);
+    // Leaflet necesita el color como texto (no puede leer variables CSS el solo),
+    // asi que se lee del tema con getComputedStyle en vez de escribirlo a mano.
+    const estilos = getComputedStyle(document.documentElement);
+    const colorMarca = estilos.getPropertyValue('--ion-color-primary').trim();
+    const colorContraste = estilos.getPropertyValue('--ion-color-primary-contrast').trim();
+    this.marcador = L.circleMarker([lat, lng], {
+      radius: 8,
+      fillColor: colorMarca,
+      fillOpacity: 0.9,
+      color: colorContraste,
+      weight: 3,
+    }).addTo(this.mapa);
   }
 
-SNIPPET (lugar-form.page.html, 120-125):
-  <app-mapa-selector
-    [latitud]="ubicacion?.latitud ?? null"
-    [longitud]="ubicacion?.longitud ?? null"
-    (ubicacionSeleccionada)="alSeleccionarUbicacion($event)"
-  ></app-mapa-selector>
-
-SNIPPET (lugar-form.page.ts, 151-153):
-  alSeleccionarUbicacion(ubicacion: { latitud: number; longitud: number }): void {
-    this.ubicacion = ubicacion;
-  }
-
-FLUJO: el componente NO modifica nada del formulario directamente:
-  el mapa se crea en ngAfterViewInit (porque recien ahi el <div> con
-  #mapaDiv existe en el DOM), centrado en la ubicacion que recibe por
-  input() o en Santa Cruz por defecto. Al hacer click, mueve el
-  circleMarker y EMITE el evento ubicacionSeleccionada (output()).
-  LugarFormPage lo escucha con (ubicacionSeleccionada) en el HTML y
-  guarda el valor en su propiedad local "ubicacion" (no en un
-  signal: es un objeto simple que no necesita reactividad especial
-  aca). setTimeout(... invalidateSize(), 300) es necesario porque
-  dentro de ion-content el tamano final del contenedor se conoce
-  recien despues de este punto - sin eso el mapa se ve gris o
-  cortado.
+FLUJO: el componente NO modifica nada del formulario directamente: el
+  mapa se crea en ngAfterViewInit, centrado en la ubicacion que recibe
+  por input() o en Santa Cruz por defecto. Al hacer click, mueve el
+  circleMarker (coloreado con el verde del tema, leido en tiempo real
+  con getComputedStyle, no escrito a mano) y EMITE ubicacionSeleccionada.
+  LugarFormPage lo escucha en el HTML y guarda el valor en su
+  propiedad local "ubicacion".
 
 PREGUNTA: "¿Como sabe el formulario que ubicacion se eligio?" -> El
   mapa nunca toca el formulario: emite un evento con la ubicacion
-  nueva, y es LugarFormPage quien lo escucha y decide que hacer con
-  ese dato.
+  nueva, y es LugarFormPage quien lo escucha y decide que hacer.
 
 ------------------------------------------------------------
 RA-07 - Formulario: agregar una o mas fotos
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 48-51   (interface FotoNueva)
-    lineas 155-164 (alSeleccionarFotos)
-    lineas 166-168 (quitarFoto)
+    lineas 72-75   (interface FotoNueva)
+    lineas 205-214 (alSeleccionarFotos)
+    lineas 216-218 (quitarFoto)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.html
-    lineas 18-44 (vista previa + input file oculto)
+    lineas 28-53 (grilla de fotos: existentes + nuevas + boton "+",
+                  Fase E2 - grilla de 3 columnas en vez de una lista)
   app-arrendatario/src/app/services/lugares.service.ts lineas 31-36
-    (subirFoto)
+    (subirFoto, SIN cambios)
 
-SNIPPET (lugar-form.page.ts, 155-168):
+SNIPPET (lugar-form.page.ts, 205-218):
   alSeleccionarFotos(evento: Event): void {
     const input = evento.target as HTMLInputElement;
     if (!input.files) return;
@@ -1504,13 +1772,13 @@ SNIPPET (lugar-form.page.ts, 155-168):
     this.fotosNuevas.splice(indice, 1);
   }
 
-SNIPPET (lugar-form.page.html, 33-44 - boton + input oculto):
-  <ion-button fill="outline" (click)="inputFotos.click()">
-    <ion-icon name="add" slot="icon-only"></ion-icon>
-  </ion-button>
-  <input type="file" accept="image/*" multiple hidden #inputFotos (change)="alSeleccionarFotos($event)" />
+SNIPPET (lugar-form.page.html, 42-44 - boton "+" del mismo tamano que
+  una foto, dentro de la grilla):
+  <button type="button" class="foto-miniatura boton-agregar-foto" (click)="inputFotos.click()">
+    <ion-icon name="add"></ion-icon>
+  </button>
 
-SNIPPET (lugares.service.ts, 31-36):
+SNIPPET (lugares.service.ts, 31-36, SIN cambios):
   subirFoto(idLugar: number, archivo: File): Observable<Lugar> {
     // No se pone Content-Type a mano: el navegador arma el multipart/form-data con el boundary.
     const datos = new FormData();
@@ -1519,32 +1787,28 @@ SNIPPET (lugares.service.ts, 31-36):
   }
 
 FLUJO: el boton "+" dispara inputFotos.click() (un <input type=file>
-  OCULTO - el boton visible es un ion-button cualquiera). Al elegir
-  archivos, (change) llama alSeleccionarFotos: por cada archivo crea
-  una vista previa LOCAL con URL.createObjectURL (no sube nada
-  todavia) y lo agrega a fotosNuevas. quitarFoto saca uno del arreglo
-  por indice (splice). La subida REAL recien pasa cuando se toca
-  "Guardar" (ver RA-08): ahi se llama subirFoto por cada archivo,
-  armando un FormData con el campo "foto" (nunca se fija el
-  Content-Type a mano, el navegador arma el boundary solo).
+  OCULTO). Al elegir archivos, (change) llama alSeleccionarFotos: por
+  cada archivo crea una vista previa LOCAL con URL.createObjectURL y
+  lo agrega a fotosNuevas. quitarFoto saca uno por indice (splice). La
+  subida REAL recien pasa al tocar "Guardar" (ver RA-08).
 
 PREGUNTA: "¿Que pasa si quito una foto antes de guardar?" -> Nada se
   manda a la API: la vista previa solo existe en memoria del
-  navegador (createObjectURL) hasta que se confirma el guardado.
+  navegador hasta que se confirma el guardado.
 
 ------------------------------------------------------------
 RA-08 - Al guardar se envia a la API y se vuelve a la pantalla anterior
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 174-232 (metodo guardar COMPLETO)
+    lineas 239-297 (metodo guardar COMPLETO)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.html
-    lineas 127-129 (boton)
+    lineas 214-224 (boton, fijo en un ion-footer, Fase E2)
   app-arrendatario/src/app/services/lugares.service.ts
     lineas 22-24 (guardarLugar, POST)
     lineas 27-28 (editarLugar, PUT)
 
-SNIPPET (lugar-form.page.ts, 174-232 - el metodo completo, el mas
+SNIPPET (lugar-form.page.ts, 239-296 - el metodo completo, el mas
   importante de la app arrendatario):
   async guardar(): Promise<void> {
     const error = this.validar();
@@ -1559,8 +1823,7 @@ SNIPPET (lugar-form.page.ts, 174-232 - el metodo completo, el mas
 
     // Aca se usa async/await en vez de subscribe: guardar/editar el lugar y
     // subir las fotos son pasos en orden (recien se puede subir una foto
-    // cuando se conoce el id del lugar), al reves que el resto de la app
-    // donde cada pantalla hace una sola peticion independiente.
+    // cuando se conoce el id del lugar).
     try {
       const idLugar = this.modoEditar
         ? (await firstValueFrom(this.lugaresService.editarLugar(Number(this.idLugar), body))).id
@@ -1585,19 +1848,27 @@ SNIPPET (lugar-form.page.ts, 174-232 - el metodo completo, el mas
     }
   }
 
+SNIPPET (lugar-form.page.html, 214-224 - boton fijo en ion-footer):
+  <ion-footer>
+    <ion-toolbar>
+      <ion-button expand="block" class="ion-padding-horizontal boton-flecha"
+                  [disabled]="guardando()" (click)="guardar()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Guardar
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+
 FLUJO COMPLETO (el ejemplo mas dificil del proyecto, ver tambien
-  seccion 4 mas abajo): 1) valida el formulario (ver RX-03); 2) arma
+  seccion 5.1 mas abajo): 1) valida el formulario (ver RX-03); 2) arma
   el body; 3) pone guardando=true (boton deshabilitado); 4) segun
   modoEditar, llama editarLugar (PUT) o guardarLugar (POST), y con
   await firstValueFrom() ESPERA la respuesta para tener el id del
   lugar; 5) por cada foto nueva, await firstValueFrom(subirFoto(id,
-  archivo)) - UNA peticion por foto, en orden, esperando que cada
-  una termine antes de mandar la siguiente; 6) si una foto falla,
-  corta el bucle ahi mismo (las fotos ya subidas y el lugar quedan
-  guardados, se avisa cual archivo fallo); 7) si todo sale bien,
-  toast de exito y router.navigate(['mis-lugares']) - vuelve a la
-  pantalla anterior, que gracias a ionViewWillEnter (RA-03) recarga
-  la lista sola.
+  archivo)) - UNA peticion por foto, en orden; 6) si una foto falla,
+  corta el bucle ahi mismo; 7) si todo sale bien, toast de exito y
+  router.navigate(['mis-lugares']) - vuelve a la pantalla anterior,
+  que gracias a ionViewWillEnter (RA-03) recarga la lista sola.
 
 ------------------------------------------------------------
 RA-09 - Al seleccionar un lugar se abre el mismo formulario con los
@@ -1605,26 +1876,26 @@ datos cargados y la ubicacion guardada
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/mis-lugares/mis-lugares.page.ts
-    lineas 99-101 (irAEditarLugar)
+    lineas 119-121 (irAEditarLugar)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 98-118 (constructor: decide modoEditar y llama cargarLugar)
-    lineas 120-149 (cargarLugar completo)
+    lineas 125-168 (constructor + propiedades: decide modoEditar y
+                    llama cargarLugar)
+    lineas 170-199 (cargarLugar completo)
 
-SNIPPET (lugar-form.page.ts, 98-118 - el patron "notaSeleccionada"):
+SNIPPET (lugar-form.page.ts, 132-134 y 147-168 - el patron
+  "notaSeleccionada"):
   // Si la ruta trae id, es modo editar (patron notaSeleccionada del practico 2).
   idLugar = this.ruta.snapshot.paramMap.get('id');
   modoEditar = this.idLugar !== null;
-
-  cargando = signal(this.modoEditar);
   ...
   constructor() {
-    addIcons({ add, 'close-circle': closeCircle });
+    addIcons({ ... });
     if (this.modoEditar) {
       this.cargarLugar();
     }
   }
 
-SNIPPET (lugar-form.page.ts, 120-148 - cargarLugar):
+SNIPPET (lugar-form.page.ts, 170-198 - cargarLugar):
   private cargarLugar(): void {
     this.lugaresService.obtenerLugar(Number(this.idLugar)).subscribe({
       next: (lugar) => {
@@ -1646,51 +1917,59 @@ SNIPPET (lugar-form.page.ts, 120-148 - cargarLugar):
     });
   }
 
-FLUJO: mis-lugares.page.ts irAEditarLugar(id) (linea 99) navega a
-  "lugar/{id}". LugarFormPage lee ese id de la ruta (linea 99:
-  "this.ruta.snapshot.paramMap.get('id')") y calcula modoEditar UNA
-  SOLA VEZ (linea 100). Si hay id, el constructor llama cargarLugar(),
-  que pide GET /lugares/{id} y llena formulario, ubicacion y
-  fotosExistentes con la respuesta; recien cuando cargando.set(false)
-  se renderiza (y se CREA) el <app-mapa-selector> en el HTML (porque
-  esta detras de un @if (cargando()) {...} @else {...}, lugar-form.
-  page.html lineas 13-17 vs 17-130) - asi el mapa nace YA con el
-  marcador en el punto guardado, sin tener que moverlo despues.
+FLUJO: mis-lugares.page.ts irAEditarLugar(id) (linea 119) navega a
+  "lugar/{id}". LugarFormPage lee ese id de la ruta (linea 133) y
+  calcula modoEditar UNA SOLA VEZ (linea 134). Si hay id, el
+  constructor llama cargarLugar(), que pide GET /lugares/{id} y llena
+  formulario, ubicacion y fotosExistentes con la respuesta; recien
+  cuando cargando.set(false) se renderiza el formulario completo
+  (esta detras de un @if (cargando()) {...} @else {...}, lugar-form.
+  page.html lineas 19-211) - asi el mapa y el selector-cantidad nacen
+  YA con los valores guardados, sin tener que moverlos despues.
 
-PREGUNTA: "¿Como decide la pagina si crea o edita?" -> Por
-  modoEditar (linea 100), calculado una sola vez mirando si la ruta
-  trajo un :id (ActivatedRoute.snapshot.paramMap.get('id')). Es el
-  mismo patron "notaSeleccionada" del practico 2.
+PREGUNTA: "¿Como decide la pagina si crea o edita?" -> Por modoEditar
+  (linea 134), calculado una sola vez mirando si la ruta trajo un :id.
+  Es el mismo patron "notaSeleccionada" del practico 2.
 
 ------------------------------------------------------------
 RA-10 - En un lugar existente aparece el boton "Ver reservas"
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.html
-    lineas 4-8 (el boton, solo si modoEditar)
+    lineas 1-16 (el header completo: ion-back-button + titulo + el
+                 boton "Ver reservas", solo si modoEditar; el
+                 ion-back-button es de la Fase E0)
   app-arrendatario/src/app/pages/lugar-form/lugar-form.page.ts
-    lineas 170-172 (irAReservas)
+    lineas 231-233 (irAReservas)
 
-SNIPPET (html, 1-10):
+SNIPPET (html, 1-16):
   <ion-header>
     <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/mis-lugares"></ion-back-button>
+      </ion-buttons>
       <ion-title>{{ modoEditar ? 'Editar lugar' : 'Nuevo lugar' }}</ion-title>
       @if (modoEditar) {
         <ion-buttons slot="end">
-          <ion-button (click)="irAReservas()">Ver reservas</ion-button>
+          <ion-button (click)="irAReservas()">
+            <ion-icon slot="start" name="calendar-outline"></ion-icon>
+            Ver reservas
+          </ion-button>
         </ion-buttons>
       }
     </ion-toolbar>
   </ion-header>
 
-SNIPPET (ts, 170-172):
+SNIPPET (ts, 231-233):
   irAReservas(): void {
     this.router.navigate(['lugar', this.idLugar, 'reservas']);
   }
 
 FLUJO: el titulo de la pantalla y el boton "Ver reservas" dependen
   del MISMO flag modoEditar que decide todo lo demas (RA-09). Si es
-  false (modo crear), el @if ni siquiera renderiza el boton.
+  false (modo crear), el @if ni siquiera renderiza el boton. El
+  ion-back-button usa la pila de navegacion del navegador; defaultHref
+  solo cubre el caso de abrir la URL directo sin historial.
 
 ------------------------------------------------------------
 RA-11 - Lista de reservas del lugar: foto, noches, fecha llegada/
@@ -1698,22 +1977,23 @@ salida, cliente y precio total
 ------------------------------------------------------------
 ARCHIVOS:
   app-arrendatario/src/app/pages/reservas-lugar/reservas-lugar.page.ts
-    (archivo completo, 79 lineas)
-    lineas 63-74 (cargarReservas)
+    (archivo completo, 103 lineas)
+    lineas 82-93 (cargarReservas)
+    lineas 95-98 (resumenReservas, Fase E2: singular/plural)
   app-arrendatario/src/app/pages/reservas-lugar/reservas-lugar.page.html
-    (archivo completo, 41 lineas)
+    (archivo completo, 75 lineas)
   app-arrendatario/src/app/services/reservas.service.ts lineas 14-16
-    (reservasDeLugar)
+    (reservasDeLugar, SIN cambios)
   app-arrendatario/src/app/utils/formato.ts
     lineas 30-33 (formatearFecha)
-    lineas 35-41 (calcularNoches)
+    lineas 40-46 (calcularNoches)
 
 SNIPPET (reservas.service.ts, 14-16):
   reservasDeLugar(idLugar: number): Observable<LugarConReservas> {
     return this.http.get<LugarConReservas>(`${this.urlBase}/lugar/${idLugar}`);
   }
 
-SNIPPET (reservas-lugar.page.ts, 63-73):
+SNIPPET (reservas-lugar.page.ts, 82-93):
   private cargarReservas(): void {
     this.reservasService.reservasDeLugar(this.idLugar).subscribe({
       next: (lugar) => {
@@ -1727,49 +2007,42 @@ SNIPPET (reservas-lugar.page.ts, 63-73):
     });
   }
 
-SNIPPET (formato.ts, 27-41 - por que no se usa el constructor Date
-  directo):
-  // new Date('2024-11-04') se interpreta en UTC: en Bolivia (UTC-4) mostraria el
-  // dia anterior. Por eso se parte el texto en vez de usar el constructor de Date.
-  export function formatearFecha(fecha: string): string {
-    const [anio, mes, dia] = fecha.substring(0, 10).split('-');
-    return `${dia}/${mes}/${anio}`;
-  }
-
-  export function calcularNoches(fechaInicio: string, fechaFin: string): number {
-    const [anioI, mesI, diaI] = fechaInicio.substring(0, 10).split('-').map(Number);
-    const [anioF, mesF, diaF] = fechaFin.substring(0, 10).split('-').map(Number);
-    const inicio = Date.UTC(anioI, mesI - 1, diaI);
-    const fin = Date.UTC(anioF, mesF - 1, diaF);
-    return Math.round((fin - inicio) / 86400000);
-  }
-
-SNIPPET (reservas-lugar.page.html, 17-39 - un item):
+SNIPPET (reservas-lugar.page.html, 18-24 y 32-70 - tarjeta de resumen
+  + cada reserva como ion-card, Fase E2):
+  <ion-card class="tarjeta-resumen">
+    <ion-card-content class="contenido-resumen">
+      <ion-icon name="business-outline"></ion-icon>
+      <span class="nombre-resumen">{{ lugar()!.nombre }}</span>
+      <span class="pastilla-conteo">{{ resumenReservas() }}</span>
+    </ion-card-content>
+  </ion-card>
+  ...
   @for (reserva of lugar()!.reservas; track reserva.id) {
-    <ion-item>
-      <ion-thumbnail slot="start">
-        @if (lugar()!.fotos.length > 0) { <img [src]="urlFoto(lugar()!.fotos[0].url)" ... /> }
-        @else { <ion-icon name="image-outline" size="large"></ion-icon> }
-      </ion-thumbnail>
-      <ion-label>
-        <h2>{{ reserva.cliente.nombrecompleto }}</h2>
-        <p>{{ calcularNoches(reserva.fechaInicio, reserva.fechaFin) }} noches</p>
-        <p>{{ formatearFecha(reserva.fechaInicio) }} - {{ formatearFecha(reserva.fechaFin) }}</p>
-        <p>{{ formatearPrecio(reserva.precioTotal) }}</p>
-      </ion-label>
-    </ion-item>
+    <ion-card class="tarjeta-reserva">
+      <ion-card-content>
+        <div class="fila-reserva">
+          <div class="foto-reserva"> ... </div>
+          <div class="datos-reserva">
+            <p class="cliente-reserva"><ion-icon name="person-outline"></ion-icon> <strong>{{ reserva.cliente.nombrecompleto }}</strong></p>
+            <p class="fechas-reserva"><ion-icon name="calendar-outline"></ion-icon> {{ formatearFecha(reserva.fechaInicio) }} – {{ formatearFecha(reserva.fechaFin) }}</p>
+            <ion-chip>{{ pluralizar(calcularNoches(reserva.fechaInicio, reserva.fechaFin), 'noche', 'noches') }}</ion-chip>
+          </div>
+        </div>
+        <div class="total-reserva">
+          <span>Total</span>
+          <ion-badge color="secondary">{{ formatearPrecio(reserva.precioTotal) }}</ion-badge>
+        </div>
+      </ion-card-content>
+    </ion-card>
   }
 
-FLUJO: idLugar sale del parametro de ruta (:id en lugar/:id/reservas).
-  cargarReservas() pide GET /reservas/lugar/{id}, que devuelve el
-  LUGAR COMPLETO con un arreglo "reservas" adentro (NO un arreglo
-  plano de reservas - hallazgo clave de la API). Cada reserva YA
-  trae su "cliente" anidado, as no hace falta ninguna peticion extra
-  para el nombre del cliente ni la foto del lugar (se usa
-  lugar().fotos[0], la misma foto para todas las reservas de ese
-  lugar). calcularNoches usa Date.UTC para las dos fechas a proposito,
-  asi la resta en milisegundos no depende de en que huso horario
-  este la computadora que corre el navegador.
+FLUJO: idLugar sale del parametro de ruta. cargarReservas() pide GET
+  /reservas/lugar/{id}, que devuelve el LUGAR COMPLETO con un arreglo
+  "reservas" adentro (NO un arreglo plano). Cada reserva YA trae su
+  "cliente" anidado. calcularNoches usa Date.UTC para las dos fechas
+  a proposito. El total de cada reserva se destaca en una ion-badge
+  dorada (color="secondary"), y la cantidad de noches usa pluralizar()
+  dentro de un ion-chip.
 
 PREGUNTA: "¿Por que no hay un obtenerLugar() extra en esta pantalla?"
   -> Porque GET reservas/lugar/{id} YA devuelve todo lo necesario
@@ -1784,18 +2057,26 @@ enunciado, para que la app sea usable
 RX-01 - Cerrar sesion en ambas apps
 ------------------------------------------------------------
 ARCHIVOS:
-  Arrendatario: mis-lugares.page.ts lineas 107-110 (cerrarSesion);
-    mis-lugares.page.html linea 5 (boton en el header)
-  Cliente: busqueda_screen.dart lineas 81-85 (_cerrarSesion); linea 93
+  Arrendatario: mis-lugares.page.ts lineas 136-139 (cerrarSesion);
+    mis-lugares.page.html lineas 9-13 (boton de icono en el header,
+    Fase E2 - antes era un ion-button con texto)
+  Cliente: busqueda_screen.dart lineas 92-96 (_cerrarSesion); linea 106
     (IconButton de logout en el AppBar)
 
-SNIPPET (mis-lugares.page.ts, 107-110):
+SNIPPET (mis-lugares.page.ts, 136-139):
   cerrarSesion(): void {
     this.authService.cerrarSesion();
     this.router.navigate(['login']);
   }
 
-SNIPPET (busqueda_screen.dart, 81-85):
+SNIPPET (mis-lugares.page.html, 9-13):
+  <ion-buttons slot="end">
+    <ion-button (click)="cerrarSesion()">
+      <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+
+SNIPPET (busqueda_screen.dart, 92-96):
   Future<void> _cerrarSesion() async {
     await context.read<AuthProvider>().cerrarSesion();
     if (!mounted) return;
@@ -1807,9 +2088,10 @@ RX-02 - La sesion se mantiene al cerrar y abrir la app
 ------------------------------------------------------------
 ARCHIVOS:
   Arrendatario: auth.service.ts lineas 29-40 (guardarSesion,
-    usuarioActual, haySesion - todo sobre localStorage)
+    usuarioActual, haySesion - todo sobre localStorage, SIN cambios)
   Cliente: auth_provider.dart lineas 24-30 (cargarSesion) y 88-91
-    (_guardarSesion - shared_preferences); main.dart lineas 17-18
+    (_guardarSesion - shared_preferences, SIN cambios); main.dart
+    lineas 18-19
 
 SNIPPET (auth.service.ts, 29-40):
   guardarSesion(usuario: Usuario): void {
@@ -1840,48 +2122,46 @@ SNIPPET (auth_provider.dart, 24-30 y 88-91):
   }
 
 FLUJO: no hay token - la sesion ES simplemente el usuario guardado en
-  almacenamiento local (localStorage en el navegador, shared_preferences
-  en el dispositivo Android). main.dart (cliente) espera cargarSesion()
-  ANTES de runApp (async main, lineas 13-21), asi la app nunca
-  "parpadea" mostrando el login antes de decidir si hay sesion.
+  almacenamiento local (localStorage en el navegador o en la app
+  Android empaquetada con Capacitor; shared_preferences en el
+  dispositivo Android del cliente). main.dart (cliente) espera
+  cargarSesion() ANTES de runApp, asi la app nunca "parpadea" el login.
 
-PREGUNTA: "¿Que pasa si cierro la app a la fuerza (no con 'Cerrar
-  sesion')?" -> No cambia nada: la proxima vez que se abra, el
-  almacenamiento local sigue teniendo el usuario guardado, as entra
-  directo sin pedir login de nuevo (probado relanzando la app
-  completa en el emulador, no solo recargando).
+PREGUNTA: "¿Que pasa si cierro la app a la fuerza?" -> No cambia nada:
+  la proxima vez que se abra, el almacenamiento local sigue teniendo
+  el usuario guardado.
 
 ------------------------------------------------------------
 RX-03 - Validaciones de formularios con mensajes claros
 ------------------------------------------------------------
 ARCHIVOS:
-  Arrendatario: lugar-form.page.ts lineas 234-251 (validar())
-  Cliente: busqueda_screen.dart lineas 51-63 y
-    busqueda_avanzada_screen.dart lineas 66-78 (mismas 3 validaciones);
-    login_screen.dart lineas 67-68 y 75-76 (Form + validator)
+  Arrendatario: lugar-form.page.ts lineas 299-317 (validar())
+  Cliente: busqueda_screen.dart lineas 62-74 y
+    busqueda_avanzada_screen.dart lineas 75-87 (mismas 3 validaciones);
+    login_screen.dart lineas 75-76 y 86-87 (Form + validator)
 
-SNIPPET (lugar-form.page.ts, 234-251 - COMPLETO, muestra la validacion
+SNIPPET (lugar-form.page.ts, 299-316 - COMPLETO, muestra la validacion
   de ubicacion que pide el enunciado):
   private validar(): string | null {
     const f = this.formulario;
     if (!f.nombre.trim()) return 'Ingresa el nombre del lugar';
-    if (!f.descripcion.trim()) return 'Ingresa una descripcion';
+    if (!f.descripcion.trim()) return 'Ingresa una descripción';
     if (!f.ciudad.trim()) return 'Ingresa la ciudad';
     if (!this.modoEditar && this.fotosNuevas.length === 0) return 'Agrega al menos una foto';
     if (Number(f.cantPersonas) < 1) return 'La cantidad de personas debe ser al menos 1';
     if (Number(f.cantCamas) < 1) return 'La cantidad de camas debe ser al menos 1';
-    if (Number(f.cantBanios) < 1) return 'La cantidad de banios debe ser al menos 1';
+    if (Number(f.cantBanios) < 1) return 'La cantidad de baños debe ser al menos 1';
     if (Number(f.cantHabitaciones) < 1) return 'La cantidad de habitaciones debe ser al menos 1';
     if (f.tieneParqueo && Number(f.cantVehiculosParqueo) < 1) {
-      return 'Ingresa la cantidad de vehiculos de parqueo';
+      return 'Ingresa la cantidad de vehículos de parqueo';
     }
     if (Number(f.precioNoche) < 0) return 'El precio por noche no puede ser negativo';
     if (Number(f.costoLimpieza) < 0) return 'El costo de limpieza no puede ser negativo';
-    if (!this.ubicacion) return 'Selecciona la ubicacion en el mapa';
+    if (!this.ubicacion) return 'Selecciona la ubicación en el mapa';
     return null;
   }
 
-SNIPPET (busqueda_screen.dart, 51-63 - llegada antes que salida):
+SNIPPET (busqueda_screen.dart, 62-74 - llegada antes que salida):
   Future<void> _buscar() async {
     if (_ciudadController.text.trim().isEmpty) {
       _mostrarMensaje('Ingresa la ciudad');
@@ -1897,17 +2177,14 @@ SNIPPET (busqueda_screen.dart, 51-63 - llegada antes que salida):
     }
     ...
 
-FLUJO: en el arrendatario, validar() es una funcion que devuelve el
-  PRIMER mensaje de error que encuentra (o null si todo esta bien);
-  guardar() la llama antes de tocar la API (ver RA-08). En el
-  cliente, cada pantalla de busqueda valida a mano con ifs (no usa
-  Form porque no son TextFormField con validator, son controllers
-  sueltos); login/registro S usan Form + GlobalKey<FormState> +
-  validator en cada TextFormField (patron mas formal, porque ahi s
-  tiene sentido el ciclo de vida de un Form real).
+FLUJO: en el arrendatario, validar() devuelve el PRIMER mensaje de
+  error que encuentra (o null); guardar() la llama antes de tocar la
+  API. En el cliente, cada pantalla de busqueda valida a mano con ifs;
+  login/registro SI usan Form + GlobalKey<FormState> + validator en
+  cada TextFormField.
 
 PREGUNTA: "¿Que pasa si elijo fecha de salida igual a la de llegada?"
-  -> isAfter() exige ESTRICTAMENTE posterior, as una fecha igual
+  -> isAfter() exige ESTRICTAMENTE posterior, asi una fecha igual
   tambien se bloquea con el mismo mensaje que una fecha anterior.
 
 ------------------------------------------------------------
@@ -1915,20 +2192,24 @@ RX-04 - Estados cargando / error / vacio en toda pantalla que pide
 datos
 ------------------------------------------------------------
 ARCHIVOS:
-  Cliente: app-cliente/lib/widget/vista_estado.dart (archivo
-    completo, 33 lineas) - usado en resultados_screen.dart (linea
-    37), detalle_lugar_screen.dart (linea 55) y mis_reservas_screen.
-    dart (linea 31)
-  Arrendatario: mis-lugares.page.html lineas 11-19, lugar-form.page.
-    html lineas 13-17, reservas-lugar.page.html lineas 8-16 (el mismo
+  Cliente: app-cliente/lib/widget/vista_estado.dart (archivo completo,
+    56 lineas - gano un parametro opcional "icono" en la Fase E1) -
+    usado en resultados_screen.dart (linea 47), detalle_lugar_screen.
+    dart (linea 66) y mis_reservas_screen.dart (linea 31)
+  Arrendatario: mis-lugares.page.html lineas 18-29, lugar-form.page.
+    html lineas 19-23, reservas-lugar.page.html lineas 11-17 (el mismo
     patron @if/@else if/@else repetido en cada pagina)
 
-SNIPPET (vista_estado.dart COMPLETO - el widget reutilizable):
+SNIPPET (vista_estado.dart COMPLETO - el widget reutilizable, con el
+  icono configurable de la Fase E1):
   class VistaEstado extends StatelessWidget {
     final bool cargando;
     final String? error;
     final bool vacio;
     final String mensajeVacio;
+    // Icono del estado vacio (cada pantalla elige el que tenga sentido).
+    // El de error siempre es el mismo: casi todos los errores son de conexion.
+    final IconData? icono;
     final Widget child;
 
     @override
@@ -1937,65 +2218,89 @@ SNIPPET (vista_estado.dart COMPLETO - el widget reutilizable):
         return const Center(child: CircularProgressIndicator());
       }
       if (error != null) {
-        return Center(child: Text(error!));
+        return _mensajeConIcono(Icons.wifi_off, error!);
       }
       if (vacio) {
-        return Center(child: Text(mensajeVacio));
+        return _mensajeConIcono(icono ?? Icons.inbox_outlined, mensajeVacio);
       }
       return child;
     }
+
+    Widget _mensajeConIcono(IconData icono, String mensaje) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icono, size: 64, color: colorTextoSecundario),
+              const SizedBox(height: 16),
+              Text(mensaje, textAlign: TextAlign.center),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
-SNIPPET (mis-lugares.page.html, 11-19 - el equivalente Angular, repetido
-  a mano en cada pagina en vez de un componente):
+SNIPPET (mis-lugares.page.html, 18-29 - el equivalente Angular, con el
+  estado vacio rediseñado en la Fase E2: icono + texto + boton):
   @if (cargando()) {
     <div class="ion-text-center ion-padding"><ion-spinner></ion-spinner></div>
   } @else if (error()) {
     <p class="ion-padding">{{ error() }}</p>
   } @else if (lugares().length === 0) {
-    <p class="ion-padding">Todavia no tenes lugares publicados.</p>
-  } @else {
-    ...
+    <div class="estado-vacio">
+      <ion-icon name="home-outline"></ion-icon>
+      <p>Todavía no tienes lugares publicados</p>
+      <ion-button (click)="irANuevoLugar()">Publicar mi primer lugar</ion-button>
+    </div>
+  } @else { ... }
 
 FLUJO: el cliente SI extrajo un widget reutilizable (VistaEstado) que
-  recibe los 4 parametros y decide que mostrar. El arrendatario
-  repite el mismo patron @if/@else-if/@else en CADA pagina (no se
-  extrajo a un componente aparte) - es una diferencia real entre las
-  dos apps, valida para explicar: en Angular standalone, un
-  componente compartido para esto exigiria pasarle contenido
-  proyectado (ng-content) por cada pantalla, que se considero mas
-  complejo de explicar que simplemente repetir 8 lineas de @if en
-  3 archivos.
+  recibe los parametros y decide que mostrar; cada pantalla eligo su
+  propio icono de estado vacio (ej. Icons.search_off en resultados,
+  Icons.event_busy_outlined en mis reservas). El arrendatario repite
+  el mismo patron @if/@else-if/@else en CADA pagina, usando desde la
+  Fase E la clase compartida .estado-vacio de global.scss (ver 6.5)
+  para el aspecto visual, sin extraer un componente Angular aparte.
 
 ------------------------------------------------------------
 RX-05 - Botones de envio deshabilitados mientras se espera respuesta
 ------------------------------------------------------------
 ARCHIVOS:
-  Cliente: login_screen.dart linea 80; registro_screen.dart linea 104;
-    confirmar_reserva_screen.dart linea 98
-  Arrendatario: login.page.html linea 21; registro.page.html linea 31;
-    lugar-form.page.html linea 127
+  Cliente: login_screen.dart linea 91; registro_screen.dart linea 122;
+    confirmar_reserva_screen.dart linea 118
+  Arrendatario: login.page.html linea 48; registro.page.html linea 69;
+    lugar-form.page.html linea 219
 
-SNIPPET (login_screen.dart, 79-82):
-  ElevatedButton(
+SNIPPET (login_screen.dart, 90-93):
+  FilledButton(
     onPressed: cargando ? null : _iniciarSesion,
-    child: const Text('Iniciar sesion'),
+    child: const Text('Iniciar sesión'),
   ),
 
-SNIPPET (login.page.html, 18-25):
-  <ion-button expand="block" class="ion-margin-top" [disabled]="enviando()" (click)="iniciarSesion()">
-    Iniciar sesion
+SNIPPET (login.page.html, 45-53):
+  <ion-button
+    expand="block"
+    class="ion-margin-top boton-flecha"
+    [disabled]="enviando()"
+    (click)="iniciarSesion()"
+  >
+    Iniciar sesión
+    <ion-icon slot="end" name="arrow-forward"></ion-icon>
   </ion-button>
 
-FLUJO: en Flutter, onPressed: null directamente deshabilita el
-  boton visualmente y evita el toque (patron "condicion ? null :
-  metodo"). En Angular, [disabled]="enviando()" liga el atributo
-  disabled al signal. En ambos casos, el flag se pone en true justo
-  antes de llamar a la API y se pone en false en el callback de exito
-  O de error (nunca se queda "trabado" en true).
+FLUJO: en Flutter, onPressed: null directamente deshabilita el boton
+  (patron "condicion ? null : metodo"); ahora todos son FilledButton
+  (Fase E1) en vez de ElevatedButton. En Angular, [disabled]="enviando()"
+  liga el atributo disabled al signal. En ambos casos, el flag se pone
+  en true justo antes de llamar a la API y se pone en false en el
+  callback de exito O de error.
 
 ============================================================
-4. HALLAZGOS Y "TRAMPAS" DE LA API (hay que poder explicarlos)
+4. HALLAZGOS Y "TRAMPAS" DE LA API (hay que poder explicarlos - SIN
+cambios en la Fase E, la fase es solo visual)
 ============================================================
 
 1) ERRORES SIEMPRE 404 (SALVO LOGIN INCORRECTO = 401)
@@ -2012,25 +2317,21 @@ FLUJO: en Flutter, onPressed: null directamente deshabilita el
    POST /lugares con un "id" en el body IGNORA ese id y crea un
    lugar DUPLICADO. La ruta real para editar es PUT /lugares/{id}.
    Se aplica en: app-arrendatario/src/app/services/lugares.service.ts
-     linea 27 (comentario explicito: "PUT y no POST con id:
-     confirmado en la Fase 0, POST con id duplica el lugar en vez de
-     actualizarlo"), lineas 22-28 (los dos metodos separados,
-     guardarLugar=POST y editarLugar=PUT).
-   Se decide en: lugar-form.page.ts lineas 211-213 (el ternario que
+     linea 26 (comentario explicito), lineas 22-28 (los dos metodos
+     separados, guardarLugar=POST y editarLugar=PUT).
+   Se decide en: lugar-form.page.ts lineas 240-242 (el ternario que
      elige cual de los dos llamar segun modoEditar).
 
 3) LATITUD/LONGITUD SIEMPRE COMO TEXTO
    La API rechaza numeros con error de validacion.
-   Cliente: lugar_model.dart usa aDecimal() al LEER (convierte
-     texto->numero adentro de la app); al escribir, confirmar_
-     reserva_screen.dart y los demas services NO mandan
-     latitud/longitud (esta app no crea lugares). Donde SI se manda:
-     app-arrendatario/lugar-form.page.ts lineas 199-200:
+   Cliente: lugar_model.dart usa aDecimal() al LEER; esta app no
+     crea lugares, asi que no manda latitud/longitud.
+   Arrendatario: lugar-form.page.ts lineas 264-265:
        latitud: String(this.ubicacion!.latitud),
        longitud: String(this.ubicacion!.longitud),
 
 4) BUSQUEDA AVANZADA: OMITIR, NUNCA MANDAR 0
-   Ver RC-05 arriba (busqueda_avanzada_screen.dart lineas 80-101):
+   Ver RC-05 arriba (busqueda_avanzada_screen.dart lineas 89-110):
    cada campo opcional solo se agrega al mapa de filtros si el
    usuario escribio algo; nunca se inicializa un campo en 0 como
    "valor por defecto".
@@ -2052,8 +2353,7 @@ FLUJO: en Flutter, onPressed: null directamente deshabilita el
    Son dos formas DISTINTAS de anidar los mismos datos segun el
    endpoint:
    - GET reservas/cliente/{id}: cada reserva.lugar es un ARREGLO de
-     1 elemento. Se aplica en reserva_model.dart lineas 34-37
-     (toma lugares[0] si la lista no esta vacia).
+     1 elemento. Se aplica en reserva_model.dart lineas 34-37.
    - GET reservas/lugar/{id}: la respuesta ES el lugar, con un
      arreglo "reservas" adentro. Se aplica en reservas.service.ts
      linea 14-16 (tipo de retorno LugarConReservas) y models/
@@ -2068,62 +2368,62 @@ FLUJO: en Flutter, onPressed: null directamente deshabilita el
 5.1 SUBIR FOTOS (arrendatario)
 ------------------------------------------------------------
 Archivo clave: app-arrendatario/src/app/pages/lugar-form/
-  lugar-form.page.ts, metodo guardar() completo en lineas 174-232.
+  lugar-form.page.ts, metodo guardar() completo en lineas 239-297.
 
-Paso 1 (linea 160-162): por cada archivo elegido, se crea una vista
-  previa local con URL.createObjectURL(archivo) - NO se sube nada
-  todavia.
-Paso 2 (linea 211-213): al guardar, PRIMERO se crea o edita el lugar
+Paso 1 (lineas 210-212 de alSeleccionarFotos): por cada archivo
+  elegido, se crea una vista previa local con URL.createObjectURL
+  (archivo) - NO se sube nada todavia.
+Paso 2 (lineas 276-278): al guardar, PRIMERO se crea o edita el lugar
   (POST o PUT, SIN fotos) y se ESPERA la respuesta con await
   firstValueFrom(...) para tener el id real del lugar.
-Paso 3 (lineas 215-223): recien con ese id, un bucle for...of pide
+Paso 3 (lineas 280-288): recien con ese id, un bucle for...of pide
   await firstValueFrom(subirFoto(idLugar, foto.archivo)) por CADA
-  foto, UNA peticion multipart/form-data por vez, esperando que cada
-  una termine antes de mandar la siguiente (lugares.service.ts lineas
-  31-36: el FormData con el campo "foto", sin fijar Content-Type a
-  mano).
-Paso 4 (lineas 216-222): si una foto falla, se corta el bucle ahi
-  mismo (no se siguen intentando las demas) y se avisa con el nombre
-  exacto del archivo que fallo.
+  foto, UNA peticion multipart/form-data por vez (lugares.service.ts
+  lineas 31-36: el FormData con el campo "foto", sin fijar
+  Content-Type a mano).
+Paso 4 (lineas 281-287): si una foto falla, se corta el bucle ahi
+  mismo y se avisa con el nombre exacto del archivo que fallo.
 Por que async/await y no subscribe aca: es la UNICA excepcion al
   patron subscribe() de toda la app, porque subir una foto depende
   del id del lugar, que recien se conoce DESPUES de que la peticion
-  anterior responda - son pasos que depende uno del otro en orden
-  estricto, no peticiones independientes.
+  anterior responda.
 
 ------------------------------------------------------------
 5.2 ELEGIR/MOSTRAR UBICACION EN UN MAPA (las dos apps, con enfoques
 distintos)
 ------------------------------------------------------------
 Arrendatario (Leaflet, para ELEGIR):
-  Archivo: mapa-selector.component.ts, completo (72 lineas).
-  1. El mapa se crea en ngAfterViewInit (linea 33), NO en el
-     constructor ni en ngOnInit, porque recien ahi el <div> del
-     template (con #mapaDiv, capturado via @ViewChild linea 24) ya
-     existe en el DOM.
+  Archivo: mapa-selector.component.ts, completo (85 lineas).
+  1. El mapa se crea en ngAfterViewInit (linea 33), porque recien ahi
+     el <div> del template (con #mapaDiv, capturado via @ViewChild
+     linea 24) ya existe en el DOM.
   2. Se centra en la ubicacion recibida por input() o en Santa Cruz
      por defecto (lineas 34-37).
-  3. Clic en el mapa (linea 49, "this.mapa.on('click', ...)") mueve
-     un L.circleMarker (NO L.marker: el icono por defecto de Leaflet
-     sale roto con el empaquetador de Angular) y EMITE el evento
-     ubicacionSeleccionada (linea 51).
+  3. Clic en el mapa (linea 49) mueve un L.circleMarker (lineas
+     59-79: coloreado con el verde del tema, leido con
+     getComputedStyle en vez de escrito a mano, Fase E2) y EMITE el
+     evento ubicacionSeleccionada (linea 51).
   4. setTimeout(() => this.mapa.invalidateSize(), 300) (linea 56) es
      necesario porque, dentro de ion-content, el tamano final del
      contenedor se conoce recien despues de este punto.
-  5. ngOnDestroy (linea 69-71) llama mapa.remove() para liberar
+  5. ngOnDestroy (linea 81-83) llama mapa.remove() para liberar
      memoria al salir de la pagina.
 
 Cliente (flutter_map, SOLO para MOSTRAR, no para elegir):
-  Archivo: app-cliente/lib/widget/mapa_lugares.dart, completo (64
-  lineas).
-  1. Un TileLayer apunta a OpenStreetMap (lineas 27-31), con
-     userAgentPackageName obligatorio (si falta, OpenStreetMap puede
-     bloquear las peticiones).
+  Archivo: app-cliente/lib/widget/mapa_lugares.dart, completo (115
+  lineas - el marcador se rediseño dos veces en la Fase E: primero una
+  pastilla de precio sola, Fase E1; despues pastilla + circulo con
+  icono de casa sobre la coordenada exacta).
+  1. Un TileLayer apunta a OpenStreetMap (lineas 41-45), con
+     userAgentPackageName obligatorio.
   2. Un MarkerLayer dibuja un Marker por lugar de los resultados
-     (lineas 32-60), cada uno con el precio arriba y un icono de pin
-     abajo.
+     (lineas 46-109): la pastilla dorada con el precio y, debajo, un
+     circulo verde con un icono de casa marcando la coordenada exacta
+     (el Marker se alinea desde el centro del circulo con un
+     Alignment calculado, no desde el centro de toda la columna).
   3. El mapa se centra en el primer resultado, o en Santa Cruz si la
-     lista esta vacia (lineas 20-22).
+     lista esta vacia (lineas 33-35). Se agrega la atribucion
+     obligatoria de OpenStreetMap (linea 111, Fase E0).
 
 En ambos casos, la latitud/longitud viajan como TEXTO hacia la API
 (nunca numero) - ver hallazgo 3 de la seccion anterior.
@@ -2132,28 +2432,22 @@ En ambos casos, la latitud/longitud viajan como TEXTO hacia la API
 5.3 CALCULAR EL PRECIO DE UNA RESERVA (cliente)
 ------------------------------------------------------------
 Archivo: app-cliente/lib/utils/calculo_reserva.dart, completo (24
-  lineas - TODO el archivo son funciones puras, sin HTTP ni estado).
+  lineas - TODO el archivo son funciones puras, sin HTTP ni estado;
+  SIN cambios en la Fase E).
 
 Paso 1 (lineas 6-8): calcularNoches(llegada, salida) = diferencia en
-  dias completos entre las dos fechas (salida.difference(llegada).
-  inDays - sin horas, porque las fechas se construyen sin hora desde
-  el DatePicker).
+  dias completos entre las dos fechas.
 Paso 2 (lineas 10-12): calcularSubtotal(noches, precioNoche) = noches
   multiplicado por el precio de una noche.
 Paso 3 (lineas 14-16): calcularServicio(subtotal) = subtotal
-  multiplicado por la constante porcentajeServicio = 0.10 (linea 4) -
-  decision propia del proyecto, NO la define la API.
+  multiplicado por la constante porcentajeServicio = 0.10 (linea 4).
 Paso 4 (lineas 18-20): calcularTotal(subtotal, limpieza, servicio) =
   suma de los tres.
-Paso 5 (lineas 22-24): CADA una de las 4 funciones de arriba pasa su
-  resultado por _redondear(), que usa toStringAsFixed(2) y
-  double.parse() para fijar 2 decimales ANTES de devolver el valor -
-  asi la SUMA final nunca arrastra errores de coma flotante (ej. que
-  120 + 5 + 12 de 136.99999999999997 en vez de 137.0 exacto).
-Paso 6: al confirmar (confirmar_reserva_screen.dart lineas 25-45,
+Paso 5 (lineas 22-24): CADA una de las 4 funciones pasa su resultado
+  por _redondear(), fijando 2 decimales ANTES de devolver.
+Paso 6: al confirmar (confirmar_reserva_screen.dart lineas 28-47,
   reserva_service.dart lineas 33-41), esos mismos numeros se mandan a
-  la API como TEXTO con 2 decimales (.toStringAsFixed(2)), igual que
-  el ejemplo confirmado en docs/API.md.
+  la API como TEXTO con 2 decimales.
 
 ============================================================
 6. GLOSARIO DE EQUIVALENCIAS ENTRE LAS DOS APPS
@@ -2164,15 +2458,17 @@ Concepto                  | Cliente (Flutter/Dart)              | Arrendatario (
 Lenguaje                  | Dart                                 | TypeScript
 Pantalla                  | StatelessWidget/StatefulWidget       | Componente standalone
                            | en screen/ (ej. login_screen.dart)   | en pages/ (ej. login.page.ts)
+Estilo/colores             | ThemeData (lib/config/tema.dart)     | Variables CSS (src/theme/
+                           | + Theme.of(context)                  | variables.scss) + src/global.scss
 Estado reactivo            | ChangeNotifier + notifyListeners()   | signal() + .set()
-                           | (repository/auth_provider.dart L12)  | (pages/login/login.page.ts L45)
+                           | (repository/auth_provider.dart L32)  | (pages/login/login.page.ts L51)
 Leer el estado en la UI     | context.watch<T>() / Consumer<T>     | lugares() directo en el HTML
-                           | (resultados_screen.dart L32)         | (mis-lugares.page.html L21)
+                           | (resultados_screen.dart L34)         | (mis-lugares.page.html L32)
 Llamar a la API             | dio (lib/config/api_config.dart)     | HttpClient (inject(HttpClient))
 Respuesta asincrona          | Future + async/await                 | Observable + subscribe
                            |                                      | (y firstValueFrom al guardar con
-                           |                                      | fotos, lugar-form.page.ts L212)
-Compartir servicios          | Provider en main.dart (L30-35)       | inject() en cada clase
+                           |                                      | fotos, lugar-form.page.ts L277-278)
+Compartir servicios          | Provider en main.dart (L33-35)       | inject() en cada clase
 Modelo de datos              | clase con factory fromJson           | interface (sin clase, solo tipos)
                            | (model/lugar_model.dart L52)         | (models/lugar.ts)
 Navegar                     | Navigator.push(MaterialPageRoute())  | router.navigate([...]) o routerLink
@@ -2182,32 +2478,345 @@ Sesion persistente           | shared_preferences                   | localStora
 Formularios                  | Form + TextFormField + validator     | FormsModule + [(ngModel)]
 Mapa                         | flutter_map (solo mostrar)            | leaflet (elegir ubicacion)
 Recargar al volver a una     | no hace falta: el provider conserva   | ionViewWillEnter()
-pantalla                    | los datos                            | (mis-lugares.page.ts L71)
+pantalla                    | los datos                            | (mis-lugares.page.ts L91)
 Pantallas solo con sesion    | pantalla inicial segun AuthProvider  | authGuard en las rutas
-                           | (main.dart L46)                      | (app.routes.ts L18,24,29,35)
+                           | (main.dart L48)                      | (app.routes.ts L18,24,29,35)
+App nativa Android           | siempre (unica plataforma objetivo)  | Capacitor, desde la Fase E2
+                           |                                      | (capacitor.config.ts, ver 6.4)
+
+------------------------------------------------------------
+6.1 TEMA Y PALETA DE CADA APP (Fase E)
+------------------------------------------------------------
+Identidad visual comun: verde `#0B6E4F` (bandera de Santa Cruz de la
+Sierra) como color de marca, con texto blanco encima; dorado `#E9A23B`
+como acento EXCLUSIVO para destacar precios (nunca en botones ni texto
+normal), siempre con texto oscuro `#1D2622` encima (nunca blanco,
+porque blanco sobre dorado no se lee bien). Decision documentada en
+docs/FASE-E-ESTETICA.md y en la entrada "Fase E1" de docs/ESTUDIO.md:
+el primer intento de la Fase E uso coral (#E8505B, el mismo de
+Airbnb); se cambio a verde/dorado porque varios compañeros de la
+materia habian elegido ese mismo coral.
+
+CLIENTE: app-cliente/lib/config/tema.dart (archivo completo, 87
+  lineas) - una sola funcion crearTema() que arma el ThemeData de toda
+  la app.
+SNIPPET (lineas 6-13 - las constantes de color):
+  const colorMarca = Color(0xFF0B6E4F);
+  const colorAcento = Color(0xFFE9A23B);
+  const textoSobreAcento = Color(0xFF1D2622);
+  const colorTextoPrincipal = Color(0xFF1D2622);
+  const colorTextoSecundario = Color(0xFF66706B);
+  const _colorFondo = Color(0xFFF6F2EA);
+
+SNIPPET (lineas 19-31 - ColorScheme.fromSeed + copyWith para fijar el
+  verde y el dorado exactos, no un tono calculado):
+  ThemeData crearTema() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: colorMarca,
+      dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
+    ).copyWith(
+      primary: colorMarca,
+      onPrimary: Colors.white,
+      tertiary: colorAcento,
+      onTertiary: textoSobreAcento,
+    );
+    return ThemeData(
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: _colorFondo,
+      ...
+      cardTheme: CardThemeData(color: Colors.white, elevation: 1,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+      ...
+    );
+  }
+En main.dart (linea 39) se agrega una sola linea: "theme: crearTema()"
+dentro del MaterialApp. Cualquier widget de Material sin estilo propio
+toma estos valores automaticamente via Theme.of(context).
+
+ARRENDATARIO: app-arrendatario/src/theme/variables.scss (archivo
+  completo, 38 lineas) + src/global.scss (ver 6.5 para sus clases).
+SNIPPET (variables.scss, lineas 3-18 - verde y dorado con su rgb,
+  contrast, shade y tint, que exige Ionic para calcular bien los
+  estados hover/active):
+  :root {
+    --ion-color-primary: #0b6e4f;
+    --ion-color-primary-rgb: 11, 110, 79;
+    --ion-color-primary-contrast: #ffffff;
+    --ion-color-primary-contrast-rgb: 255, 255, 255;
+    --ion-color-primary-shade: #0a6146;
+    --ion-color-primary-tint: #237d61;
+
+    --ion-color-secondary: #e9a23b;
+    --ion-color-secondary-rgb: 233, 162, 59;
+    --ion-color-secondary-contrast: #1d2622;
+    --ion-color-secondary-contrast-rgb: 29, 38, 34;
+    --ion-color-secondary-shade: #cd8f34;
+    --ion-color-secondary-tint: #ebab4f;
+  }
+Cualquier componente de Ionic ya sabe leer estas variables por su
+cuenta (color="primary", color="secondary") sin que la pagina importe
+nada - a diferencia de ThemeData, que es un objeto de Dart que hay que
+pasarle explicitamente al MaterialApp.
+
+Modo claro unico: src/global.scss linea 37 comenta el import de
+  dark.system.css ("Solo modo claro (CLAUDE.md, fase E): se comenta el
+  modo oscuro automatico"); src/index.html agrega
+  <meta name="color-scheme" content="light">.
+
+------------------------------------------------------------
+6.2 WIDGETS/COMPONENTES NUEVOS DE LA FASE E
+------------------------------------------------------------
+CLIENTE (app-cliente/lib/widget/):
+  - foto_lugar.dart (42 lineas): Image.network(urlFoto(...)) con
+    errorBuilder y placeholder cuando no hay foto, con radio de borde
+    configurable. Reemplaza el Image.network que antes se repetia en
+    LugarCard, GaleriaFotos, ConfirmarReservaScreen y ReservaCard.
+  - campo_fecha.dart (38 lineas): un InputDecorator que imita un
+    TextField con el estilo del tema, pero abre un DatePicker al
+    tocarlo (no es un campo de texto real). Usado en busqueda_screen.
+    dart (llegada/salida).
+  - contador_huespedes.dart (34 lineas): botones -/+ dentro de un
+    contenedor con borde, usado en busqueda_screen.dart.
+  - caracteristicas_lugar.dart (50 lineas): Wrap de Chips con icono
+    (personas, camas, banios, habitaciones, wifi, parqueo), usado en
+    detalle_lugar_screen.dart (ver RC-12).
+  - barra_reservar.dart (43 lineas): barra inferior fija con el
+    precio y el boton "Reservar" (ver RC-13).
+  - barra_resumen_mapa.dart (67 lineas, el mas nuevo): tarjeta
+    flotante sobre la vista de mapa con ciudad/huespedes/fechas de la
+    busqueda actual; agregada en el ajuste posterior a la Fase E2 (ver
+    docs/ESTUDIO.md, entrada "Ajustes entre E2 y E3") inspirada en el
+    diseño de Stitch "mapa_de_alojamientos_santa_cruz" (ver 6.7).
+  - encabezado_bnb.dart (41 lineas): icono de casa en un circulo del
+    color de marca + "bnb" + un subtitulo; reutilizado por login y
+    registro.
+
+ARRENDATARIO (app-arrendatario/src/app/components/):
+  - selector-cantidad/selector-cantidad.component.ts (33 lineas, +
+    .html de 24 lineas): botones -/+ reutilizables con input()/
+    output(), usado 4 veces en el formulario de lugar (personas,
+    camas, banios, habitaciones) - ver RA-05.
+
+------------------------------------------------------------
+6.3 WIDGETS QUE YA EXISTIAN Y CAMBIARON EN LA FASE E
+------------------------------------------------------------
+  - vista_estado.dart (app-cliente): gano un parametro opcional
+    "icono" para que cada pantalla elija el icono de su estado vacio
+    (antes siempre era el mismo texto sin icono) - ver RX-04.
+  - galeria_fotos.dart (app-cliente): se reescribio para usar
+    FotoLugar en la foto grande y en las miniaturas (antes repetia
+    Image.network a mano), y la miniatura seleccionada gano un borde
+    del color de marca - ver RC-11.
+  - lugar_card.dart (app-cliente): paso de un ListTile simple a una
+    Card con foto 16:9 arriba, nombre en negrita, descripcion en 2
+    lineas y una fila de huespedes (pluralizado)/precio - ver RC-07.
+  - reserva_card.dart (app-cliente): paso de un ListTile a una Card
+    con foto de 80x80, fecha con icono de calendario y "noches"
+    pluralizado - ver RC-16.
+  - mapa_lugares.dart (app-cliente): el marcador cambio DOS veces -
+    primero una pastilla dorada sola con el precio (Fase E1), despues
+    pastilla + circulo verde con icono de casa sobre la coordenada
+    exacta (ajuste posterior) - ver RC-08 y 5.2.
+
+------------------------------------------------------------
+6.4 CAPACITOR Y ANDROID (ARRENDATARIO, DESDE LA FASE E2)
+------------------------------------------------------------
+Ademas de `ionic serve` (navegador), la app arrendatario corre como
+app NATIVA Android empaquetada con Capacitor: `npm run build && npx
+cap sync android && npx cap run android`.
+
+ARCHIVO: app-arrendatario/capacitor.config.ts (completo, 16 lineas):
+  const config: CapacitorConfig = {
+    appId: 'bo.edu.nur.bnb_arrendatario',
+    appName: 'bnb Anfitriones',
+    webDir: 'www',
+    // En desarrollo la app llama a Mockoon por http://10.0.2.2:3001: con el
+    // esquema https por defecto Android bloquea esas peticiones (no son HTTPS).
+    server: {
+      androidScheme: 'http',
+      cleartext: true,
+    },
+  };
+
+Por que androidScheme/cleartext: desde Android 9, el sistema bloquea
+por defecto cualquier peticion HTTP que no sea HTTPS. En desarrollo la
+app llama a Mockoon por http://10.0.2.2:3001 (HTTP simple);
+androidScheme: 'http' hace que la propia app se sirva a si misma por
+HTTP (en vez de HTTPS, su valor por defecto) y cleartext: true
+autoriza explicitamente ese trafico sin cifrar. Deja de ser necesario
+(pero no molesta) cuando se use la API real por HTTPS.
+
+ARCHIVOS: app-arrendatario/src/environments/environment.ts (19
+  lineas) y environment.prod.ts (8 lineas) - cual URL usa la app segun
+  como corre:
+  environment.ts, lineas 5-9 (se usa con `ionic serve`, el navegador
+  corre en localhost de verdad):
+    export const environment = {
+      production: false,
+      apiUrl: 'http://localhost:3001/api',
+    };
+  environment.prod.ts, lineas 1-7 (se usa con `npm run build`, lo que
+  despues empaqueta Capacitor hacia el emulador/APK; 10.0.2.2 es el
+  alias fijo del emulador de Android hacia la PC que lo hospeda):
+    export const environment = {
+      production: true,
+      apiUrl: 'http://10.0.2.2:3001/api',
+    };
+`angular.json` cambia `environment.ts` por `environment.prod.ts`
+automaticamente en el build de produccion (fileReplacements), no hace
+falta tocar ningun import a mano.
+
+La carpeta app-arrendatario/android/ (generada por `npx cap add
+android`) esta versionada, con su propio .gitignore excluyendo
+build/, .gradle/ y local.properties.
+
+------------------------------------------------------------
+6.5 CLASES REUTILIZABLES DE GLOBAL.SCSS (ARRENDATARIO)
+------------------------------------------------------------
+Archivo: app-arrendatario/src/global.scss (179 lineas). Ademas de los
+imports de Ionic, define clases que varias paginas comparten en vez de
+repetir el mismo CSS:
+
+  .estado-vacio (lineas 41-53): icono grande + texto centrados, para
+    una lista sin datos. Usado en mis-lugares (lista vacia) y
+    reservas-lugar (lugar sin reservas).
+  .foto-portada (lineas 56-61): recorte 16:9 con esquinas redondeadas
+    (object-fit: cover; border-radius: 16px), para la foto de portada
+    de una tarjeta. Usado en mis-lugares (portada del lugar) y
+    lugar-form (fotos existentes/nuevas de la grilla).
+  .pastilla-marca (lineas 94-115): la pastilla "Para anfitriones" de
+    login/registro - fondo verde muy claro, texto verde, un punto
+    chico a la izquierda (::before), mayusculas.
+  .tarjeta-formulario (lineas 118-129): la tarjeta blanca que envuelve
+    el formulario de login/registro (titulo + subtitulo con estilos
+    propios).
+  .campo-arena (lineas 133-137): el fondo "arena" (el mismo color que
+    el fondo de la app) y radio 12 que comparten los campos de login,
+    registro y el formulario de lugar - un solo lugar para no repetir
+    ese estilo en cada pagina.
+  .pastilla-conteo (lineas 157-165): pastilla de conteo (ej. "N
+    reservas") en reservas-lugar - mismo fondo/color verde que
+    .pastilla-marca, sin el punto ni las mayusculas.
+
+Otras clases del mismo archivo, sin pedirlas explicitamente pero
+relacionadas: .icono-marca y .encabezado-marca (el circulo con el
+icono de casa y el contenedor que lo centra, lineas 63-91), .boton-
+flecha (radio 12 del boton principal, lineas 140-142), .titulo-seccion
+(icono + texto de cada ion-list-header del formulario, lineas 145-
+154) y .texto-enlace (el texto con el link verde debajo del
+formulario, lineas 168-178).
+
+------------------------------------------------------------
+6.6 FUNCION PLURALIZAR (LAS DOS APPS)
+------------------------------------------------------------
+Agregada en el ajuste posterior a la Fase E2 para corregir cantidades
+que se mostraban siempre en plural (ej. "1 baños"). Misma idea en las
+dos apps: antepone la cantidad y elige singular o plural segun si es 1.
+
+CLIENTE: app-cliente/lib/utils/conversiones.dart, lineas 46-49:
+  // Antepone la cantidad y elige singular o plural, ej. "1 baño" o "2 baños".
+  String pluralizar(int cantidad, String singular, String plural) {
+    return '$cantidad ${cantidad == 1 ? singular : plural}';
+  }
+Usado en: widget/caracteristicas_lugar.dart (personas, camas, banios,
+  habitaciones, vehiculos de parqueo), widget/lugar_card.dart
+  (huespedes), widget/reserva_card.dart (noches), screen/
+  confirmar_reserva_screen.dart (noches, huespedes).
+
+ARRENDATARIO: app-arrendatario/src/app/utils/formato.ts, lineas 35-38:
+  // Antepone la cantidad y elige singular o plural, ej. "1 baño" o "2 baños".
+  export function pluralizar(cantidad: number, singular: string, plural: string): string {
+    return `${cantidad} ${cantidad === 1 ? singular : plural}`;
+  }
+Usado en: pages/mis-lugares/mis-lugares.page.ts (expuesta al template
+  en la linea 72) + mis-lugares.page.html (camas, banios), pages/
+  reservas-lugar/reservas-lugar.page.ts (linea 69) + reservas-lugar.
+  page.html (noches).
+
+PREGUNTA: "¿Por que recibe el singular y el plural como texto en vez
+  de agregar una 's' automaticamente?" -> En español el plural no
+  siempre es "agregar s" (habitación -> habitaciones); es una funcion
+  generica reutilizable para cualquier palabra, no una regla
+  gramatical completa.
+
+------------------------------------------------------------
+6.7 DISEÑOS DE STITCH: QUE SE TOMO Y QUE SE DEJO FUERA
+------------------------------------------------------------
+Stitch es una herramienta de IA que genera pantallas de referencia a
+partir de una descripcion. Se generaron 7 diseños en
+docs/diseño-stitch/*/code.html (+ un DESIGN.md con la paleta de la
+bandera de Santa Cruz), usados SOLO como referencia visual para la
+Fase E2 de la app arrendatario: nunca se copio su HTML ni Tailwind
+literalmente, se tradujo a mano a componentes de Ionic. Reglas
+transversales aplicadas a las 5 pantallas que SI se usaron: diseño
+solo movil (360-412px, una columna), colores unicamente desde
+variables.scss/global.scss, tipografia del sistema, areas tactiles de
+al menos 48px.
+
+| Pantalla Stitch | Aplica a | Se tomo | Se dejo fuera (y por que) |
+|---|---|---|---|
+| iniciar_sesi_n_bnb_anfitriones_m_vil | Login | Tarjeta blanca redondeada con sombra; pastilla "Para anfitriones"; titulo/subtitulo dentro de la tarjeta; campos con relleno arena y etiqueta arriba; icono de sobre en el email; boton de ojo en la contraseña; boton ancho con flecha | "¿Olvidaste tu contraseña?", "Soporte", "Acceso seguro para anfitriones", Terminos/Privacidad, version de escritorio del mismo login - la API no tiene recuperacion de contraseña ni esas pantallas de soporte/legal |
+| registro_de_anfitri_n_bnb | Registro | Mismo patron de tarjeta/campos que el login; icono de telefono y de sobre | Prefijo de pais "+591" (el telefono es un campo de texto simple); encabezado horizontal del diseño (se uso el mismo encabezado vertical del login, por consistencia); candado en nombre/email |
+| mis_lugares_panel_de_anfitri_n | Mis lugares | Tarjeta por lugar con foto de portada 16:9, pastilla dorada de precio superpuesta, fila de caracteristicas (camas, baños, wifi), botones "Editar"/"Ver reservas", boton flotante "Publicar nuevo" | Avatar del usuario, campana de notificaciones, filtros "Todos/Activos/En revision/Borradores", "Ingresos estimados" y "+18%", calificacion/reseñas/"Superhost", contador en "Ver reservas", menu de tres puntos, barra de pestañas inferior - nada de eso existe en la API ni lo pide el enunciado |
+| nuevo_lugar | Formulario de lugar | Secciones con encabezado e icono (Fotos, Informacion, Capacidad, Servicios, Precios, Ubicacion); grilla de 3 columnas de fotos; selector -/+ para las cantidades; footer fijo con "Guardar" | "Modo Edicion" y "85% Listo", contador "N fotos añadidas", subtitulos inventados en wifi/parqueo, candado en ciudad, "Estimacion de ingresos", "Direccion detectada" y etiqueta de barrio sobre el mapa (exigen geocodificacion), X en fotos existentes (la API no permite borrarlas), avatar en el encabezado |
+| reservas_del_lugar | Reservas del lugar | Tarjeta de resumen con nombre del lugar y pastilla de cantidad; tarjeta por reserva con foto, cliente, fechas, chip de noches y total en pastilla dorada | "Propiedad activa", ocupacion, ingresos activos, proyeccion de ingresos, "Cobros garantizados" y conversion a Bs, filtros "Todas/Llegan hoy/Proximas/En curso", estados de la reserva, check-in, "En N dias", deposito, cantidad de personas, "Ver detalle" - datos que la reserva no guarda o calculos que no pide el enunciado |
+| b_squeda_en_mapa_alojamientos_santa_cruz, mapa_de_alojamientos_santa_cruz | (ninguna de la app arrendatario) | - | Son pantallas de la app CLIENTE (Flutter); no aplican al arrendatario. El segundo diseño si se uso como inspiracion visual para la barra flotante del mapa del CLIENTE (ver 6.2, barra_resumen_mapa.dart), ya resuelto en la Fase E1/ajuste posterior |
 
 ============================================================
-7. COMANDOS PARA LEVANTAR CADA APP (por si el docente pide correrla)
+7. COMO SE EJECUTA EL PROYECTO (comandos, por si el docente pide
+correrla; incluye Mockoon y ambas formas de correr el arrendatario)
 ============================================================
 
-APP CLIENTE (Flutter, se prueba en emulador/celular Android):
+MOCK LOCAL (Mockoon, se usa durante TODO el desarrollo, incluida la
+Fase E - la API real se activa recien antes de la defensa):
+  npx @mockoon/cli start --data contexto/mockoon-backend-airbnb.json --port 3001
+  Mismas rutas, formas y casos de error que docs/API.md, con casos
+  simulados por valores magicos (password:"incorrecta",
+  email:"noexiste@example.com", id:99999, ciudad:"sin-resultados").
+
+APP CLIENTE (Flutter, SIEMPRE en emulador/celular Android):
   cd app-cliente
   flutter run -d <id-del-emulador-o-celular>
-  (requiere el emulador Android ya prendido; api_config.dart debe
-  apuntar a una URL que responda - la real o el mock)
+  (requiere el emulador Android ya prendido y Mockoon corriendo;
+  api_config.dart ya apunta a http://10.0.2.2:3001/api)
 
-APP ARRENDATARIO (Ionic, se prueba en el navegador):
+APP ARRENDATARIO - opcion 1, navegador (mas rapido para iterar):
   cd app-arrendatario
   ionic serve
-  (abre http://localhost:8100 automaticamente; environment.ts debe
-  apuntar a una URL que responda; en Chrome, F12 -> Ctrl+Shift+M para
-  vista movil)
+  (abre http://localhost:8100; usa environment.ts, que ya apunta a
+  http://localhost:3001/api; en Chrome, F12 -> Ctrl+Shift+M para vista
+  movil)
 
-MOCK DE RESPALDO (si la API real esta caida, Mockoon):
-  npx @mockoon/cli start --data contexto/mockoon-backend-airbnb.json --port 3001
-  Apuntar api_config.dart a http://10.0.2.2:3001/api (desde el
-  emulador Android) o environment.ts a http://localhost:3001/api
-  (desde el navegador). Revertir a la URL real despues de probar.
+APP ARRENDATARIO - opcion 2, emulador Android con Capacitor (para
+probar como se ve/corre la app nativa, Fase E2):
+  cd app-arrendatario
+  npm run build
+  npx cap sync android
+  npx cap run android
+  (usa environment.prod.ts, que ya apunta a http://10.0.2.2:3001/api;
+  requiere el emulador Android ya prendido)
+
+Antes de la defensa, cuando el docente confirme que la API real
+responde: cambiar las 3 URLs (api_config.dart, environment.ts,
+environment.prod.ts) a la URL real. Con Mockoon NO se puede probar el
+flujo cruzado entre apps (el mock siempre devuelve el mismo lugar fijo
+"Casa Azul", sin importar lo que se cree o edite); recien con la API
+real se puede probar asi, en orden:
+  1. Arrendatario: crear un lugar nuevo con nombre distintivo, foto
+     real y ubicacion en el mapa; guardar.
+  2. Cliente: buscar esa misma ciudad y confirmar que aparece ese
+     lugar nuevo con los datos correctos (foto, nombre, descripcion,
+     huespedes, precio).
+  3. Abrir su detalle y verificar que los 8 datos de RC-12 coinciden
+     con lo que se lleno en el formulario del arrendatario.
+  4. Reservarlo desde el cliente (elegir fechas) y confirmar; revisar
+     "Mis reservas" del cliente.
+  5. Arrendatario: abrir "Ver reservas" de ese mismo lugar y confirmar
+     que la reserva aparece con el cliente, fechas, noches y total
+     correctos (noches x precio + limpieza + 10% de servicio).
+  6. Editar el precio del lugar en el arrendatario y confirmar que el
+     cliente ve el precio actualizado al volver a abrir el detalle.
 
 ============================================================
 FIN DEL DOCUMENTO

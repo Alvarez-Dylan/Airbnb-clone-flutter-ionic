@@ -66,7 +66,7 @@ class MapaLugares extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.18),
+                            color: colorScheme.shadow.withValues(alpha: 0.18),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -93,7 +93,7 @@ class MapaLugares extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.18),
+                            color: colorScheme.shadow.withValues(alpha: 0.18),
                             blurRadius: 3,
                             offset: const Offset(0, 1),
                           ),

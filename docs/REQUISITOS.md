@@ -8,7 +8,7 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 |---|---|---|---|---|
 | RG-01 | Las dos apps están hechas en tecnologías distintas vistas en clase (cliente: Flutter; arrendatario: Ionic + Angular) | 1 | `app-cliente/` (Flutter) y `app-arrendatario/` (Ionic + Angular), creados y compilando | ✔ |
 | RG-02 | Ambas apps exigen iniciar sesión antes de entrar | A1, C1 | Arrendatario: `guards/auth.guard.ts`. Cliente: `main.dart` elige `LoginScreen` si no hay sesión | ✔ |
-| RG-03 | Código propio y explicable: cada fase tiene su entrada en `docs/ESTUDIO.md` | Todas | `docs/ESTUDIO.md` (14 entradas: Fase 1, A1–A6, C1–C7) | ✔ |
+| RG-03 | Código propio y explicable: cada fase tiene su entrada en `docs/ESTUDIO.md` | Todas | `docs/ESTUDIO.md` (19 entradas: Fase 1, A1–A6, C1–C7, E0–E2, ajustes entre E2 y E3, E3) | ✔ |
 
 ## App Cliente (Flutter)
 
@@ -22,11 +22,11 @@ Definición de "terminado". Cada requisito sale del enunciado (PDF) o de sus wir
 | RC-06 | Botón "Ver reservas": lista de reservas hechas anteriormente por el cliente | C6 | `lib/screen/busqueda_screen.dart` (botón) → `lib/screen/mis_reservas_screen.dart` | ✔ |
 | RC-07 | Resultados en lista: primera foto, nombre, descripción, cantidad de personas y precio por noche | C2 | `lib/widget/lugar_card.dart` | ✔ |
 | RC-08 | Debajo de la lista, botón "Vista de mapa": los mismos lugares como marcadores en un mapa | C3 | `lib/widget/mapa_lugares.dart` + `resultados_screen.dart` | ✔ |
-| RC-09 | En el mapa, botón "Vista de lista" para volver a la lista | C3 | `resultados_screen.dart` (`_verMapa` + `bottomNavigationBar`) | ✔ |
+| RC-09 | En el mapa, botón "Vista de lista" para volver a la lista | C3, E1 | `resultados_screen.dart` (`_verMapa` + `FloatingActionButton.extended`) | ✔ |
 | RC-10 | Al seleccionar un lugar (desde lista o mapa) se abre su página de detalle | C3, C4 | `resultados_screen.dart` → `_irADetalle()` + `lib/screen/detalle_lugar_screen.dart` | ✔ |
 | RC-11 | Detalle: primera foto en grande y las demás pequeñas debajo; tocar una pequeña la muestra en grande | C4 | `lib/widget/galeria_fotos.dart` | ✔ |
-| RC-12 | Detalle: nombre, descripción, personas, camas, baños, nombre del anfitrión, precio por noche, habitaciones, si tiene wifi y parqueo para cuántos vehículos | C4 | `lib/screen/detalle_lugar_screen.dart` → `_buildContenido()` | ✔ |
-| RC-13 | Detalle: botón "Reservar" que lleva a confirmar reserva | C4 | `lib/screen/detalle_lugar_screen.dart` (botón "Reservar") | ✔ |
+| RC-12 | Detalle: nombre, descripción, personas, camas, baños, nombre del anfitrión, precio por noche, habitaciones, si tiene wifi y parqueo para cuántos vehículos | C4, E1 | `lib/screen/detalle_lugar_screen.dart` → `_buildContenido()` + `lib/widget/caracteristicas_lugar.dart` | ✔ |
+| RC-13 | Detalle: botón "Reservar" que lleva a confirmar reserva | C4, E1 | `lib/widget/barra_reservar.dart` (botón "Reservar", usado como `bottomNavigationBar` de `detalle_lugar_screen.dart`) | ✔ |
 | RC-14 | Confirmar reserva: precio total por la cantidad de noches, gastos de limpieza, cobro por servicio y el total sumado | C5 | `lib/utils/calculo_reserva.dart` + `lib/screen/confirmar_reserva_screen.dart` | ✔ |
 | RC-15 | Botón "Confirmar reserva" que envía la reserva a la API | C5 | `lib/repository/reserva_provider.dart` → `confirmarReserva()` + `lib/service/reserva_service.dart` | ✔ |
 | RC-16 | (Wireframe) Lista de reservas del cliente con foto, nombre del lugar, noches, fecha de inicio, fecha de fin y precio | C6 | `lib/model/reserva_model.dart` + `lib/widget/reserva_card.dart` | ✔ |

@@ -1,0 +1,86 @@
+[
+  {
+    "nombre": "Departamento colonial cerca de la plaza",
+    "descripcion": "Departamento de dos pisos en una casona colonial a pasos de la plaza 24 de Septiembre. Ideal para recorrer el centro a pie.",
+    "cantPersonas": 4,
+    "cantCamas": 3,
+    "cantBanios": 2,
+    "cantHabitaciones": 2,
+    "tieneWifi": 1,
+    "cantVehiculosParqueo": 1,
+    "precioNoche": 30,
+    "costoLimpieza": 5,
+    "ciudad": "Santa Cruz",
+    "latitud": -17.7829,
+    "longitud": -63.1806,
+    "fotos": [
+      "Departamento colonial cerca de la plaza.jpeg",
+      "Departamento colonial cerca de la plaza-2.jpeg",
+      "Departamento colonial cerca de la plaza-3.jpeg",
+      "Departamento colonial cerca de la plaza-4.jpeg"
+    ]
+  },
+  {
+    "nombre": "Monoambiente moderno en Equipetrol",
+    "descripcion": "Monoambiente con vista a la ciudad en una torre con seguridad, cerca de restaurantes y cafés de Equipetrol.",
+    "cantPersonas": 2,
+    "cantCamas": 1,
+    "cantBanios": 1,
+    "cantHabitaciones": 1,
+    "tieneWifi": 1,
+    "cantVehiculosParqueo": 0,
+    "precioNoche": 35,
+    "costoLimpieza": 5,
+    "ciudad": "Santa Cruz",
+    "latitud": -17.764,
+    "longitud": -63.1965,
+    "fotos": [
+      "Monoambiente moderno en Equipetrol.jpeg",
+      "Monoambiente moderno en Equipetrol-2.jpeg",
+      "Monoambiente moderno en Equipetrol-3.jpeg",
+      "Monoambiente moderno en Equipetrol-4.jpeg"
+    ]
+  },
+  {
+    "nombre": "Casa con piscina en el Urubó",
+    "descripcion": "Casa amplia con piscina y jardín tropical, perfecta para grupos y fines de semana fuera de la ciudad.",
+    "cantPersonas": 8,
+    "cantCamas": 6,
+    "cantBanios": 3,
+    "cantHabitaciones": 4,
+    "tieneWifi": 1,
+    "cantVehiculosParqueo": 3,
+    "precioNoche": 85,
+    "costoLimpieza": 15,
+    "ciudad": "Santa Cruz",
+    "latitud": -17.756,
+    "longitud": -63.245,
+    "fotos": [
+      "Casa con piscina en el Urubó.jpeg",
+      "Casa con piscina en el Urubó-2.jpeg",
+      "Casa con piscina en el Urubó-3.jpeg",
+      "Casa con piscina en el Urubó-4.jpeg"
+    ]
+  },
+  {
+    "nombre": "Casa familiar con jardín",
+    "descripcion": "Casa de dos plantas en un barrio tranquilo, con jardín y garaje. Ideal para familias.",
+    "cantPersonas": 6,
+    "cantCamas": 4,
+    "cantBanios": 2,
+    "cantHabitaciones": 3,
+    "tieneWifi": 1,
+    "cantVehiculosParqueo": 1,
+    "precioNoche": 50,
+    "costoLimpieza": 10,
+    "ciudad": "Santa Cruz",
+    "latitud": -17.751,
+    "longitud": -63.176,
+    "fotos": [
+      "Casa familiar con jardín.jpeg",
+      "Casa familiar con jardín-2.jpeg",
+      "Casa familiar con jardín-3.jpeg",
+      "Casa familiar con jardín-4.jpeg"
+    ]
+  }
+]
