@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../model/lugar_model.dart';
 import '../repository/busqueda_provider.dart';
+import '../utils/conversiones.dart';
+import '../widget/barra_resumen_mapa.dart';
 import '../widget/lugar_card.dart';
 import '../widget/mapa_lugares.dart';
 import '../widget/vista_estado.dart';
@@ -32,12 +34,12 @@ class _ResultadosScreenState extends State<ResultadosScreen> {
     final busquedaProvider = context.watch<BusquedaProvider>();
     final hayResultados = busquedaProvider.resultados.isNotEmpty;
     final cantidad = busquedaProvider.resultados.length;
-    final palabraResultados = cantidad == 1 ? 'resultado' : 'resultados';
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${busquedaProvider.ciudad} · $cantidad $palabraResultados',
+          '${busquedaProvider.ciudad} · ${pluralizar(cantidad, 'resultado', 'resultados')}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -49,7 +51,20 @@ class _ResultadosScreenState extends State<ResultadosScreen> {
         mensajeVacio: 'No se encontraron lugares',
         icono: Icons.search_off,
         child: _verMapa
-            ? MapaLugares(lugares: busquedaProvider.resultados, onTapLugar: _irADetalle)
+            ? Stack(
+                children: [
+                  MapaLugares(lugares: busquedaProvider.resultados, onTapLugar: _irADetalle),
+                  Positioned(
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                    child: SafeArea(
+                      bottom: false,
+                      child: BarraResumenMapa(busquedaProvider: busquedaProvider),
+                    ),
+                  ),
+                ],
+              )
             : ListView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                 itemCount: busquedaProvider.resultados.length,
@@ -66,6 +81,9 @@ class _ResultadosScreenState extends State<ResultadosScreen> {
       floatingActionButton: hayResultados
           ? FloatingActionButton.extended(
               onPressed: () => setState(() => _verMapa = !_verMapa),
+              // En la vista de mapa, pastilla oscura (como en el diseño de referencia).
+              backgroundColor: _verMapa ? colorScheme.onSurface : null,
+              foregroundColor: _verMapa ? colorScheme.surface : null,
               icon: Icon(_verMapa ? Icons.list : Icons.map_outlined),
               label: Text(_verMapa ? 'Vista de lista' : 'Vista de mapa'),
             )

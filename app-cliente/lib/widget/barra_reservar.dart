@@ -24,7 +24,7 @@ class BarraReservar extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${formatearPrecio(precioNoche)} noche',
+                  '${formatearPrecio(precioNoche)} / noche',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(

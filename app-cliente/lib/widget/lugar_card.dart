@@ -55,7 +55,7 @@ class LugarCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '${lugar.cantPersonas} huéspedes',
+                          pluralizar(lugar.cantPersonas, 'huésped', 'huéspedes'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: colorTextoSecundario),

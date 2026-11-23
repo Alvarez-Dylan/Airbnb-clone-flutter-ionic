@@ -57,8 +57,14 @@
             </p>
 
             <div class="caracteristicas-lugar">
-              <span><ion-icon name="bed-outline"></ion-icon> {{ lugar.cantCamas }} camas</span>
-              <span><ion-icon name="water-outline"></ion-icon> {{ lugar.cantBanios }} baños</span>
+              <span
+                ><ion-icon name="bed-outline"></ion-icon>
+                {{ pluralizar(lugar.cantCamas, 'cama', 'camas') }}</span
+              >
+              <span
+                ><ion-icon name="water-outline"></ion-icon>
+                {{ pluralizar(lugar.cantBanios, 'baño', 'baños') }}</span
+              >
               @if (lugar.tieneWifi) {
                 <span><ion-icon name="wifi-outline"></ion-icon> Wifi</span>
               }

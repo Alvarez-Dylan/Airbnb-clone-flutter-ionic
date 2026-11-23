@@ -57,7 +57,7 @@ class ReservaCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${reserva.noches} noches · Anfitrión: ${reserva.nombreAnfitrion}',
+                    '${pluralizar(reserva.noches, 'noche', 'noches')} · Anfitrión: ${reserva.nombreAnfitrion}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: colorTextoSecundario),

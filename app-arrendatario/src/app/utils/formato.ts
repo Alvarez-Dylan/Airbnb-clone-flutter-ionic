@@ -32,6 +32,11 @@ export function formatearFecha(fecha: string): string {
   return `${dia}/${mes}/${anio}`;
 }
 
+// Antepone la cantidad y elige singular o plural, ej. "1 baño" o "2 baños".
+export function pluralizar(cantidad: number, singular: string, plural: string): string {
+  return `${cantidad} ${cantidad === 1 ? singular : plural}`;
+}
+
 export function calcularNoches(fechaInicio: string, fechaFin: string): number {
   const [anioI, mesI, diaI] = fechaInicio.substring(0, 10).split('-').map(Number);
   const [anioF, mesF, diaF] = fechaFin.substring(0, 10).split('-').map(Number);

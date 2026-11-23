@@ -37,3 +37,13 @@ String formatearPrecio(double valor) {
 String formatearFecha(DateTime fecha) {
   return DateFormat('dd/MM/yyyy').format(fecha);
 }
+
+// Version corta (sin anio) para resumenes compactos, como la barra sobre el mapa.
+String formatearFechaCorta(DateTime fecha) {
+  return DateFormat('dd/MM').format(fecha);
+}
+
+// Antepone la cantidad y elige singular o plural, ej. "1 baño" o "2 baños".
+String pluralizar(int cantidad, String singular, String plural) {
+  return '$cantidad ${cantidad == 1 ? singular : plural}';
+}

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../model/lugar_model.dart';
+import '../utils/conversiones.dart';
 
 class CaracteristicasLugar extends StatelessWidget {
   final LugarModel lugar;
@@ -12,7 +13,7 @@ class CaracteristicasLugar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parqueo = lugar.cantVehiculosParqueo > 0
-        ? 'Parqueo para ${lugar.cantVehiculosParqueo} vehículos'
+        ? 'Parqueo para ${pluralizar(lugar.cantVehiculosParqueo, 'vehículo', 'vehículos')}'
         : 'No tiene parqueo';
 
     return Wrap(
@@ -21,19 +22,19 @@ class CaracteristicasLugar extends StatelessWidget {
       children: [
         Chip(
           avatar: const Icon(Icons.people_outline, size: 18),
-          label: Text('${lugar.cantPersonas} personas'),
+          label: Text(pluralizar(lugar.cantPersonas, 'persona', 'personas')),
         ),
         Chip(
           avatar: const Icon(Icons.bed_outlined, size: 18),
-          label: Text('${lugar.cantCamas} camas'),
+          label: Text(pluralizar(lugar.cantCamas, 'cama', 'camas')),
         ),
         Chip(
           avatar: const Icon(Icons.bathtub_outlined, size: 18),
-          label: Text('${lugar.cantBanios} baños'),
+          label: Text(pluralizar(lugar.cantBanios, 'baño', 'baños')),
         ),
         Chip(
           avatar: const Icon(Icons.door_front_door_outlined, size: 18),
-          label: Text('${lugar.cantHabitaciones} habitaciones'),
+          label: Text(pluralizar(lugar.cantHabitaciones, 'habitación', 'habitaciones')),
         ),
         Chip(
           avatar: Icon(lugar.tieneWifi ? Icons.wifi : Icons.wifi_off, size: 18),

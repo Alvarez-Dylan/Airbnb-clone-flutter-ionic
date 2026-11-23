@@ -33,7 +33,7 @@ import {
 import type { Lugar } from '../../models/lugar';
 import { AuthService } from '../../services/auth.service';
 import { LugaresService } from '../../services/lugares.service';
-import { formatearPrecio, urlFoto } from '../../utils/formato';
+import { formatearPrecio, pluralizar, urlFoto } from '../../utils/formato';
 import { mensajeDeError } from '../../utils/manejar-error';
 
 @Component({
@@ -69,6 +69,7 @@ export class MisLugaresPage implements ViewWillEnter {
 
   // Expuestas al template.
   formatearPrecio = formatearPrecio;
+  pluralizar = pluralizar;
   urlFoto = urlFoto;
 
   constructor() {

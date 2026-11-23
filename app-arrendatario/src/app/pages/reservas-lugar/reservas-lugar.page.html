@@ -55,7 +55,9 @@
                     <ion-icon name="calendar-outline"></ion-icon>
                     {{ formatearFecha(reserva.fechaInicio) }} – {{ formatearFecha(reserva.fechaFin) }}
                   </p>
-                  <ion-chip>{{ calcularNoches(reserva.fechaInicio, reserva.fechaFin) }} noches</ion-chip>
+                  <ion-chip>{{
+                    pluralizar(calcularNoches(reserva.fechaInicio, reserva.fechaFin), 'noche', 'noches')
+                  }}</ion-chip>
                 </div>
               </div>
 

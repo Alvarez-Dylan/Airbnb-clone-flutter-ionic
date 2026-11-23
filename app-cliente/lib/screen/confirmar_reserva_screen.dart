@@ -93,7 +93,7 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
               child: Column(
                 children: [
                   _filaPrecio(
-                    '$noches noches x ${formatearPrecio(widget.lugar.precioNoche)}',
+                    '${pluralizar(noches, 'noche', 'noches')} x ${formatearPrecio(widget.lugar.precioNoche)}',
                     formatearPrecio(subtotal),
                   ),
                   _filaPrecio('Limpieza', formatearPrecio(limpieza)),
@@ -157,7 +157,7 @@ class _ConfirmarReservaScreenState extends State<ConfirmarReservaScreen> {
                     style: const TextStyle(color: colorTextoSecundario),
                   ),
                   Text(
-                    '$huespedes huéspedes',
+                    pluralizar(huespedes, 'huésped', 'huéspedes'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: colorTextoSecundario),

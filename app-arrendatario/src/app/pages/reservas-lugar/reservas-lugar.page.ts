@@ -21,7 +21,13 @@ import { imageOutline, businessOutline, personOutline, calendarOutline } from 'i
 
 import type { LugarConReservas } from '../../models/reserva';
 import { ReservasService } from '../../services/reservas.service';
-import { calcularNoches, formatearFecha, formatearPrecio, urlFoto } from '../../utils/formato';
+import {
+  calcularNoches,
+  formatearFecha,
+  formatearPrecio,
+  pluralizar,
+  urlFoto,
+} from '../../utils/formato';
 import { mensajeDeError } from '../../utils/manejar-error';
 
 @Component({
@@ -60,6 +66,7 @@ export class ReservasLugarPage {
   calcularNoches = calcularNoches;
   formatearFecha = formatearFecha;
   formatearPrecio = formatearPrecio;
+  pluralizar = pluralizar;
   urlFoto = urlFoto;
 
   constructor() {
