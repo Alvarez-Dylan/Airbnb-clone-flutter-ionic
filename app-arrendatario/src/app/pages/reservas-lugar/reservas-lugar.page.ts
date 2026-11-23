@@ -9,15 +9,15 @@ import {
   IonContent,
   IonButtons,
   IonBackButton,
-  IonList,
-  IonItem,
-  IonThumbnail,
-  IonLabel,
+  IonCard,
+  IonCardContent,
+  IonChip,
+  IonBadge,
   IonIcon,
   IonSpinner,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { imageOutline } from 'ionicons/icons';
+import { imageOutline, businessOutline, personOutline, calendarOutline } from 'ionicons/icons';
 
 import type { LugarConReservas } from '../../models/reserva';
 import { ReservasService } from '../../services/reservas.service';
@@ -35,10 +35,10 @@ import { mensajeDeError } from '../../utils/manejar-error';
     IonContent,
     IonButtons,
     IonBackButton,
-    IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
+    IonCard,
+    IonCardContent,
+    IonChip,
+    IonBadge,
     IonIcon,
     IonSpinner,
   ],
@@ -53,6 +53,9 @@ export class ReservasLugarPage {
   error = signal('');
   lugar = signal<LugarConReservas | null>(null);
 
+  // La foto de portada es la misma para todas las reservas (la primera del lugar).
+  fotoRota = signal(false);
+
   // Expuestas al template.
   calcularNoches = calcularNoches;
   formatearFecha = formatearFecha;
@@ -60,7 +63,12 @@ export class ReservasLugarPage {
   urlFoto = urlFoto;
 
   constructor() {
-    addIcons({ 'image-outline': imageOutline });
+    addIcons({
+      'image-outline': imageOutline,
+      'business-outline': businessOutline,
+      'person-outline': personOutline,
+      'calendar-outline': calendarOutline,
+    });
     this.cargarReservas();
   }
 
@@ -77,7 +85,12 @@ export class ReservasLugarPage {
     });
   }
 
-  ocultarImagenRota(evento: Event): void {
-    (evento.target as HTMLImageElement).style.display = 'none';
+  resumenReservas(): string {
+    const cantidad = this.lugar()?.reservas.length ?? 0;
+    return cantidad === 1 ? '1 reserva' : `${cantidad} reservas`;
+  }
+
+  marcarFotoRota(): void {
+    this.fotoRota.set(true);
   }
 }

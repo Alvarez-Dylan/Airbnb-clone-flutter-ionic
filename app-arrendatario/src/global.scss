@@ -34,4 +34,145 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* Solo modo claro (CLAUDE.md, fase E): se comenta el modo oscuro automatico. */
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
+
+// Estado vacio (lista sin datos): icono grande + texto, centrados.
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+}
+
+// Foto de portada de una tarjeta (mis-lugares, lugar-form): recorte 16:9 y esquinas redondeadas.
+.foto-portada {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+// Encabezado de marca (login, registro): icono en circulo + "bnb" + pastilla.
+.encabezado-marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+
+  h1 {
+    margin: 8px 0 0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+}
+
+.icono-marca {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 36px;
+    color: var(--ion-color-primary-contrast);
+  }
+}
+
+// Pastilla "Para anfitriones": fondo verde muy claro, texto verde, punto a la izquierda.
+.pastilla-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(var(--ion-color-primary-rgb), 0.12);
+  color: var(--ion-color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+  }
+}
+
+// Tarjeta blanca que envuelve un formulario (login, registro).
+.tarjeta-formulario {
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .subtitulo {
+    margin: 4px 0 20px;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Campo de formulario estilo "arena": mismo fondo que la pantalla y radio 12
+// (login, registro, lugar-form). Un solo lugar para no repetir el estilo en cada pagina.
+.campo-arena {
+  --background: var(--ion-background-color);
+  --border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+// Boton principal con radio 12 (no shape="round"), con icono al final o al inicio.
+.boton-flecha {
+  --border-radius: 12px;
+}
+
+// Icono a la izquierda del titulo de una seccion (ion-list-header del formulario de lugar).
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-icon {
+    color: var(--ion-color-primary);
+    font-size: 18px;
+  }
+}
+
+// Pastilla de conteo (ej. "N reservas"): fondo verde muy claro, texto verde, sin punto ni mayusculas.
+.pastilla-conteo {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(var(--ion-color-primary-rgb), 0.12);
+  color: var(--ion-color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+// Texto bajo el formulario con un enlace en verde (login <-> registro).
+.texto-enlace {
+  text-align: center;
+  color: var(--ion-color-medium);
+  margin-top: 16px;
+
+  a {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+}

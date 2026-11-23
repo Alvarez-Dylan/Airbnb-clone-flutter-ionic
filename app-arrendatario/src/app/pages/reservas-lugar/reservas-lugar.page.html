@@ -14,31 +14,59 @@
     </div>
   } @else if (error()) {
     <p class="ion-padding">{{ error() }}</p>
-  } @else if (lugar()!.reservas.length === 0) {
-    <p class="ion-padding">Este lugar aún no tiene reservas</p>
   } @else {
-    <ion-list>
-      @for (reserva of lugar()!.reservas; track reserva.id) {
-        <ion-item>
-          <ion-thumbnail slot="start">
-            @if (lugar()!.fotos.length > 0) {
-              <img
-                [src]="urlFoto(lugar()!.fotos[0].url)"
-                alt="Foto del lugar"
-                (error)="ocultarImagenRota($event)"
-              />
-            } @else {
-              <ion-icon name="image-outline" size="large"></ion-icon>
-            }
-          </ion-thumbnail>
-          <ion-label>
-            <h2>{{ reserva.cliente.nombrecompleto }}</h2>
-            <p>{{ calcularNoches(reserva.fechaInicio, reserva.fechaFin) }} noches</p>
-            <p>{{ formatearFecha(reserva.fechaInicio) }} - {{ formatearFecha(reserva.fechaFin) }}</p>
-            <p>{{ formatearPrecio(reserva.precioTotal) }}</p>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
+    <ion-card class="tarjeta-resumen">
+      <ion-card-content class="contenido-resumen">
+        <ion-icon name="business-outline"></ion-icon>
+        <span class="nombre-resumen">{{ lugar()!.nombre }}</span>
+        <span class="pastilla-conteo">{{ resumenReservas() }}</span>
+      </ion-card-content>
+    </ion-card>
+
+    @if (lugar()!.reservas.length === 0) {
+      <div class="estado-vacio">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>Este lugar aún no tiene reservas</p>
+      </div>
+    } @else {
+      <div class="lista-reservas">
+        @for (reserva of lugar()!.reservas; track reserva.id) {
+          <ion-card class="tarjeta-reserva">
+            <ion-card-content>
+              <div class="fila-reserva">
+                <div class="foto-reserva">
+                  @if (lugar()!.fotos.length > 0 && !fotoRota()) {
+                    <img
+                      [src]="urlFoto(lugar()!.fotos[0].url)"
+                      alt="Foto del lugar"
+                      (error)="marcarFotoRota()"
+                    />
+                  } @else {
+                    <ion-icon name="image-outline"></ion-icon>
+                  }
+                </div>
+
+                <div class="datos-reserva">
+                  <p class="cliente-reserva">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <strong>{{ reserva.cliente.nombrecompleto }}</strong>
+                  </p>
+                  <p class="fechas-reserva">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    {{ formatearFecha(reserva.fechaInicio) }} – {{ formatearFecha(reserva.fechaFin) }}
+                  </p>
+                  <ion-chip>{{ calcularNoches(reserva.fechaInicio, reserva.fechaFin) }} noches</ion-chip>
+                </div>
+              </div>
+
+              <div class="total-reserva">
+                <span>Total</span>
+                <ion-badge color="secondary">{{ formatearPrecio(reserva.precioTotal) }}</ion-badge>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+    }
   }
 </ion-content>

@@ -8,12 +8,16 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonItem,
-  IonLabel,
+  IonCard,
+  IonCardContent,
   IonInput,
+  IonInputPasswordToggle,
   IonButton,
+  IonIcon,
   ToastController,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { homeOutline, mailOutline, callOutline, arrowForward } from 'ionicons/icons';
 
 import { AuthService } from '../../services/auth.service';
 import { mensajeDeError } from '../../utils/manejar-error';
@@ -29,10 +33,12 @@ import { mensajeDeError } from '../../utils/manejar-error';
     IonToolbar,
     IonTitle,
     IonContent,
-    IonItem,
-    IonLabel,
+    IonCard,
+    IonCardContent,
     IonInput,
+    IonInputPasswordToggle,
     IonButton,
+    IonIcon,
   ],
 })
 export class RegistroPage {
@@ -45,6 +51,15 @@ export class RegistroPage {
   password = '';
   telefono = '';
   enviando = signal(false);
+
+  constructor() {
+    addIcons({
+      'home-outline': homeOutline,
+      'mail-outline': mailOutline,
+      'call-outline': callOutline,
+      'arrow-forward': arrowForward,
+    });
+  }
 
   registrar(): void {
     this.enviando.set(true);

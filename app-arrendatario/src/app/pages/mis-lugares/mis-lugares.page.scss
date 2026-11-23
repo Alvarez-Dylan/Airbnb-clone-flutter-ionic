@@ -1,0 +1,81 @@
+// Titulo del encabezado con el subtitulo gris debajo (cantidad de lugares).
+.titulo-mis-lugares {
+  display: flex;
+  flex-direction: column;
+
+  p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Espacio al final para que el boton flotante no tape la ultima tarjeta.
+.lista-lugares {
+  padding: 16px;
+  padding-bottom: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.portada-lugar {
+  position: relative;
+}
+
+.placeholder-foto {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-light);
+
+  ion-icon {
+    font-size: 48px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.precio-portada {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-weight: 700;
+}
+
+.ubicacion-lugar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ion-color-medium);
+  margin: 4px 0 12px;
+}
+
+.caracteristicas-lugar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ion-color-light-shade);
+  color: var(--ion-color-medium);
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.acciones-lugar {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+  }
+}

@@ -5,24 +5,56 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Email</ion-label>
-    <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
-  </ion-item>
+  <div class="encabezado-marca">
+    <div class="icono-marca">
+      <ion-icon name="home-outline"></ion-icon>
+    </div>
+    <h1>bnb</h1>
+    <span class="pastilla-marca">Para anfitriones</span>
+  </div>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
-  </ion-item>
+  <ion-card class="tarjeta-formulario">
+    <ion-card-content>
+      <h2>Bienvenido de vuelta</h2>
+      <p class="subtitulo">Gestiona tus espacios y reservas en Santa Cruz</p>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    [disabled]="enviando()"
-    (click)="iniciarSesion()"
-  >
-    Iniciar sesión
-  </ion-button>
+      <ion-input
+        class="campo-arena"
+        label="Correo electrónico"
+        labelPlacement="stacked"
+        fill="solid"
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+      >
+        <ion-icon slot="end" name="mail-outline"></ion-icon>
+      </ion-input>
 
-  <ion-button expand="block" fill="clear" routerLink="/registro">Registrarse</ion-button>
+      <ion-input
+        class="campo-arena"
+        label="Contraseña"
+        labelPlacement="stacked"
+        fill="solid"
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+      >
+        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+      </ion-input>
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top boton-flecha"
+        [disabled]="enviando()"
+        (click)="iniciarSesion()"
+      >
+        Iniciar sesión
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+
+      <p class="texto-enlace">
+        ¿Aún no publicas tu espacio? <a routerLink="/registro">Registrarse</a>
+      </p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

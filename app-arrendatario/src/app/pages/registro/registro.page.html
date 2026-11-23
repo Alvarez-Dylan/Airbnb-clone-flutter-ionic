@@ -5,34 +5,75 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="floating">Nombre completo</ion-label>
-    <ion-input [(ngModel)]="nombrecompleto" name="nombrecompleto"></ion-input>
-  </ion-item>
+  <div class="encabezado-marca">
+    <div class="icono-marca">
+      <ion-icon name="home-outline"></ion-icon>
+    </div>
+    <h1>bnb</h1>
+    <span class="pastilla-marca">Para anfitriones</span>
+  </div>
 
-  <ion-item>
-    <ion-label position="floating">Email</ion-label>
-    <ion-input type="email" [(ngModel)]="email" name="email"></ion-input>
-  </ion-item>
+  <ion-card class="tarjeta-formulario">
+    <ion-card-content>
+      <h2>Crea tu cuenta de anfitrión</h2>
+      <p class="subtitulo">Empieza a rentar tus propiedades en Santa Cruz</p>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
-  </ion-item>
+      <ion-input
+        class="campo-arena"
+        label="Nombre completo"
+        labelPlacement="stacked"
+        fill="solid"
+        [(ngModel)]="nombrecompleto"
+        name="nombrecompleto"
+      ></ion-input>
 
-  <ion-item>
-    <ion-label position="floating">Teléfono</ion-label>
-    <ion-input type="tel" [(ngModel)]="telefono" name="telefono"></ion-input>
-  </ion-item>
+      <ion-input
+        class="campo-arena"
+        label="Correo electrónico"
+        labelPlacement="stacked"
+        fill="solid"
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+      >
+        <ion-icon slot="end" name="mail-outline"></ion-icon>
+      </ion-input>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    [disabled]="enviando()"
-    (click)="registrar()"
-  >
-    Registrarse
-  </ion-button>
+      <ion-input
+        class="campo-arena"
+        label="Teléfono"
+        labelPlacement="stacked"
+        fill="solid"
+        type="tel"
+        [(ngModel)]="telefono"
+        name="telefono"
+      >
+        <ion-icon slot="end" name="call-outline"></ion-icon>
+      </ion-input>
 
-  <ion-button expand="block" fill="clear" routerLink="/login">Iniciar sesión</ion-button>
+      <ion-input
+        class="campo-arena"
+        label="Contraseña"
+        labelPlacement="stacked"
+        fill="solid"
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+      >
+        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+      </ion-input>
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top boton-flecha"
+        [disabled]="enviando()"
+        (click)="registrar()"
+      >
+        Registrarse
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+
+      <p class="texto-enlace">¿Ya tienes cuenta? <a routerLink="/login">Iniciar sesión</a></p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

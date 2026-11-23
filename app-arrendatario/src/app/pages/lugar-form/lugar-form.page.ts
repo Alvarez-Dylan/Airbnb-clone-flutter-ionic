@@ -9,22 +9,45 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
+  IonFooter,
   IonButtons,
   IonBackButton,
+  IonList,
+  IonListHeader,
   IonItem,
-  IonLabel,
   IonInput,
+  IonTextarea,
   IonToggle,
+  IonGrid,
+  IonRow,
+  IonCol,
   IonButton,
   IonIcon,
   IonSpinner,
   ToastController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, closeCircle } from 'ionicons/icons';
+import {
+  add,
+  closeCircle,
+  imagesOutline,
+  informationCircleOutline,
+  peopleOutline,
+  bedOutline,
+  waterOutline,
+  squareOutline,
+  sparklesOutline,
+  wifiOutline,
+  carOutline,
+  cashOutline,
+  locationOutline,
+  calendarOutline,
+  saveOutline,
+} from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
 
 import { MapaSelectorComponent } from '../../components/mapa-selector/mapa-selector.component';
+import { SelectorCantidadComponent } from '../../components/selector-cantidad/selector-cantidad.component';
 import type { Foto } from '../../models/lugar';
 import { AuthService } from '../../services/auth.service';
 import { LugaresService } from '../../services/lugares.service';
@@ -51,14 +74,16 @@ interface FotoNueva {
   previewUrl: string;
 }
 
+type CampoCantidad = 'cantPersonas' | 'cantCamas' | 'cantBanios' | 'cantHabitaciones';
+
 function formularioVacio(): FormularioLugar {
   return {
     nombre: '',
     descripcion: '',
-    cantPersonas: '',
-    cantCamas: '',
-    cantBanios: '',
-    cantHabitaciones: '',
+    cantPersonas: '1',
+    cantCamas: '1',
+    cantBanios: '1',
+    cantHabitaciones: '1',
     tieneWifi: false,
     tieneParqueo: false,
     cantVehiculosParqueo: '',
@@ -78,16 +103,23 @@ function formularioVacio(): FormularioLugar {
     IonToolbar,
     IonTitle,
     IonContent,
+    IonFooter,
     IonButtons,
     IonBackButton,
+    IonList,
+    IonListHeader,
     IonItem,
-    IonLabel,
     IonInput,
+    IonTextarea,
     IonToggle,
+    IonGrid,
+    IonRow,
+    IonCol,
     IonButton,
     IonIcon,
     IonSpinner,
     MapaSelectorComponent,
+    SelectorCantidadComponent,
   ],
 })
 export class LugarFormPage {
@@ -113,7 +145,23 @@ export class LugarFormPage {
   urlFoto = urlFoto;
 
   constructor() {
-    addIcons({ add, 'close-circle': closeCircle });
+    addIcons({
+      add,
+      'close-circle': closeCircle,
+      'images-outline': imagesOutline,
+      'information-circle-outline': informationCircleOutline,
+      'people-outline': peopleOutline,
+      'bed-outline': bedOutline,
+      'water-outline': waterOutline,
+      'square-outline': squareOutline,
+      'sparkles-outline': sparklesOutline,
+      'wifi-outline': wifiOutline,
+      'car-outline': carOutline,
+      'cash-outline': cashOutline,
+      'location-outline': locationOutline,
+      'calendar-outline': calendarOutline,
+      'save-outline': saveOutline,
+    });
     if (this.modoEditar) {
       this.cargarLugar();
     }
@@ -167,6 +215,17 @@ export class LugarFormPage {
 
   quitarFoto(indice: number): void {
     this.fotosNuevas.splice(indice, 1);
+  }
+
+  // Unico lugar donde se convierte entre el texto del formulario y el numero
+  // que necesita selector-cantidad: nunca deja pasar un NaN ni un valor bajo 1.
+  obtenerCantidad(campo: CampoCantidad): number {
+    const numero = Number(this.formulario[campo]);
+    return Number.isNaN(numero) || numero < 1 ? 1 : numero;
+  }
+
+  actualizarCantidad(campo: CampoCantidad, valor: number): void {
+    this.formulario[campo] = String(valor);
   }
 
   irAReservas(): void {

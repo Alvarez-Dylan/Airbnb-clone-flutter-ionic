@@ -1,0 +1,98 @@
+.tarjeta-resumen {
+  margin: 16px 16px 0;
+}
+
+.contenido-resumen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-icon {
+    font-size: 24px;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
+  }
+}
+
+.nombre-resumen {
+  flex: 1;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lista-reservas {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fila-reserva {
+  display: flex;
+  gap: 12px;
+}
+
+.foto-reserva {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-light);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  ion-icon {
+    font-size: 28px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.datos-reserva {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cliente-reserva,
+.fechas-reserva {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.fechas-reserva {
+  color: var(--ion-color-medium);
+  font-size: 14px;
+}
+
+ion-chip {
+  align-self: flex-start;
+}
+
+.total-reserva {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ion-color-light-shade);
+  color: var(--ion-color-medium);
+
+  ion-badge {
+    font-size: 14px;
+    font-weight: 700;
+  }
+}

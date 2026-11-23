@@ -9,18 +9,26 @@ import {
   IonContent,
   IonButtons,
   IonButton,
-  IonList,
-  IonItem,
-  IonThumbnail,
-  IonLabel,
+  IonCard,
+  IonCardContent,
+  IonBadge,
   IonIcon,
   IonSpinner,
   IonFab,
-  IonFabButton,
   type ViewWillEnter,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, imageOutline } from 'ionicons/icons';
+import {
+  add,
+  imageOutline,
+  logOutOutline,
+  locationOutline,
+  bedOutline,
+  waterOutline,
+  wifiOutline,
+  calendarOutline,
+  homeOutline,
+} from 'ionicons/icons';
 
 import type { Lugar } from '../../models/lugar';
 import { AuthService } from '../../services/auth.service';
@@ -39,14 +47,12 @@ import { mensajeDeError } from '../../utils/manejar-error';
     IonContent,
     IonButtons,
     IonButton,
-    IonList,
-    IonItem,
-    IonThumbnail,
-    IonLabel,
+    IonCard,
+    IonCardContent,
+    IonBadge,
     IonIcon,
     IonSpinner,
     IonFab,
-    IonFabButton,
   ],
 })
 export class MisLugaresPage implements ViewWillEnter {
@@ -58,12 +64,25 @@ export class MisLugaresPage implements ViewWillEnter {
   cargando = signal(false);
   error = signal('');
 
+  // Ids de lugares cuya foto de portada fallo al cargar (se muestra el placeholder).
+  fotosRotas = new Set<number>();
+
   // Expuestas al template.
   formatearPrecio = formatearPrecio;
   urlFoto = urlFoto;
 
   constructor() {
-    addIcons({ add, 'image-outline': imageOutline });
+    addIcons({
+      add,
+      'image-outline': imageOutline,
+      'log-out-outline': logOutOutline,
+      'location-outline': locationOutline,
+      'bed-outline': bedOutline,
+      'water-outline': waterOutline,
+      'wifi-outline': wifiOutline,
+      'calendar-outline': calendarOutline,
+      'home-outline': homeOutline,
+    });
   }
 
   // Se carga aca y no en ngOnInit: Ionic mantiene viva la pagina al navegar
@@ -100,8 +119,17 @@ export class MisLugaresPage implements ViewWillEnter {
     this.router.navigate(['lugar', id]);
   }
 
-  ocultarImagenRota(evento: Event): void {
-    (evento.target as HTMLImageElement).style.display = 'none';
+  irAReservas(id: number): void {
+    this.router.navigate(['lugar', id, 'reservas']);
+  }
+
+  resumenLugares(): string {
+    const cantidad = this.lugares().length;
+    return cantidad === 1 ? '1 lugar publicado' : `${cantidad} lugares publicados`;
+  }
+
+  marcarFotoRota(id: number): void {
+    this.fotosRotas.add(id);
   }
 
   cerrarSesion(): void {

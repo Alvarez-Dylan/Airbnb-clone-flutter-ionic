@@ -1,8 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Mis lugares</ion-title>
+    <ion-title>
+      <div class="titulo-mis-lugares">
+        <span>Mis lugares</span>
+        <p>{{ resumenLugares() }}</p>
+      </div>
+    </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrarSesion()">Cerrar sesión</ion-button>
+      <ion-button (click)="cerrarSesion()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -15,35 +22,75 @@
   } @else if (error()) {
     <p class="ion-padding">{{ error() }}</p>
   } @else if (lugares().length === 0) {
-    <p class="ion-padding">Todavía no tienes lugares publicados.</p>
+    <div class="estado-vacio">
+      <ion-icon name="home-outline"></ion-icon>
+      <p>Todavía no tienes lugares publicados</p>
+      <ion-button (click)="irANuevoLugar()">Publicar mi primer lugar</ion-button>
+    </div>
   } @else {
-    <ion-list>
+    <div class="lista-lugares">
       @for (lugar of lugares(); track lugar.id) {
-        <ion-item button (click)="irAEditarLugar(lugar.id)">
-          <ion-thumbnail slot="start">
-            @if (lugar.fotos.length > 0) {
+        <ion-card button (click)="irAEditarLugar(lugar.id)">
+          <div class="portada-lugar">
+            @if (lugar.fotos.length > 0 && !fotosRotas.has(lugar.id)) {
               <img
+                class="foto-portada"
                 [src]="urlFoto(lugar.fotos[0].url)"
                 [alt]="lugar.nombre"
-                (error)="ocultarImagenRota($event)"
+                (error)="marcarFotoRota(lugar.id)"
               />
             } @else {
-              <ion-icon name="image-outline" size="large"></ion-icon>
+              <div class="foto-portada placeholder-foto">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
             }
-          </ion-thumbnail>
-          <ion-label>
+            <ion-badge color="secondary" class="precio-portada">
+              {{ formatearPrecio(lugar.precioNoche) }} / noche
+            </ion-badge>
+          </div>
+
+          <ion-card-content>
             <h2>{{ lugar.nombre }}</h2>
-            <p>{{ lugar.ciudad }}</p>
-            <p>{{ formatearPrecio(lugar.precioNoche) }} / noche</p>
-          </ion-label>
-        </ion-item>
+            <p class="ubicacion-lugar">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ lugar.ciudad }}
+            </p>
+
+            <div class="caracteristicas-lugar">
+              <span><ion-icon name="bed-outline"></ion-icon> {{ lugar.cantCamas }} camas</span>
+              <span><ion-icon name="water-outline"></ion-icon> {{ lugar.cantBanios }} baños</span>
+              @if (lugar.tieneWifi) {
+                <span><ion-icon name="wifi-outline"></ion-icon> Wifi</span>
+              }
+            </div>
+
+            <div class="acciones-lugar">
+              <ion-button
+                fill="outline"
+                size="small"
+                (click)="$event.stopPropagation(); irAEditarLugar(lugar.id)"
+              >
+                Editar
+              </ion-button>
+              <ion-button
+                fill="solid"
+                size="small"
+                (click)="$event.stopPropagation(); irAReservas(lugar.id)"
+              >
+                <ion-icon slot="start" name="calendar-outline"></ion-icon>
+                Ver reservas
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
       }
-    </ion-list>
+    </div>
   }
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="irANuevoLugar()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
+    <ion-button shape="round" (click)="irANuevoLugar()">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Publicar nuevo
+    </ion-button>
   </ion-fab>
 </ion-content>

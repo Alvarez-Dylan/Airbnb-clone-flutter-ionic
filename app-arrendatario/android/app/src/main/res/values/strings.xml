@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">bnb Anfitriones</string>
+    <string name="title_activity_main">bnb Anfitriones</string>
+    <string name="package_name">bo.edu.nur.bnb_arrendatario</string>
+    <string name="custom_url_scheme">bo.edu.nur.bnb_arrendatario</string>
+</resources>

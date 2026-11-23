@@ -63,7 +63,19 @@ export class MapaSelectorComponent implements AfterViewInit, OnDestroy {
     }
     // circleMarker en vez de marker: el icono por defecto de Leaflet sale roto
     // con el empaquetador de Angular, asi se evita configurar assets.
-    this.marcador = L.circleMarker([lat, lng], { radius: 8 }).addTo(this.mapa);
+    // Leaflet necesita el color como texto (no puede leer variables CSS el solo),
+    // asi que se lee del tema con getComputedStyle en vez de escribirlo a mano:
+    // asi el marcador usa siempre el mismo verde que el resto de la app.
+    const estilos = getComputedStyle(document.documentElement);
+    const colorMarca = estilos.getPropertyValue('--ion-color-primary').trim();
+    const colorContraste = estilos.getPropertyValue('--ion-color-primary-contrast').trim();
+    this.marcador = L.circleMarker([lat, lng], {
+      radius: 8,
+      fillColor: colorMarca,
+      fillOpacity: 0.9,
+      color: colorContraste,
+      weight: 3,
+    }).addTo(this.mapa);
   }
 
   ngOnDestroy(): void {

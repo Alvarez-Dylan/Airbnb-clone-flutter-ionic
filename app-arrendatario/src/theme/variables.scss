@@ -1,2 +1,38 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Identidad visual de la app (verde + dorado, bandera de Santa Cruz).
+// Unico lugar con colores: las paginas usan color="primary"/"secondary", nunca un color escrito a mano.
+:root {
+  /** primary: color de marca **/
+  --ion-color-primary: #0b6e4f;
+  --ion-color-primary-rgb: 11, 110, 79;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0a6146;
+  --ion-color-primary-tint: #237d61;
+
+  /** secondary: dorado, solo para destacar precios (ion-badge color="secondary") **/
+  --ion-color-secondary: #e9a23b;
+  --ion-color-secondary-rgb: 233, 162, 59;
+  --ion-color-secondary-contrast: #1d2622;
+  --ion-color-secondary-contrast-rgb: 29, 38, 34;
+  --ion-color-secondary-shade: #cd8f34;
+  --ion-color-secondary-tint: #ebab4f;
+
+  --ion-background-color: #f6f2ea;
+  --ion-text-color: #1d2622;
+
+  /** medium: texto secundario (subtitulos, notas) **/
+  --ion-color-medium: #66706b;
+  --ion-color-medium-rgb: 102, 112, 107;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5a635e;
+  --ion-color-medium-tint: #757e7a;
+
+  /** superficies: tarjetas e items en blanco **/
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+
+  /** encabezado del mismo color que el fondo, como en los disenos **/
+  --ion-toolbar-background: #f6f2ea;
+  --ion-toolbar-color: #1d2622;
+}

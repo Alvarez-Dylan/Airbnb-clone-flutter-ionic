@@ -8,12 +8,16 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonItem,
-  IonLabel,
+  IonCard,
+  IonCardContent,
   IonInput,
+  IonInputPasswordToggle,
   IonButton,
+  IonIcon,
   ToastController,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { homeOutline, mailOutline, arrowForward } from 'ionicons/icons';
 
 import { AuthService } from '../../services/auth.service';
 import { mensajeDeError } from '../../utils/manejar-error';
@@ -29,10 +33,12 @@ import { mensajeDeError } from '../../utils/manejar-error';
     IonToolbar,
     IonTitle,
     IonContent,
-    IonItem,
-    IonLabel,
+    IonCard,
+    IonCardContent,
     IonInput,
+    IonInputPasswordToggle,
     IonButton,
+    IonIcon,
   ],
 })
 export class LoginPage {
@@ -43,6 +49,10 @@ export class LoginPage {
   email = '';
   password = '';
   enviando = signal(false);
+
+  constructor() {
+    addIcons({ 'home-outline': homeOutline, 'mail-outline': mailOutline, 'arrow-forward': arrowForward });
+  }
 
   iniciarSesion(): void {
     this.enviando.set(true);

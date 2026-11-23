@@ -1,0 +1,24 @@
+<div class="selector-cantidad">
+  <div class="etiqueta-selector">
+    <ion-icon [name]="icono()"></ion-icon>
+    <span>{{ etiqueta() }}</span>
+  </div>
+
+  <div class="controles-selector">
+    <ion-button
+      fill="outline"
+      shape="round"
+      size="small"
+      [disabled]="valor() <= minimo()"
+      (click)="restar()"
+    >
+      <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+    </ion-button>
+
+    <span class="valor-selector">{{ valor() }}</span>
+
+    <ion-button fill="solid" shape="round" size="small" (click)="sumar()">
+      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+    </ion-button>
+  </div>
+</div>
