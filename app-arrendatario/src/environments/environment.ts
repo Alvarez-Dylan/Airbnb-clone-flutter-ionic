@@ -2,10 +2,11 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-// Se usa con `ionic serve` (navegador): ahi la app corre en localhost de verdad.
+// Se usa con `ionic serve` (navegador). API real: el tunel del docente ya
+// esta arriba (confirmado 2026-11-25), asi que apunta directo a ella.
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3001/api',
+  apiUrl: 'https://api.airbnbmob2.online/api',
 };
 
 /*
