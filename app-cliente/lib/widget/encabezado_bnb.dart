@@ -1,5 +1,5 @@
-// Encabezado con el icono de la marca y el nombre "bnb", reutilizado en login
-// y registro con un subtitulo distinto segun la pantalla.
+// Encabezado con el icono de la marca y el nombre "Quedate", reutilizado en
+// login y registro con un subtitulo distinto segun la pantalla.
 import 'package:flutter/material.dart';
 
 import '../config/tema.dart';
@@ -28,7 +28,7 @@ class EncabezadoBnb extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'bnb',
+          'Quedate',
           style: Theme.of(
             context,
           ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),

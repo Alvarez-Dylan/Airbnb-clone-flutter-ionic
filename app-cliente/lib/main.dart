@@ -35,7 +35,7 @@ class BnbClienteApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReservaProvider()),
       ],
       child: MaterialApp(
-        title: 'BNB Cliente',
+        title: 'Quedate Cliente',
         theme: crearTema(),
         // Selectores de fecha y demas textos de Material en espanol.
         localizationsDelegates: const [
